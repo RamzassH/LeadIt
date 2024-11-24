@@ -12,7 +12,6 @@ backend/pkg/
 backend/*.exe
 backend/*.out
 backend/*.test
-backend/go.sum
 backend/.idea/
 
 # Node.js (frontend)
