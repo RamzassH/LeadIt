@@ -1,0 +1,55 @@
+# Общие исключения
+*.log
+*.env
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Golang (backend)
+backend/bin/
+backend/pkg/
+backend/*.exe
+backend/*.out
+backend/*.test
+backend/go.sum
+backend/.idea/
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/.idea/
+frontend/.cache/
+frontend/out/
+frontend/yarn-error.log*
+frontend/npm-debug.log*
+frontend/tsconfig.tsbuildinfo
+
+# Docker
+docker-compose.override.yml
+**/Dockerfile~
+*.dockerignore
+
+# Переменные окружения
+*.env
+*.env.local
+*.env.*.local
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+
+# Сборка и кэш
+build/
+dist/
+.cache/
+*.tsbuildinfo
+
+# Логи и временные файлы
+logs/
+*.log
+*.gz
+*.sql
+*.sqlite
+*.db
