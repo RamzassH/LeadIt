@@ -1,22 +1,15 @@
 FROM node:20-alpine
 
-RUN corepack enable
-
-RUN corepack prepare yarn@4.5.2 --activate
-
 WORKDIR /app
 
-COPY .yarnrc.yml ./
-COPY package.json yarn.lock ./
+COPY package.json ./
 
-RUN yarn config set npmRegistryServer https://registry.yarnpkg.com
-
-RUN yarn install --immutable
+RUN npm install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
