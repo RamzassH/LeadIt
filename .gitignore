@@ -26,8 +26,6 @@ frontend/tsconfig.tsbuildinfo
 
 # Docker
 docker-compose.override.yml
-**/Dockerfile~
-*.dockerignore
 
 # Переменные окружения
 *.env
