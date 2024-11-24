@@ -11,7 +11,7 @@ COPY package.json yarn.lock ./
 
 RUN yarn config set npmRegistryServer https://registry.yarnpkg.com
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 
 COPY . .
 
