@@ -1,0 +1,6 @@
+env: "local"
+storage_path: "./storage/auth.db"
+token_ttl: 1h
+grpc:
+  port: 57442
+  timout: 10h

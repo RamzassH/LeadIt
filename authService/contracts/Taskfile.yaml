@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  generate:
+    aliases:
+      - gen
+    desc: 'Generate code from proto files'
+    cmds:
+      - protoc -I Z:\LeadIt\authService\contracts\proto Z:\LeadIt\authService\contracts\proto\auth\auth.proto --go_out=Z:\LeadIt\authService\contracts\gen\go --go_opt=paths=source_relative --go-grpc_out=Z:\LeadIt\authService\contracts\gen\go --go-grpc_opt=paths=source_relative

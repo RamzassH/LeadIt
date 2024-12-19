@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "leatIt.auth.v1;authv1";
+
+service Auth {
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
+  rpc ValidateSession (ValidateSessionRequest) returns (ValidateSessionResponse);
+  rpc AssignRole (AssignRoleRequest) returns (AssignRoleResponse);
+  rpc RemoveRole (RemoveRoleRequest) returns (RemoveRoleResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+message RegisterRequest {
+  oneof identifier {
+    string email = 1;
+    string phone_number = 2;
+  }
+  string password = 3;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+}
+
+message LoginRequest {
+  oneof identifier {
+    string email = 1;
+    string phone_number = 2;
+  }
+  string password = 3;
+  int32 app_id = 4;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message IsAdminRequest {
+  int64 user_id = 1;
+}
+
+message IsAdminResponse {
+  bool is_admin = 1;
+}
+
+message UpdateUserRequest {
+  int64 user_id = 1;
+  string new_email = 2;
+  string new_phone_number = 3;
+  string new_password = 4;
+}
+
+message UpdateUserResponse {
+  bool success = 1;
+}
+
+message ResetPasswordRequest {
+  oneof identifier {
+    string email = 1;
+    string phone_number = 2;
+  }
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+}
+
+message ValidateSessionRequest {
+  string token = 1;
+}
+
+message ValidateSessionResponse {
+  bool is_valid = 1;
+}
+
+message AssignRoleRequest {
+  int64 user_id = 1;
+  string role = 2;
+}
+
+message AssignRoleResponse {
+  bool success = 1;
+}
+
+message RemoveRoleRequest {
+  int64 user_id = 1;
+  string role = 2;
+}
+
+message RemoveRoleResponse {
+  bool success = 1;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string new_token = 1;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+}
