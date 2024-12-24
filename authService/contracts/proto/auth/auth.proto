@@ -10,20 +10,18 @@ service Auth {
   rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
   rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
   rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc Logout (LogoutRequest) returns (LogoutResponse);
-  rpc ValidateSession (ValidateSessionRequest) returns (ValidateSessionResponse);
   rpc AssignRole (AssignRoleRequest) returns (AssignRoleResponse);
   rpc RemoveRole (RemoveRoleRequest) returns (RemoveRoleResponse);
-  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
 }
 
 message RegisterRequest {
-  oneof identifier {
-    string email = 1;
-    string phone_number = 2;
-  }
-  string password = 3;
+  string name = 1;
+  string surname = 2;
+  string email = 3;
+  string password = 4;
 }
 
 message RegisterResponse {
@@ -31,16 +29,14 @@ message RegisterResponse {
 }
 
 message LoginRequest {
-  oneof identifier {
-    string email = 1;
-    string phone_number = 2;
-  }
-  string password = 3;
-  int32 app_id = 4;
+  string email = 1;
+  string password = 2;
+  int64 app_id = 3;
 }
 
 message LoginResponse {
   string token = 1;
+  string refreshToken = 2;
 }
 
 message IsAdminRequest {
@@ -74,20 +70,10 @@ message ResetPasswordResponse {
 }
 
 message LogoutRequest {
-  string token = 1;
+  string refresh_token = 1;
 }
 
-message LogoutResponse {
-  bool success = 1;
-}
-
-message ValidateSessionRequest {
-  string token = 1;
-}
-
-message ValidateSessionResponse {
-  bool is_valid = 1;
-}
+message LogoutResponse {}
 
 message AssignRoleRequest {
   int64 user_id = 1;
@@ -112,8 +98,10 @@ message RefreshTokenRequest {
 }
 
 message RefreshTokenResponse {
-  string new_token = 1;
+  string token = 1;
+  string refresh_token = 2;
 }
+
 
 message ValidateTokenRequest {
   string token = 1;
