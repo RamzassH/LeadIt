@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  db:
+  authdb:
     image: postgres:14
     restart: always
     environment:
@@ -11,24 +9,25 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5433"
+      - "5434:5432"
 
   auth-service:
     build: .
     restart: always
     depends_on:
-      - db
+      - authdb
     environment:
       ENV: ${ENV}
       GRPC_PORT: ${GRPC_PORT}
       DATABASE_DSN: ${DATABASE_DSN}
       TOKEN_TTL: ${TOKEN_TTL}
+      CONFIG_PATH: "/app/backend/config/config.yaml"
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
+    volumes:
+      - ./backend/config:/app/config
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
-    volumes:
-      - ./internal/migrations:/migrations
-    command: ["./auth-service"]
+    command: [ "./auth-service" ]
 
 volumes:
   db_data:
