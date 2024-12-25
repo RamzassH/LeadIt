@@ -5,7 +5,6 @@ services:
     ports:
       - "50051:50051"
     environment:
-      - DATABASE_URL=postgres://user:password@db:5432/authdb?sslmode=disable
       - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=minio:9000
       - MINIO_ACCESS_KEY=minioadmin
@@ -35,7 +34,6 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-
 
   redis:
     image: redis:7

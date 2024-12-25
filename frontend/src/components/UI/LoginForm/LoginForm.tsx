@@ -7,6 +7,7 @@ import Checkbox from "@/components/UI/Checkbox/Checkbox";
 import Loader from "@/components/UI/Loader/Loader";
 import { useState } from "react";
 import {setValueInCookie, getValueFromCookie, removeValueFromCookie} from "@/utils/cookie";
+import {useFetching} from "@/hooks/useFetching";
 
 interface LoginFormProps {
     callback: () => void;
@@ -26,23 +27,21 @@ export default function LoginForm({ callback }: LoginFormProps) {
         clearErrors,
     } = useForm<LoginData>();
 
-    const [isLoading, setLoading] = useState(false);
+    const [getAuthToken, isLoading, error] = useFetching(async () => {
+
+    })
 
     // Обработчик отправки формы
     const onSubmit = async (data: LoginData) => {
-        setLoading(true);
-        // Симуляция асинхронной операции
         try {
-            // Здесь будет логика для отправки данных на сервер
-            // Например, await someAuthFunction(data);
+            await getAuthToken()
+            if (error) {
+                throw new Error(error)
+            }
             setTimeout(() => {
-                setValueInCookie("authToken", "Goidada")
-                setLoading(false);
                 console.log("Авторизация успешна", data);
             }, 2000); // Задержка для симуляции загрузки
         } catch (error) {
-            // Обработка ошибки (например, ошибка сервера)
-            setLoading(false);
             setError("login", {
                 type: "manual",
                 message: "",
@@ -55,7 +54,6 @@ export default function LoginForm({ callback }: LoginFormProps) {
     };
 
     const handleCreateAccount = () => {
-        console.log(getValueFromCookie("authToken"))
         callback();
     };
 
