@@ -1,0 +1,17 @@
+.successMessage {
+    display: flex;
+    align-items: center;
+    background-color: #4caf50; /* Зеленый фон */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.icon {
+    margin-right: 10px;
+    font-size: 20px;
+}

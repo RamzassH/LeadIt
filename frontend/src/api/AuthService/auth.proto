@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package auth;
+
+// Сообщение запроса авторизации
+message AuthRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// Сообщение ответа авторизации
+message AuthResponse {
+  string token = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// Сервис для авторизации
+service AuthService {
+  rpc Authenticate (AuthRequest) returns (AuthResponse);
+}
