@@ -8,14 +8,15 @@ RUN apk update && apk add --no-cache git
 WORKDIR /app
 
 # Копируйте файлы зависимостей и скачайте модули
-COPY go.mod go.sum ./
+COPY backend/go.mod backend/go.sum ./
+COPY contracts ./
 RUN go mod download
 
 # Копируйте исходный код
 COPY . .
 
 # Соберите приложение
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-service ./cmd/auth/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-service ./backend/cmd/auth/main.go
 
 # Stage 2: Создайте минимальный образ для запуска приложения
 FROM alpine:latest
@@ -23,14 +24,18 @@ FROM alpine:latest
 # Установите необходимые пакеты
 RUN apk --no-cache add ca-certificates
 
-# Создайте директорию для приложения
+# Рабочая директория
 WORKDIR /root/
 
-# Копируйте скомпилированный бинарник из предыдущего этапа
+# Создадим необходимые директории, чтобы соответствовать пути ./backend/config/
+RUN mkdir -p ./backend/config
+
+# Скопируем бинарник
 COPY --from=builder /app/auth-service .
 
-# Экспортируйте порт, который будет использоваться приложением
+# Скопируем config.yaml (из того же места, куда положили в builder)
+COPY --from=builder /app/backend/config/local.yaml ./local.yaml
+
 EXPOSE 50051
 
-# Запустите приложение
-CMD ["./auth-service"]
+CMD ["./auth-service", "--config", "./backend/config/local.yaml"]

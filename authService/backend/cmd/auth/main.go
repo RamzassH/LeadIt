@@ -25,6 +25,7 @@ func main() {
 
 	validate := validator.New()
 
+	logger.Info("connection string:", cfg.PostgresDSN)
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	if err != nil {
 		logger.Error("Failed to connect to database", slog.Any("error", err))
