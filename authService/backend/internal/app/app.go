@@ -33,7 +33,6 @@ func New(
 		logger,
 		storage, // UserSaver
 		storage, // UserProvider
-		storage, // AppProvider
 		storage, // TokenSaver
 		tokenTTL,
 		refreshTokenTTL,

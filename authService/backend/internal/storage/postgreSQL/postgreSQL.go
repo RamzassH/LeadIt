@@ -9,7 +9,6 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"golang.org/x/net/context"
-	"math/rand"
 )
 
 type Storage struct {
@@ -43,19 +42,17 @@ func New(db *sql.DB) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveUser(ctx context.Context, name, surname, email string, passHash []byte, isAdmin bool) (int64, error) {
+func (s *Storage) SaveUser(ctx context.Context, name, surname, email string, passHash []byte) (int64, error) {
 	const op = "storage.SaveUser"
 
 	query := `
-        INSERT INTO users(name, surname, email, password_hash, is_admin, app_id)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO users(name, surname, email, password_hash)
+        VALUES ($1, $2, $3, $4)
         RETURNING id
     `
 
-	//TODO mock
-	appID := rand.Intn(5)
 	var id int64
-	err := s.db.QueryRowContext(ctx, query, name, surname, email, passHash, isAdmin, appID).Scan(&id)
+	err := s.db.QueryRowContext(ctx, query, name, surname, email, passHash).Scan(&id)
 	if err != nil {
 		var postgresError *pq.Error
 		if errors.As(err, &postgresError) {
@@ -167,13 +164,4 @@ func (s *Storage) RevokeRefreshToken(ctx context.Context, token string) error {
 	}
 
 	return nil
-}
-
-// TODO пока мокнуто
-func (s *Storage) App(ctx context.Context, appID int64) (app models.App, err error) {
-	return models.App{
-		int64(rand.Intn(5)),
-		string(rand.Intn(5)),
-		string(rand.Intn(5)),
-	}, nil
 }

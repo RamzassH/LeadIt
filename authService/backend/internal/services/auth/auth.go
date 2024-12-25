@@ -36,7 +36,6 @@ type Auth struct {
 	logger          *slog.Logger
 	userSaver       UserSaver
 	userProvider    UserProvider
-	appProvider     AppProvider
 	tokenSaver      TokenSaver
 	tokenTTL        time.Duration
 	refreshTokenTTL time.Duration
@@ -54,7 +53,6 @@ type UserSaver interface {
 		surname string,
 		email string,
 		passwordHash []byte,
-		isAdmin bool,
 	) (uid int64, err error)
 }
 
@@ -64,15 +62,10 @@ type UserProvider interface {
 	IsAdmin(ctx context.Context, uid int64) (isAdmin bool, err error)
 }
 
-type AppProvider interface {
-	App(ctx context.Context, appID int64) (app models.App, err error)
-}
-
 func New(
 	log *slog.Logger,
 	userSaver UserSaver,
 	userProvider UserProvider,
-	appProvider AppProvider,
 	tokenSaver TokenSaver,
 	tokenTTL time.Duration,
 	refreshTokenTTL time.Duration) *Auth {
@@ -80,14 +73,13 @@ func New(
 		userSaver:       userSaver,
 		userProvider:    userProvider,
 		logger:          log,
-		appProvider:     appProvider,
 		tokenSaver:      tokenSaver,
 		tokenTTL:        tokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
 	}
 }
 
-func (a *Auth) Login(ctx context.Context, email string, password string, appID int64) (token string, refreshToken string, err error) {
+func (a *Auth) Login(ctx context.Context, email string, password string) (token string, refreshToken string, err error) {
 	const op = "auth.Login"
 
 	logger := a.logger.With(slog.String("operation", op))
@@ -113,12 +105,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 		return "", "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	app, err := a.appProvider.App(ctx, appID)
-	if err != nil {
-		return "", "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	token, err = jwt.NewToken(user, app, a.tokenTTL)
+	token, err = jwt.NewToken(user, a.tokenTTL)
 	if err != nil {
 		a.logger.Error("failed to generate token", err)
 
@@ -164,7 +151,7 @@ func (a *Auth) Logout(ctx context.Context, refreshToken string) error {
 	return nil
 }
 
-func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string, email string, password string, isAdmin bool) (userID int64, err error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string, email string, password string) (userID int64, err error) {
 	const op = "auth.Register"
 
 	logger := a.logger.With(
@@ -184,9 +171,8 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 		slog.String("name", name),
 		slog.String("surname", surname),
 		slog.String("email", email),
-		slog.Bool("isAdmin", isAdmin),
 	)
-	id, saveErr = a.userSaver.SaveUser(ctx, name, surname, email, hashPass, isAdmin)
+	id, saveErr = a.userSaver.SaveUser(ctx, name, surname, email, hashPass)
 	if saveErr != nil {
 		if errors.Is(saveErr, storage.ErrUserExists) {
 			logger.Warn("user already exists")
@@ -247,14 +233,7 @@ func (a *Auth) RefreshToken(ctx context.Context, refreshToken string) (token str
 		return "", "", fmt.Errorf("%s: %w", op, err)
 	}
 
-	//TODO заглушка, разобраться с id приложений
-	app, err := a.appProvider.App(ctx, 1)
-	if err != nil {
-		logger.Error("failed to get app", err)
-		return "", "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	token, err = jwt.NewToken(user, app, a.tokenTTL)
+	token, err = jwt.NewToken(user, a.tokenTTL)
 	if err != nil {
 		logger.Error("failed to generate token", err)
 		return "", "", fmt.Errorf("%s: %w", op, err)

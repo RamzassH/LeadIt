@@ -11,10 +11,13 @@ type Config struct {
 	Env             string        `yaml:"env" env-default:"local"`
 	StoragePath     string        `yaml:"storage_path" env-required:"true"`
 	TokenTTL        time.Duration `yaml:"token_ttl" env-required:"true"`
+	TokenSecret     string        `yaml:"token_secret" env-required:"true"`
 	RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" env-required:"true"`
 	PostgresDSN     string        `yaml:"storage_connection_string" env-required:"true"`
 	GRPC            GRPCConfig    `yaml:"grpc"`
 }
+
+var cfgInstance *Config
 
 type GRPCConfig struct {
 	Port    int    `yaml:"port" env-default:"8080"`
@@ -22,6 +25,10 @@ type GRPCConfig struct {
 }
 
 func MustLoadConfig() *Config {
+	if cfgInstance != nil {
+		return cfgInstance
+	}
+
 	path := fetchConfigPath()
 	if path == "" {
 		panic("config file path is empty")
@@ -37,8 +44,8 @@ func MustLoadConfig() *Config {
 		panic("failed to read config: " + err.Error())
 	}
 
-	return &config
-
+	cfgInstance = &config
+	return cfgInstance
 }
 
 func fetchConfigPath() string {

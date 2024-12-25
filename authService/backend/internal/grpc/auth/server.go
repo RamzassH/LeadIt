@@ -17,16 +17,14 @@ type Auth interface {
 	Login(
 		ctx context.Context,
 		email string,
-		password string,
-		appID int64) (token string, refreshToken string, err error)
+		password string) (token string, refreshToken string, err error)
 
 	RegisterNewUser(
 		ctx context.Context,
 		name string,
 		surname string,
 		email string,
-		password string,
-		isAdmin bool) (userID int64, err error)
+		password string) (userID int64, err error)
 
 	IsAdmin(
 		ctx context.Context,
@@ -89,7 +87,7 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	userID, err := s.auth.RegisterNewUser(ctx, req.GetName(), req.GetSurname(), req.GetEmail(), req.GetPassword(), false)
+	userID, err := s.auth.RegisterNewUser(ctx, req.GetName(), req.GetSurname(), req.GetEmail(), req.GetPassword())
 
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExists) {
@@ -114,7 +112,7 @@ func (s *ServerAPI) Login(ctx context.Context, req *authv1.LoginRequest) (*authv
 		return nil, status.Errorf(codes.InvalidArgument, "validate login: %w", err)
 	}
 
-	token, refreshToken, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), req.GetAppId())
+	token, refreshToken, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword())
 
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
@@ -193,17 +191,5 @@ func (s *ServerAPI) UpdateUser(ctx context.Context, req *authv1.UpdateUserReques
 }
 
 func (s *ServerAPI) ResetPassword(ctx context.Context, req *authv1.ResetPasswordRequest) (*authv1.ResetPasswordResponse, error) {
-	panic("implement me")
-}
-
-func (s *ServerAPI) ValidateToken(ctx context.Context, req *authv1.ValidateTokenRequest) (*authv1.ValidateTokenResponse, error) {
-	panic("implement me")
-}
-
-func (s *ServerAPI) AssignRole(ctx context.Context, req *authv1.AssignRoleRequest) (*authv1.AssignRoleResponse, error) {
-	panic("implement me")
-}
-
-func (s *ServerAPI) RemoveRole(ctx context.Context, req *authv1.RemoveRoleRequest) (*authv1.RemoveRoleResponse, error) {
 	panic("implement me")
 }
