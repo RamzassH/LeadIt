@@ -5,9 +5,8 @@ import styles from "./LoginForm.module.css";
 import Button from "@/components/UI/Button/Button";
 import Checkbox from "@/components/UI/Checkbox/Checkbox";
 import Loader from "@/components/UI/Loader/Loader";
-import { useState } from "react";
-import {setValueInCookie, getValueFromCookie, removeValueFromCookie} from "@/utils/cookie";
 import {useFetching} from "@/hooks/useFetching";
+import {loginUser} from  "@/api/AuthService/AuthService"
 
 interface LoginFormProps {
     callback: () => void;
@@ -27,20 +26,11 @@ export default function LoginForm({ callback }: LoginFormProps) {
         clearErrors,
     } = useForm<LoginData>();
 
-    const [getAuthToken, isLoading, error] = useFetching(async () => {
-
-    })
-
     // Обработчик отправки формы
     const onSubmit = async (data: LoginData) => {
         try {
-            await getAuthToken()
-            if (error) {
-                throw new Error(error)
-            }
-            setTimeout(() => {
-                console.log("Авторизация успешна", data);
-            }, 2000); // Задержка для симуляции загрузки
+            console.log(data.login, data.password)
+            loginUser(data.login, data.password)
         } catch (error) {
             setError("login", {
                 type: "manual",
@@ -57,9 +47,9 @@ export default function LoginForm({ callback }: LoginFormProps) {
         callback();
     };
 
-    if (isLoading) {
-        return <Loader />;
-    }
+    //if (isLoading) {
+    //    return <Loader />;
+    //}
 
     return (
         <div className={styles.container}>
