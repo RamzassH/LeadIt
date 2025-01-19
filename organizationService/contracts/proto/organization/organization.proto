@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package organization;
+
+option go_package = "leatIt.organization.v1;organizationv1";
+
+service Organization {
+  rpc CreateOrganization (CreateOrganizationRequest) returns (CreateOrganizationResponse);
+  rpc GetOrganizationInfo(GetOrganizationInfoRequest) returns (GetOrganizationInfoResponse);
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse);
+  rpc DeleteOrganization (DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
+}
+
+message CreateOrganizationRequest {
+  string name = 1;
+  int64 organizer_id = 2;
+  string info = 3;
+}
+message CreateOrganizationResponse {
+  int64 organization_id = 1;
+}
+
+
+message GetOrganizationInfoRequest {
+  int64 organization_id = 1;
+}
+
+
+message GetOrganizationInfoResponse {
+  string name = 1;
+  string info = 2;
+  int32 employees_number = 3;
+  string date_created = 4;
+}
+
+message UpdateOrganizationRequest {
+  string name = 1;
+  int64 organizer_id = 2;
+  string info = 3;
+}
+
+
+message UpdateOrganizationResponse {
+  int64 organization_id = 1;
+}
+
+
+message DeleteOrganizationRequest {
+  int64 organization_id = 1;
+}
+
+
+message DeleteOrganizationResponse {
+  bool success = 1;
+}
+
