@@ -1,12 +1,12 @@
 "use client";
 import { useForm, Controller } from "react-hook-form";
-import Input from "@/components/UI/Input/Input";
+import Input from "@/components/UI/AuthPage/Input/Input";
 import styles from "./LoginForm.module.css";
-import Button from "@/components/UI/Button/Button";
-import Checkbox from "@/components/UI/Checkbox/Checkbox";
-import Loader from "@/components/UI/Loader/Loader";
+import Button from "@/components/UI/AuthPage/Button/Button";
+import Checkbox from "@/components/UI/AuthPage/Checkbox/Checkbox";
+import Loader from "@/components/UI/AuthPage/Loader/Loader";
 import {useFetching} from "@/hooks/useFetching";
-import {loginUser} from  "@/api/AuthService/AuthService"
+import {loginUser} from "@/api/AuthService/AuthService"
 
 interface LoginFormProps {
     callback: () => void;

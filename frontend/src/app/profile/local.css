@@ -15,7 +15,6 @@
     /* Inside Auto Layout */
     flex: none;
     order: 0;
-    flex-grow: 1;
     margin: 0 0;
 
     box-sizing: border-box;
@@ -147,9 +146,20 @@
     top: -13px;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
 main {
     display: flex;
-    height: 1223px;
+    flex-grow: 1;
+    /*height: 1223px;*/
+}
+
+footer {
+    bottom: 0;
 }
 
 .menu {

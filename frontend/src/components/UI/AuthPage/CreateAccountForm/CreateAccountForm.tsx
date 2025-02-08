@@ -1,11 +1,11 @@
 "use client";
 import styles from "./CreateAccountForm.module.css";
-import Input from "@/components/UI/Input/Input";
+import Input from "@/components/UI/AuthPage/Input/Input";
 import { useForm, Controller } from "react-hook-form";
-import Button from "@/components/UI/Button/Button";
-import Checkbox from "@/components/UI/Checkbox/Checkbox";
-import Loader from "@/components/UI/Loader/Loader";
-import SuccessMessage from "@/components/UI/SuccessMessage/SuccessMessage";
+import Button from "@/components/UI/AuthPage/Button/Button";
+import Checkbox from "@/components/UI/AuthPage/Checkbox/Checkbox";
+import Loader from "@/components/UI/AuthPage/Loader/Loader";
+import SuccessMessage from "@/components/UI/AuthPage/SuccessMessage/SuccessMessage";
 import { useState } from "react";
 
 interface AccountData {

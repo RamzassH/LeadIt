@@ -1,6 +1,6 @@
 import styles from "./Input.module.css";
 import React from "react";
-import Error from "@/components/UI/Error/Error";
+import Error from "@/components/UI/AuthPage/Error/Error";
 
 interface InputProps {
     type: string;

@@ -1,6 +1,6 @@
 "use client"
-import LoginForm from "@/components/UI/LoginForm/LoginForm";
-import CreateAccountForm from "@/components/UI/CreateAccountForm/CreateAccountForm";
+import LoginForm from "@/components/UI/AuthPage/LoginForm/LoginForm";
+import CreateAccountForm from "@/components/UI/AuthPage/CreateAccountForm/CreateAccountForm";
 import {useState} from "react";
 
 export default function Auth() {
