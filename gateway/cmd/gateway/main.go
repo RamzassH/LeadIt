@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	authv1 "github.com/RamzassH/LeadIt/gateway/contracts/contracts/gen/auth"
+	authv1 "github.com/RamzassH/LeadIt/gateway/contracts/gen/auth"
 	"google.golang.org/grpc"
 	"log"
 	"net/http"

@@ -1,27 +1,33 @@
 module github.com/RamzassH/LeadIt/authService/backend
 
-go 1.23
+go 1.23.3
 
 require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-playground/validator/v10 v10.23.0
+	github.com/golang-migrate/migrate/v4 v4.18.1
+	github.com/lib/pq v1.10.9
+	golang.org/x/crypto v0.32.0
+	golang.org/x/net v0.34.0
+	google.golang.org/grpc v1.70.0
+)
+
+require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.23.0 // indirect
-	github.com/golang-migrate/migrate/v4 v4.18.1 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/genproto v0.0.0-20241219184827-bd154493cd20 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 )
 
 require (
@@ -33,3 +39,5 @@ require (
 )
 
 replace github.com/RamzassH/LeadIt/gateway/contracts => ../../gateway/contracts
+
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250207221924-e9438ea467c6
