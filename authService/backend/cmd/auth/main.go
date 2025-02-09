@@ -39,7 +39,10 @@ func main() {
 		logger.Error("Failed to ping database", slog.Any("error", err))
 		os.Exit(1)
 	}
-	logger.Info("Successfully connected to the database")
+	logger.Info("Successfully connected to the database",
+		slog.String("env", cfg.Env),
+		slog.Any("cfg", cfg),
+		slog.Int("port", cfg.GRPC.Port))
 
 	application, err := app.New(
 		logger,
