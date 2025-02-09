@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/RamzassH/LeadIt/authService/backend/internal/services/auth"
 	"github.com/RamzassH/LeadIt/authService/backend/internal/storage"
-	authv1 "github.com/RamzassH/LeadIt/gateway/contracts/gen/auth"
+	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
