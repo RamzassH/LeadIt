@@ -11,6 +11,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.23.0 // indirect
 	github.com/golang-migrate/migrate/v4 v4.18.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -25,11 +26,10 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/RamzassH/LeadIt/authService/contracts v0.0.1
+	github.com/RamzassH/LeadIt/gateway/contracts v0.0.1
 	github.com/joho/godotenv v1.5.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
 
-replace github.com/RamzassH/LeadIt/authService/contracts => ../contracts
-
+replace github.com/RamzassH/LeadIt/gateway/contracts => ../../gateway/contracts

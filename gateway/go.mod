@@ -1,0 +1,13 @@
+module github.com/RamzassH/LeadIt/gateway/contracts
+
+go 1.23
+
+require (
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3 // indirect
+	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/grpc v1.70.0 // indirect
+	google.golang.org/protobuf v1.36.4 // indirect
+)

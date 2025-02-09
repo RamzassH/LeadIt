@@ -24,7 +24,7 @@ services:
       CONFIG_PATH: "/app/backend/config/config.yaml"
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
     volumes:
-      - ./backend/config:/app/config
+      - ./backend/config:/app/backend/config
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
     command: [ "./auth-service" ]
