@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/RamzassH/LeadIt/authService/backend/internal/services/auth"
-	"github.com/RamzassH/LeadIt/authService/backend/internal/storage"
 	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
@@ -90,7 +89,7 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 	userID, err := s.auth.RegisterNewUser(ctx, req.GetName(), req.GetSurname(), req.GetEmail(), req.GetPassword())
 
 	if err != nil {
-		if errors.Is(err, storage.ErrUserExists) {
+		if errors.Is(err, auth.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 
@@ -138,7 +137,7 @@ func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*a
 
 	isAdmin, err := s.auth.IsAdmin(ctx, isAdminReq.userId)
 	if err != nil {
-		if errors.Is(err, storage.ErrUserNotFound) {
+		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "validate isAdmin: %w", err)
@@ -157,7 +156,7 @@ func (s *ServerAPI) RefreshToken(ctx context.Context, req *authv1.RefreshTokenRe
 
 	token, newRefreshToken, err := s.auth.RefreshToken(ctx, refreshToken)
 	if err != nil {
-		if errors.Is(err, storage.ErrTokenNotFound) {
+		if errors.Is(err, auth.ErrTokenNotFound) {
 			return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 		}
 		return nil, status.Error(codes.Internal, "internal error")
@@ -177,7 +176,7 @@ func (s *ServerAPI) Logout(ctx context.Context, req *authv1.LogoutRequest) (*aut
 
 	err := s.auth.Logout(ctx, refreshToken)
 	if err != nil {
-		if errors.Is(err, storage.ErrTokenNotFound) {
+		if errors.Is(err, auth.ErrTokenNotFound) {
 			return nil, status.Error(codes.NotFound, "refresh token not found")
 		}
 		return nil, status.Error(codes.Internal, "internal error")

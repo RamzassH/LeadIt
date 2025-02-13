@@ -20,8 +20,8 @@ type Config struct {
 var cfgInstance *Config
 
 type GRPCConfig struct {
-	Port    int    `yaml:"port" env-default:"8080"`
-	Timeout string `yaml:"timeout" env-default:"5s"`
+	Port    int           `yaml:"port" env-default:"8080"`
+	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
 }
 
 func MustLoadConfig() *Config {
@@ -34,13 +34,18 @@ func MustLoadConfig() *Config {
 		panic("config file path is empty")
 	}
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		panic("config file not found " + path)
+	return MustLoadConfigByPath(path)
+}
+
+func MustLoadConfigByPath(configPath string) *Config {
+
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		panic("config file not found " + configPath)
 	}
 
 	var config Config
 
-	if err := cleanenv.ReadConfig(path, &config); err != nil {
+	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
 		panic("failed to read config: " + err.Error())
 	}
 
