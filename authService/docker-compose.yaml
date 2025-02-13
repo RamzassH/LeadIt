@@ -21,7 +21,7 @@ services:
       GRPC_PORT: ${GRPC_PORT}
       DATABASE_DSN: ${DATABASE_DSN}
       TOKEN_TTL: ${TOKEN_TTL}
-      CONFIG_PATH: "/app/backend/config/config.yaml"
+      CONFIG_PATH: "/app/authService/backend/config/config.yaml"
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
     volumes:
       - ./backend/config:/app/backend/config

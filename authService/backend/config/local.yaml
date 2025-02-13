@@ -6,4 +6,4 @@ refresh_token_ttl: 168h
 token_secret: "super_secret_token"
 grpc:
   port: 57442
-  timout: 10h
+  timeout: 10h

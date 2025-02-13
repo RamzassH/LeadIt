@@ -9,5 +9,5 @@ tasks:
     desc: 'Generate code from proto files'
     cmds:
       - protoc -I proto -I third_party/googleapis --go_out=./gen --go_opt paths=source_relative --go-grpc_out=./gen --go-grpc_opt=paths=source_relative --grpc-gateway_out=./gen --grpc-gateway_opt=paths=source_relative proto/auth/auth.proto
-      - go run backend/cmd/auth/main.go --config ./config/local.yaml
+      - go run backend/cmd/auth/main.go -config ./backend/config/local.yaml
       - go run ./cmd/migrator/migrator.go --storage-path=Z:/LeadIt/authService/backend/internal/storage/auth.db --migrations-path=Z:/LeadIt/authService/backend/internal/migrations --force-version=1

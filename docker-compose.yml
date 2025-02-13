@@ -14,7 +14,9 @@ services:
       - "5434:5432"
 
   auth-service:
-    build: ./authService
+    build:
+      context: .
+      dockerfile: ./authService/Dockerfile
     restart: always
     depends_on:
       - authdb
@@ -23,13 +25,13 @@ services:
       GRPC_PORT: ${GRPC_PORT}
       DATABASE_DSN: ${DATABASE_DSN}
       TOKEN_TTL: ${TOKEN_TTL}
-      CONFIG_PATH: "/app/backend/config/config.yaml"
+      CONFIG_PATH: "/app/authService/backend/config/config.yaml"
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
     volumes:
       - ./authService/backend/config:/app/backend/config
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
-    command: [ "./auth-service", "--config", "/app/backend/config/config.yaml" ]
+    command: [ "./auth-service", "--config", "/app/authService/backend/config/config.yaml" ]
 
   gateway:
     build: ./gateway
@@ -37,7 +39,7 @@ services:
     depends_on:
       - auth-service
     environment:
-      GRPC_SERVER_ADDRESS: "auth-service:50051"
+      GRPC_SERVER_ADDRESS: "auth-service:57442"
       HTTP_PORT: "8080"
     ports:
       - "8080:8080"

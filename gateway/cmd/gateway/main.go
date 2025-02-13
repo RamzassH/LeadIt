@@ -14,7 +14,7 @@ import (
 func main() {
 	grpcServerAddress := os.Getenv("GRPC_SERVER_ADDRESS")
 	if grpcServerAddress == "" {
-		grpcServerAddress = "localhost:50051"
+		grpcServerAddress = "localhost:57442"
 	}
 
 	ctx := context.Background()
