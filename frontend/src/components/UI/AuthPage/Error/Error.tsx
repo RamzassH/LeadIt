@@ -1,10 +1,10 @@
 import React from "react";
-import styles from "./Error.module.css";
+import {ErrorText} from "@/components/UI/AuthPage/Error/styled/ErrorText";
 
 interface ErrorProps {
     children: React.ReactNode;
 }
 
 export default function Error({ children }:ErrorProps)  {
-    return <div className={styles.errorText}>{children}</div>;
+    return <ErrorText>{children}</ErrorText>;
 };

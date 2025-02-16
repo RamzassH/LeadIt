@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import styles from "./Checkbox.module.css"
+import {CheckboxContainer, CheckboxInput, CheckboxLabel} from "@/components/UI/AuthPage/Checkbox/styled/Checkbox";
 
 // Интерфейс для пропсов компонента
 interface CheckboxProps {
     label: string; // Метка для чекбокса
     checked?: boolean; // Начальное состояние (по умолчанию false)
     onChange?: (checked: boolean) => void; // Функция, которая вызывается при изменении состояния
-    classStyles?: string[]; // Кастомные стили
+    style?: React.CSSProperties;
 }
 
-export default function Checkbox({ label, checked = false, onChange, classStyles }: CheckboxProps)  {
+export default function Checkbox({ label, checked = false, onChange, style}: CheckboxProps)  {
     const [isChecked, setIsChecked] = useState(checked);
-
-    let componentStyle = styles["checkbox-container"] + " " + (classStyles?.join(" ") || "");
 
     // Обработчик изменения состояния
     const handleChange = () => {
@@ -24,16 +22,16 @@ export default function Checkbox({ label, checked = false, onChange, classStyles
     };
 
     return (
-        <label className={componentStyle}>
-            <input
+        <CheckboxContainer style={style}>
+            <CheckboxInput
+                className="checkbox-input"
                 type="checkbox"
                 checked={isChecked}
                 onChange={handleChange}
-                className={styles["checkbox-input"]}
             />
-            <div className={styles["checkbox-label"]}>
+            <CheckboxLabel className="checkbox-label">
                 {label}
-            </div>
-        </label>
+            </CheckboxLabel>
+        </CheckboxContainer>
     );
 };

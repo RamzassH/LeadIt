@@ -1,27 +1,52 @@
-"use client"
+"use client";
 import LoginForm from "@/components/UI/AuthPage/LoginForm/LoginForm";
 import CreateAccountForm from "@/components/UI/AuthPage/CreateAccountForm/CreateAccountForm";
-import {useState} from "react";
+import { useState } from "react";
+import theme from "../../../theme/theme";
+import { ThemeProvider } from "@mui/system";
+import { Main } from "@/app/auth/styled/AuthStyled";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Auth() {
-    const [isLoginForm, setLogin] = useState(true)
+    const [isLoginForm, setLogin] = useState(true);
 
     const showCreateAccountForm = () => {
-        setLogin(false)
-    }
+        setLogin(false);
+    };
 
     const showLoginForm = () => {
-        setLogin(true)
-    }
+        setLogin(true);
+    };
 
     return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-            <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-                {isLoginForm ?
-                    <LoginForm callback={showCreateAccountForm}/>:
-                    <CreateAccountForm returnCallback={showLoginForm}/>
-                }
-            </main>
-        </div>
-);
+        <ThemeProvider theme={theme}>
+            <Main>
+                <AnimatePresence>
+                    {isLoginForm ? (
+                        <motion.div
+                            key="login"
+                            initial={{ translateX : "-100%"}}
+                            animate={{ translateX : 0}}
+                            exit={{ translateX : "-100%"}}
+                            transition={{ duration: 0.5 }}
+                            style={{ width: "100%", height: "100%", position: "absolute" }}
+                        >
+                            <LoginForm callback={showCreateAccountForm} />
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="createAccount"
+                            initial={{ translateX : "100%"}}
+                            animate={{ translateX : 0}}
+                            exit={{ translateX : "100%"}}
+                            transition={{ duration: 0.5 }}
+                            style={{ width: "100%", height: "100%", position: "absolute" }}
+                        >
+                            <CreateAccountForm returnCallback={showLoginForm} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </Main>
+        </ThemeProvider>
+    );
 }

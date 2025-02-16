@@ -1,6 +1,6 @@
-import styles from "./Input.module.css";
 import React from "react";
 import Error from "@/components/UI/AuthPage/Error/Error";
+import {InputComponent, InputContainer, InputWrapper, Message} from "@/components/UI/AuthPage/Input/styled/Input";
 
 interface InputProps {
     type: string;
@@ -8,7 +8,6 @@ interface InputProps {
     placeholder: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // Теперь ожидаем onChange вместо setValue
-    classStyles?: string[];
     style?: React.CSSProperties;
     isError?: boolean;
     errorMessage?: string;
@@ -20,15 +19,11 @@ export default function Input({
                                   placeholder,
                                   value,
                                   onChange,
-                                  classStyles,
                                   isError,
                                   errorMessage,
                               }: InputProps) {
     // Если тип 'tel', то используем стиль для ввода телефона
-    let componentStyle =
-        styles.input +
-        ` ${isError ? styles.error + ` ` : ""}` +
-        (classStyles?.join(" ") || "");
+    let errorStyle = `${isError ? "error" : ""}`;
 
     // Функция для маскирования номера телефона (пример для формата +1 (234) 567-8901)
     const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,20 +52,21 @@ export default function Input({
     };
 
     return (
-        <div>
-            <input
-                className={componentStyle}
-                name={name}
-                type={type}
-                value={value}
-                onChange={type === "tel" ? handlePhoneChange : onChange} // Используем onChange из props или handlePhoneChange
-                placeholder={placeholder}
-            />
+        <InputContainer>
+            <InputWrapper className={errorStyle}>
+                <InputComponent className={errorStyle}
+                                name={name}
+                                type={type}
+                                value={value}
+                                onChange={type === "tel" ? handlePhoneChange : onChange} // Используем onChange из props или handlePhoneChange
+                                placeholder={placeholder}
+                />
+            </InputWrapper>
             {isError && errorMessage ? (
-                <div className={styles.message}>
+                <Message>
                     <Error>{errorMessage}</Error>
-                </div>
+                </Message>
             ) : null}
-        </div>
+        </InputContainer>
     );
 }
