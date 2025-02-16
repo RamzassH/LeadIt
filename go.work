@@ -4,4 +4,5 @@ use (
 	./authService/backend
 	./gateway
 	./libs/contracts
+	notificationService
 )

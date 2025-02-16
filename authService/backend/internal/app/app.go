@@ -31,9 +31,9 @@ func New(
 
 	authService := auth.New(
 		logger,
-		storage, // UserSaver
-		storage, // UserProvider
-		storage, // TokenSaver
+		storage,
+		storage,
+		storage,
 		tokenTTL,
 		refreshTokenTTL,
 	)
