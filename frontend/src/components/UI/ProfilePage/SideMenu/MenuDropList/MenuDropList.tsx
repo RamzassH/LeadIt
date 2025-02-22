@@ -4,10 +4,12 @@ import { motion } from "framer-motion"; // Импортируем motion из Fr
 import MenuButton from "@/components/UI/ProfilePage/SideMenu/MenuButton/MenuButton";
 import Text from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/Text";
 import MenuDropListContainer from "@/components/UI/ProfilePage/SideMenu/MenuDropList/styles/MenuDropListContainer";
-import DropList from "@/components/UI/ProfilePage/SideMenu/MenuDropList/styles/DropList";
+import {DropList, DropListBackground} from "@/components/UI/ProfilePage/SideMenu/MenuDropList/styles/DropList";
 import {LastIcon} from "@/components/UI/ProfilePage/SideMenu/MenuDropList/styles/LastIcon";
 import SvgIcon from "@/components/UI/ProfilePage/SideMenu/MenuDropList/svg/SvgIcon";
 import Icon from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/StyleIcon";
+import Button from "@/components/UI/AuthPage/Button/Button";
+import CreateButton from "@/components/UI/ProfilePage/SideMenu/MenuDropList/CreateButton/CreateButton";
 
 
 interface MenuDropListProps {
@@ -81,7 +83,10 @@ export default function MenuDropList({
                 style={{ overflow: "hidden" }} // Управляем overflow для скрытия содержимого при сжатии
             >
                 <DropList ref={dropListRef}>
-                    {children}
+                    {children ?
+                        children :
+                        <CreateButton/>
+                    }
                 </DropList>
             </motion.div>
         </MenuDropListContainer>

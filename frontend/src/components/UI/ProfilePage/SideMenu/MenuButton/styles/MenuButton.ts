@@ -9,6 +9,18 @@ const StyleMenuButton = styled(Button)`
     display: flex;
     box-shadow: none;
     justify-content: flex-start;
+    
+    border-radius: calc(15rem/16);
+    
+    &.list-item {
+        border-radius: 0;
+        width: 88%;
+    }
+    
+    &.list-item:last-child {
+        border-radius: 0 0 calc(15rem/16) calc(15rem/16);
+    }
+    
     &:hover {
         background-color: ${({theme}) => theme.palette.primary.main};
         color: ${({theme}) => theme.palette.dark?.main};

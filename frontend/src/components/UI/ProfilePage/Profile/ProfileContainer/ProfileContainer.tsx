@@ -1,32 +1,29 @@
 import {
-    BackgroundContainer,
     ContainerColumn,
     ContainerRow
 } from "@/components/UI/ProfilePage/Profile/styled/Containers";
-import {ChangeButton, Title} from "@/components/UI/ProfilePage/Profile/styled/Title";
-import {Text} from "@/components/UI/ProfilePage/Profile/styled/Text";
 import AvatarProfileContainer from "@/components/UI/ProfilePage/Profile/AvatarProfileContainer/AvatarProfileContainer";
 import MainInfoContainer from "@/components/UI/ProfilePage/Profile/MainInfoContainer/MainInfoContainer";
 import AdditionalInfoContainer
     from "@/components/UI/ProfilePage/Profile/AdditionalInfoContainer/AdditionalInfoContainer";
+import React from "react";
 
 interface ProfileContainerProps {
-    avatarSrc: string;
-    name: string;
-    surname: string;
-    email: string;
-    description: string;
+    style?: React.CSSProperties;
 }
 
-export default function ProfileContainer({avatarSrc, name, surname, email, description}:ProfileContainerProps) {
-
+export default function ProfileContainer({style}:ProfileContainerProps) {
     return (
-        <ContainerRow>
-            <AvatarProfileContainer src={avatarSrc}/>
-            <div style={{width: "calc(100% - 6rem/16 - 435%/1200 * 100)", height: "100%"}}>
+        <ContainerRow style={style}>
+            <div style={{width: "calc(452rem/16)", margin: "calc(10rem/16)"}}>
                 <ContainerColumn>
-                    <MainInfoContainer name={name} surname={surname} email={email}/>
-                    <AdditionalInfoContainer description={description}/>
+                    <AvatarProfileContainer style={{height: "calc(570rem/16)", marginBottom: "calc(10rem/16)"}}/>
+                    <AdditionalInfoContainer style={{height: "calc(100% - 570rem/16 - 20rem/16)", marginTop:"calc(10rem/16)"}}/>
+                </ContainerColumn>
+            </div>
+            <div style={{width: "calc(100% - 452rem/16)", margin: "calc(10rem/16)"}}>
+                <ContainerColumn>
+                    <MainInfoContainer/>
                 </ContainerColumn>
             </div>
         </ContainerRow>

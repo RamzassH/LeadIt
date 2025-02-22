@@ -55,7 +55,7 @@ const SideMenu = forwardRef((props: SideMenuProps, ref) => {
             </MenuButton>
             <MenuDropList firstIcon={<VIPIcon />} text="Гойда №1" visibility={visibleButton}>
                 {list1.map((item, index) => (
-                    <MenuButton callback={item.callback} key={index}>
+                    <MenuButton className="list-item" callback={item.callback} key={index}>
                         <Icon className="first-icon">{item.icon}</Icon>
                         <Text className={visibleButton}>{item.text}</Text>
                     </MenuButton>
@@ -63,11 +63,13 @@ const SideMenu = forwardRef((props: SideMenuProps, ref) => {
             </MenuDropList>
             <MenuDropList firstIcon={<BookIcon />} text="Гойда №2" visibility={visibleButton}>
                 {list2.map((item, index) => (
-                    <MenuButton callback={item.callback} key={index}>
+                    <MenuButton className="list-item" callback={item.callback} key={index}>
                         <Icon className="first-icon">{item.icon}</Icon>
                         <Text className={visibleButton}>{item.text}</Text>
                     </MenuButton>
                 ))}
+            </MenuDropList>
+            <MenuDropList firstIcon={<BookIcon />} text="Гойда №3" visibility={visibleButton}>
             </MenuDropList>
             <div style={{ marginBottom: "auto" }}></div>
             <div />

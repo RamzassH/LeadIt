@@ -1,16 +1,19 @@
 import {
+    Background,
     BackgroundContainer,
-    ContainerColumn,
     ContainerRow
 } from "@/components/UI/ProfilePage/Profile/styled/Containers";
 import {ChangeButton, Title} from "@/components/UI/ProfilePage/Profile/styled/Title";
 import {Text} from "@/components/UI/ProfilePage/Profile/styled/Text";
+import React from "react";
+import useUserInfoStore from "@/components/UI/ProfilePage/store";
 
 interface AdditionalInfoProps {
-    description: string;
+    style?: React.CSSProperties;
 }
 
-export default function AdditionalInfoContainer({description}: AdditionalInfoProps) {
+export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
+    const description = useUserInfoStore(state => state.info.description);
     const formattedText = description.split("\n").map((line, index) => (
         <span key={index}>
             {line}
@@ -19,24 +22,36 @@ export default function AdditionalInfoContainer({description}: AdditionalInfoPro
     ));
 
     return (
-        <div style={{width: "100%", height: "calc(100% - 320rem/16 - 6rem/16)"}}>
-            <BackgroundContainer>
-                <div style={{padding: "calc(12rem/16) calc(16rem/16)"}}>
-                    <ContainerRow>
-                        <Title>
-                            Дополнительная информация
-                        </Title>
-                        <div style={{marginRight: "auto"}}/>
-                        <ChangeButton>
-                            изменить
-                        </ChangeButton>
-                    </ContainerRow>
-                </div>
-                <ContainerColumn style={{padding: "calc(0rem/16) calc(16rem/16) calc(12rem/16) calc(16rem/16)"}}>
-                    <Text style={{width: "100%", fontWeight: "400"}}>
-                        {formattedText}
-                    </Text>
-                </ContainerColumn>
+        <div style={style}>
+            <BackgroundContainer style={{justifyContent: "center", alignItems: "center"}}>
+                <Background style={{
+                    width: "calc(100% - 36rem/16 * 2)",
+                    height: "calc(100% - 36rem/16 * 2)",
+                    }}
+                >
+                    <div style={{padding: "calc(12rem/16) calc(16rem/16)"}}>
+                        <ContainerRow>
+                            <Title>
+                                О себе
+                            </Title>
+                            <div style={{marginRight: "auto"}}/>
+                            <ChangeButton>
+                                изменить
+                            </ChangeButton>
+                        </ContainerRow>
+                    </div>
+                        <BackgroundContainer style={{
+                            width: "calc(100% - 16rem/16 * 2)",
+                            height: "fit-content",
+                            margin: "0 calc(16rem/16) calc(16rem/16)",
+                            padding: "calc(16rem/16)"
+                            }}
+                        >
+                            <Text>
+                                {formattedText}
+                            </Text>
+                        </BackgroundContainer>
+                </Background>
             </BackgroundContainer>
         </div>
     )
