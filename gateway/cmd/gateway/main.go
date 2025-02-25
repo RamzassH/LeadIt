@@ -37,7 +37,6 @@ func main() {
 	}
 
 	log.Printf("Запуск HTTP gateway на порту %s. gRPC сервер: %s", httpPort, grpcServerAddress)
-	// Запускаем HTTP сервер
 	if err := http.ListenAndServe(":"+httpPort, mux); err != nil {
 		log.Fatalf("Ошибка при запуске HTTP сервера: %v", err)
 	}

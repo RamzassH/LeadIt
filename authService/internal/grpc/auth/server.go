@@ -7,6 +7,7 @@ import (
 	"github.com/RamzassH/LeadIt/authService/internal/services/auth"
 	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	"github.com/go-playground/validator/v10"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -21,7 +22,7 @@ type Auth interface {
 
 	VerifyCode(
 		ctx context.Context,
-		userID int64,
+		email string,
 		code string) (token string, refreshToken string, err error)
 
 	RegisterNewUser(
@@ -47,13 +48,15 @@ type Auth interface {
 type ServerAPI struct {
 	authv1.UnimplementedAuthServer
 	auth     Auth
+	logger   zerolog.Logger
 	validate *validator.Validate
 }
 
-func RegisterGRPCServer(grpcServer *grpc.Server, validate *validator.Validate, authService Auth) {
+func RegisterGRPCServer(grpcServer *grpc.Server, validate *validator.Validate, logger zerolog.Logger, authService Auth) {
 	authv1.RegisterAuthServer(grpcServer, &ServerAPI{
 		validate: validate,
 		auth:     authService,
+		logger:   logger,
 	})
 }
 
@@ -70,8 +73,8 @@ type LoginRequestValidation struct {
 }
 
 type VerifyValidation struct {
-	UserId int64  `json:"userId,omitempty" validate:"required"`
-	Code   string `json:"code,omitempty" validate:"required"`
+	Email string `json:"email,omitempty" validate:"required"`
+	Code  string `json:"code,omitempty" validate:"required"`
 }
 
 type IsAdminValidation struct {
@@ -114,19 +117,28 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 
 func (s *ServerAPI) VerifyCode(ctx context.Context, req *authv1.VerifyRequest) (*authv1.VerifyResponse, error) {
 	verifyReq := VerifyValidation{
-		UserId: req.GetUserId(),
-		Code:   req.GetCode(),
+		Email: req.GetEmail(),
+		Code:  req.GetCode(),
 	}
 
 	if err := s.ValidateStruct(verifyReq); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	token, refreshToken, err := s.auth.VerifyCode(ctx, req.GetUserId(), req.GetCode())
+	token, refreshToken, err := s.auth.VerifyCode(ctx, req.GetEmail(), req.GetCode())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		if errors.Is(err, auth.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
 	}
 
+	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
+
+	metaData := metadata.Pairs("Cookie", cookie)
+
+	if err := grpc.SetHeader(ctx, metaData); err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
 	return &authv1.VerifyResponse{
 		Token:        token,
 		RefreshToken: refreshToken,

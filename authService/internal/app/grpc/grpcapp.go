@@ -24,7 +24,7 @@ func New(
 	authService authgrpc.Auth) *App {
 	gRPCServer := grpc.NewServer()
 
-	authgrpc.RegisterGRPCServer(gRPCServer, validate, authService)
+	authgrpc.RegisterGRPCServer(gRPCServer, validate, log, authService)
 
 	return &App{
 		logger:     log,

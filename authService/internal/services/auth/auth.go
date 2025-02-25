@@ -13,6 +13,8 @@ import (
 	"github.com/RamzassH/LeadIt/authService/internal/storage"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"kafka"
 	"regexp"
 	"time"
@@ -208,7 +210,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 		logger.Error().Err(err).Msg("failed to generate verification code")
 	}
 
-	userVerificationKey := fmt.Sprintf("auth:verefication:%d", id)
+	userVerificationKey := fmt.Sprintf("auth:verefication:%s", email)
 	logger.Info().Str("key stored set", userVerificationKey).Msg("key stored")
 
 	redisErr := a.redisStorage.Set(ctx, userVerificationKey, code, VerificationCodeTTL)
@@ -243,12 +245,12 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 	return id, nil
 }
 
-func (a *Auth) VerifyCode(ctx context.Context, userId int64, code string) (token string, refreshToken string, err error) {
+func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token string, refreshToken string, err error) {
 	const op = "auth.VerifyCode"
 
 	logger := a.logger.With().Str("operation", op).Logger()
 
-	key := fmt.Sprintf("auth:verefication:%d", userId)
+	key := fmt.Sprintf("auth:verefication:%s", email)
 	storedCode, err := a.redisStorage.Get(ctx, key)
 	logger.Info().Str("storedKey", key).Msg("Проверка хранения кода в Redis")
 	logger.Info().Str("stored code", storedCode).Msg(storedCode)
@@ -259,13 +261,13 @@ func (a *Auth) VerifyCode(ctx context.Context, userId int64, code string) (token
 	}
 	if storedCode != code {
 		logger.Error().Msg("invalid code")
-		return "", "", nil
+		return "", "", status.Error(codes.InvalidArgument, "invalid code")
 	}
 
 	_ = a.redisStorage.Del(ctx, key)
 	logger.Info().Msg("user successfully verified")
 
-	user, err := a.userProvider.UserById(ctx, userId)
+	user, err := a.userProvider.User(ctx, email)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			return "", "", fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
@@ -287,12 +289,12 @@ func (a *Auth) VerifyCode(ctx context.Context, userId int64, code string) (token
 
 	rt := models.RefreshToken{
 		Token:     refreshToken,
-		UserID:    userId,
+		UserID:    user.ID,
 		ExpiresAt: time.Now().Add(a.refreshTokenTTL),
 		Revoked:   false,
 		CreatedAt: time.Now(),
 	}
-	logger.Debug().Int64("userId", userId).Int64("user.ID", user.ID)
+	logger.Debug().Str("email", email).Str("Email", user.Email)
 	logger.Debug().Str("refreshToken", refreshToken).Msg("refresh token")
 
 	if err := a.tokenSaver.SaveRefreshToken(ctx, rt); err != nil {
