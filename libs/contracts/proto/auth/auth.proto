@@ -13,6 +13,13 @@ service Auth {
     };
   }
 
+  rpc VerifyCode(VerifyRequest) returns (VerifyResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/verify"
+      body: "*"
+    };
+  }
+
   rpc Login (LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
       post: "/v1/auth/login"
@@ -63,8 +70,19 @@ message RegisterRequest {
   string password = 4;
 }
 
+
 message RegisterResponse {
   int64 user_id = 1;
+}
+
+message VerifyRequest {
+  int64 userId = 1;
+  string code = 2;
+}
+
+message VerifyResponse {
+  string token = 1;
+  string refresh_token = 2;
 }
 
 message LoginRequest {

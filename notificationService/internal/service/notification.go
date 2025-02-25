@@ -15,12 +15,12 @@ type SMTP struct {
 }
 
 type NotificationService struct {
-	logger             *zerolog.Logger
+	logger             zerolog.Logger
 	notificationSender NotificationSender
 	smtp               SMTP
 }
 
-func New(logger *zerolog.Logger, smtpConfig SMTP) *NotificationService {
+func New(logger zerolog.Logger, smtpConfig SMTP) *NotificationService {
 	return &NotificationService{
 		logger: logger,
 		smtp:   smtpConfig,
@@ -28,13 +28,21 @@ func New(logger *zerolog.Logger, smtpConfig SMTP) *NotificationService {
 }
 
 type NotificationSender interface {
-	SendEmail(ctx context.Context, to, subject, body string) error
-	SendNotification(ctx context.Context, userId, subject, body string) error
+	SendEmailNotification(ctx context.Context, to, subject, body string) (bool, error)
 }
 
 func (ns *NotificationService) SendEmailNotification(ctx context.Context, to, subject, body string) (bool, error) {
+	if ns.smtp.Host == "" || ns.smtp.Port == "" || ns.smtp.User == "" || ns.smtp.Password == "" {
+		ns.logger.Error().Msg("SMTP credentials are empty! Check configuration.")
+		return false, fmt.Errorf("SMTP credentials are missing")
+	}
+
 	auth := smtp.PlainAuth("", ns.smtp.User, ns.smtp.Password, ns.smtp.Host)
-	msg := []byte(fmt.Sprintf("Subject: %s\r\n\r\n%s", subject, body))
+
+	msg := []byte(fmt.Sprintf(
+		"From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n%s",
+		ns.smtp.User, to, subject, body,
+	))
 
 	addr := fmt.Sprintf("%s:%s", ns.smtp.Host, ns.smtp.Port)
 	if err := smtp.SendMail(addr, auth, ns.smtp.User, []string{to}, msg); err != nil {
@@ -42,11 +50,6 @@ func (ns *NotificationService) SendEmailNotification(ctx context.Context, to, su
 		return false, err
 	}
 
-	ns.logger.Info().Msg("Email sent successfully")
+	ns.logger.Info().Str("email", to).Msg("Email sent successfully")
 	return true, nil
-}
-
-func (ns *NotificationService) SendKafkaNotification(ctx context.Context, userId string, subject string, message string) (bool, error) {
-	//TODO implement me
-	panic("implement me")
 }

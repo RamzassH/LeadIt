@@ -4,20 +4,25 @@ import (
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
+	"time"
 )
 
 type Config struct {
-	Env  string     `yaml:"env" env-default:"local"`
-	SMTP SMTPConfig `yaml:"smtp"`
+	Env                   string        `yaml:"env" env-default:"local"`
+	StoragePath           string        `yaml:"storage_path" env-required:"true"`
+	TokenTTL              time.Duration `yaml:"token_ttl" env-required:"true"`
+	TokenSecret           string        `yaml:"token_secret" env-required:"true"`
+	RefreshTokenTTL       time.Duration `yaml:"refresh_token_ttl" env-required:"true"`
+	PostgresDSN           string        `yaml:"storage_connection_string" env-required:"true"`
+	RedisConnectionString string        `yaml:"redis_connection_string" env-required:"true"`
+	GRPC                  GRPCConfig    `yaml:"grpc"`
 }
 
 var cfgInstance *Config
 
-type SMTPConfig struct {
-	Host     string `yaml:"host" env-required:"true"`
-	Port     string `yaml:"port" env-default:"587"`
-	User     string `yaml:"user" env-required:"true"`
-	Password string `yaml:"password" env-required:"true"`
+type GRPCConfig struct {
+	Port    int           `yaml:"port" env-default:"8080"`
+	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
 }
 
 func MustLoadConfig() *Config {
@@ -26,7 +31,6 @@ func MustLoadConfig() *Config {
 	}
 
 	path := fetchConfigPath()
-
 	if path == "" {
 		panic("config file path is empty")
 	}
@@ -35,6 +39,7 @@ func MustLoadConfig() *Config {
 }
 
 func MustLoadConfigByPath(configPath string) *Config {
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		panic("config file not found " + configPath)
 	}

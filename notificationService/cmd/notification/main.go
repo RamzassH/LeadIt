@@ -1,27 +1,23 @@
 package main
 
 import (
-	"github.com/RamzassH/LeadIt/notificationService/internal/app"
-	"github.com/RamzassH/LeadIt/notificationService/internal/config"
 	notification "github.com/RamzassH/LeadIt/notificationService/internal/service"
 	"github.com/go-playground/validator/v10"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 	"syscall"
-)
 
-const (
-	envLocal = "local"
-	envProd  = "prod"
+	"github.com/RamzassH/LeadIt/notificationService/internal/app"
+	"github.com/RamzassH/LeadIt/notificationService/internal/config"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"kafka"
 )
 
 func main() {
 	cfg := config.MustLoadConfig()
 
 	logger := setupLogger(cfg.Env)
-
 	logger.Info().Str("env", cfg.Env).Msg("Starting notification service")
 
 	validate := validator.New()
@@ -33,32 +29,32 @@ func main() {
 		Password: cfg.SMTP.Password,
 	}
 
-	application, _ := app.New(logger, cfg.GRPC.Port, validate, smtpConfig.Host, smtpConfig.Port, smtpConfig.User, smtpConfig.Password)
+	brokers := []string{"kafka:9092"}
+	topic := "notification"
+	groupID := "notification-consumer-group"
 
-	go application.GRPCServer.MustStart()
+	consumer := kafka.NewConsumer(brokers, topic, groupID, logger)
+	defer consumer.Close()
+
+	application, err := app.New(logger, consumer, validate, smtpConfig)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to initialize application")
+	}
+
+	go application.Start()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
-
-	sign := <-stop
-
-	logger.Info().Str("signal", sign.String()).Msg("Shutting down...")
-
-	application.GRPCServer.Stop()
-
-	logger.Info().Msg("application stopped")
+	sig := <-stop
+	logger.Info().Str("signal", sig.String()).Msg("Shutting down...")
 }
 
-func setupLogger(env string) *zerolog.Logger {
+func setupLogger(env string) zerolog.Logger {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
-	var logger zerolog.Logger
-
-	if env == envLocal {
-		logger = log.Logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	} else {
-		logger = log.Output(os.Stdout)
+	if env == "local" {
+		return log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
-	return &logger
+	return log.Output(os.Stdout)
 }
