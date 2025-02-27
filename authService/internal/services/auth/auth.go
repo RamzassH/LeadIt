@@ -66,17 +66,16 @@ type TokenSaver interface {
 
 type UserSaver interface {
 	SaveUser(ctx context.Context,
-		name string,
-		surname string,
-		email string,
-		passwordHash []byte,
+		user models.User,
 	) (uid int64, err error)
 }
 
 type UserProvider interface {
-	User(ctx context.Context, email string) (user models.User, err error)
+	UserByEmail(ctx context.Context, email string) (user models.User, err error)
 	UserById(ctx context.Context, id int64) (user models.User, err error)
 	IsAdmin(ctx context.Context, uid int64) (isAdmin bool, err error)
+	UpdateUser(ctx context.Context, user models.User) error
+	VerifyUser(ctx context.Context, userID int64) error
 }
 
 type Redis interface {
@@ -118,7 +117,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string) (token 
 
 	a.logger.Info().Str("operation", op).Msg("login user")
 
-	user, err := a.userProvider.User(ctx, email)
+	user, err := a.userProvider.UserByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			logger.Error().Msg("user not found")
@@ -183,23 +182,29 @@ func (a *Auth) Logout(ctx context.Context, refreshToken string) error {
 	return nil
 }
 
-func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string, email string, password string) (userId int64, err error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, user models.RegisterUserPayload) (userId int64, err error) {
 	const op = "auth.Register"
 
 	logger := a.logger.With().Str("operation", op).Logger()
 
-	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error().Err(err).Str(op, err.Error())
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	logger.Info().Str("username", name).Str("surname", surname).Str("email", email).Msg("register user")
+	logger.Info().Str("username", user.Name).Str("surname", user.Surname).Str("email", user.Email).Msg("register user")
 
 	var id int64
 	var saveErr error
 
-	id, saveErr = a.userSaver.SaveUser(ctx, name, surname, email, hashPass)
+	userEntity := models.User{
+		Email:    user.Email,
+		Name:     user.Name,
+		Surname:  user.Surname,
+		PassHash: hashPass,
+	}
+	id, saveErr = a.userSaver.SaveUser(ctx, userEntity)
 	if saveErr != nil {
 		logger.Error().Err(saveErr).Str("operation", op).Msg("failed to save user")
 		return 0, fmt.Errorf("%s: %w", op, saveErr)
@@ -210,7 +215,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 		logger.Error().Err(err).Msg("failed to generate verification code")
 	}
 
-	userVerificationKey := fmt.Sprintf("auth:verefication:%s", email)
+	userVerificationKey := fmt.Sprintf("auth:verefication:%s", user.Email)
 	logger.Info().Str("key stored set", userVerificationKey).Msg("key stored")
 
 	redisErr := a.redisStorage.Set(ctx, userVerificationKey, code, VerificationCodeTTL)
@@ -226,7 +231,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 
 	ConfirmMsg := ConfirmMassage{
 		UserID: id,
-		Email:  email,
+		Email:  user.Email,
 		Code:   code,
 		Time:   time.Now().UTC().Format(time.RFC3339),
 	}
@@ -243,6 +248,35 @@ func (a *Auth) RegisterNewUser(ctx context.Context, name string, surname string,
 	}
 
 	return id, nil
+}
+
+func (a *Auth) UpdateUser(ctx context.Context, user models.UpdateUserPayload) error {
+	const op = "auth.UpdateUser"
+	logger := a.logger.With().Str("operation", op).Logger()
+
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		logger.Error().Err(err).Str("operation", op).Msg("failed to generate hash password")
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	userPayload := models.User{
+		ID:         user.ID,
+		Name:       user.Name,
+		Surname:    user.Surname,
+		MiddleName: user.MiddleName,
+		Email:      user.Email,
+		PassHash:   hashPass,
+		BirthDate:  user.BirthDate,
+	}
+
+	updateErr := a.userProvider.UpdateUser(ctx, userPayload)
+	if updateErr != nil {
+		logger.Error().Err(updateErr).Msg("failed to update user")
+		return fmt.Errorf("%s: %w", op, updateErr)
+	}
+
+	return nil
 }
 
 func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token string, refreshToken string, err error) {
@@ -267,7 +301,8 @@ func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token
 	_ = a.redisStorage.Del(ctx, key)
 	logger.Info().Msg("user successfully verified")
 
-	user, err := a.userProvider.User(ctx, email)
+	user, err := a.userProvider.UserByEmail(ctx, email)
+	logger.Info().Interface("user", user).Msg("user found")
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			return "", "", fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
@@ -369,6 +404,11 @@ func (a *Auth) RefreshToken(ctx context.Context, refreshToken string) (token str
 	}
 	if err := a.tokenSaver.SaveRefreshToken(ctx, newRT); err != nil {
 		logger.Error().Err(err).Msg("failed to save new refresh token")
+		return "", "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err := a.userProvider.VerifyUser(ctx, user.ID); err != nil {
+		logger.Error().Err(err).Msg("failed to verify user")
 		return "", "", fmt.Errorf("%s: %w", op, err)
 	}
 

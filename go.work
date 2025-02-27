@@ -6,4 +6,5 @@ use (
 	./libs/contracts
 	./notificationService
 	./libs/kafka
+	libs/redis
 )

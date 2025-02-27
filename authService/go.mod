@@ -46,5 +46,6 @@ require (
 )
 
 replace github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts
+replace github.com/RamzassH/LeadIt/libs/redis => ../libs/redis
 
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250207221924-e9438ea467c6

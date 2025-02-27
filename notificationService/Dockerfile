@@ -8,6 +8,7 @@ COPY go.work .
 COPY authService ./authService
 COPY gateway ./gateway
 COPY libs/contracts ./libs/contracts
+COPY libs/redis ./libs/redis
 COPY libs/kafka ./libs/kafka
 COPY notificationService ./notificationService
 

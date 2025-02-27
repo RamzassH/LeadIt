@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/RamzassH/LeadIt/authService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/authService/internal/services/auth"
 	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	"github.com/go-playground/validator/v10"
@@ -12,6 +13,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"strconv"
+	"time"
 )
 
 type Auth interface {
@@ -27,10 +30,11 @@ type Auth interface {
 
 	RegisterNewUser(
 		ctx context.Context,
-		name string,
-		surname string,
-		email string,
-		password string) (userID int64, err error)
+		user models.RegisterUserPayload) (userID int64, err error)
+
+	UpdateUser(
+		ctx context.Context,
+		updatePayload models.UpdateUserPayload) (err error)
 
 	IsAdmin(
 		ctx context.Context,
@@ -60,27 +64,6 @@ func RegisterGRPCServer(grpcServer *grpc.Server, validate *validator.Validate, l
 	})
 }
 
-type RegisterValidation struct {
-	Name     string `validate:"required,min=1,max=100"`
-	Surname  string `validate:"required,min=1,max=100"`
-	Email    string `json:"email,omitempty" validate:"required,email"`
-	Password string `json:"password,omitempty" validate:"required"`
-}
-
-type LoginRequestValidation struct {
-	Email    string `json:"email,omitempty" validate:"omitempty,email"`
-	Password string `json:"password,omitempty" validate:"required"`
-}
-
-type VerifyValidation struct {
-	Email string `json:"email,omitempty" validate:"required"`
-	Code  string `json:"code,omitempty" validate:"required"`
-}
-
-type IsAdminValidation struct {
-	userId int64 `validate:"required,min=1,max=100"`
-}
-
 func (s *ServerAPI) ValidateStruct(data interface{}) error {
 	if err := s.validate.Struct(data); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
@@ -89,7 +72,7 @@ func (s *ServerAPI) ValidateStruct(data interface{}) error {
 }
 
 func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (*authv1.RegisterResponse, error) {
-	registerReq := RegisterValidation{
+	registerReq := models.RegisterUserPayload{
 		Name:     req.GetName(),
 		Surname:  req.GetSurname(),
 		Email:    req.GetEmail(),
@@ -100,7 +83,7 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	userID, err := s.auth.RegisterNewUser(ctx, req.GetName(), req.GetSurname(), req.GetEmail(), req.GetPassword())
+	userID, err := s.auth.RegisterNewUser(ctx, registerReq)
 
 	if err != nil {
 		if errors.Is(err, auth.ErrUserExists) {
@@ -115,8 +98,8 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 	}, nil
 }
 
-func (s *ServerAPI) VerifyCode(ctx context.Context, req *authv1.VerifyRequest) (*authv1.VerifyResponse, error) {
-	verifyReq := VerifyValidation{
+func (s *ServerAPI) Verify(ctx context.Context, req *authv1.VerifyRequest) (*authv1.VerifyResponse, error) {
+	verifyReq := models.VerifyUserPayload{
 		Email: req.GetEmail(),
 		Code:  req.GetCode(),
 	}
@@ -130,15 +113,13 @@ func (s *ServerAPI) VerifyCode(ctx context.Context, req *authv1.VerifyRequest) (
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
-
-	metaData := metadata.Pairs("Cookie", cookie)
-
-	if err := grpc.SetHeader(ctx, metaData); err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
+	if err := setCookieHeader(ctx, token); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
+
 	return &authv1.VerifyResponse{
 		Token:        token,
 		RefreshToken: refreshToken,
@@ -146,7 +127,7 @@ func (s *ServerAPI) VerifyCode(ctx context.Context, req *authv1.VerifyRequest) (
 }
 
 func (s *ServerAPI) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.LoginResponse, error) {
-	loginReq := LoginRequestValidation{
+	loginReq := models.LoginUserPayload{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 	}
@@ -164,11 +145,7 @@ func (s *ServerAPI) Login(ctx context.Context, req *authv1.LoginRequest) (*authv
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
-	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
-
-	metaData := metadata.Pairs("Cookie", cookie)
-
-	if err := grpc.SetHeader(ctx, metaData); err != nil {
+	if err := setCookieHeader(ctx, token); err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
@@ -179,15 +156,15 @@ func (s *ServerAPI) Login(ctx context.Context, req *authv1.LoginRequest) (*authv
 }
 
 func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*authv1.IsAdminResponse, error) {
-	isAdminReq := IsAdminValidation{
-		userId: req.GetUserId(),
+	isAdminReq := models.IsAdminPayload{
+		UserId: req.GetUserId(),
 	}
 
 	if err := s.ValidateStruct(isAdminReq); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validate isAdmin: %w", err)
 	}
 
-	isAdmin, err := s.auth.IsAdmin(ctx, isAdminReq.userId)
+	isAdmin, err := s.auth.IsAdmin(ctx, isAdminReq.UserId)
 	if err != nil {
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, err.Error())
@@ -198,6 +175,17 @@ func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*a
 	return &authv1.IsAdminResponse{
 		IsAdmin: isAdmin,
 	}, nil
+}
+
+func setCookieHeader(ctx context.Context, token string) error {
+	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
+
+	metaData := metadata.Pairs("Cookie", cookie)
+	if err := grpc.SetHeader(ctx, metaData); err != nil {
+		return status.Error(codes.Unauthenticated, err.Error())
+	}
+
+	return nil
 }
 
 func (s *ServerAPI) RefreshToken(ctx context.Context, req *authv1.RefreshTokenRequest) (*authv1.RefreshTokenResponse, error) {
@@ -238,7 +226,38 @@ func (s *ServerAPI) Logout(ctx context.Context, req *authv1.LogoutRequest) (*aut
 }
 
 func (s *ServerAPI) UpdateUser(ctx context.Context, req *authv1.UpdateUserRequest) (*authv1.UpdateUserResponse, error) {
-	panic("implement me")
+	birthDate, err := time.Parse(time.RFC3339, req.GetBirth())
+
+	userId, err := strconv.ParseInt(req.GetUserId(), 10, 64)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid user id")
+	}
+
+	updatePayload := models.UpdateUserPayload{
+		ID:         userId,
+		Name:       req.GetName(),
+		Surname:    req.GetSurname(),
+		MiddleName: req.GetMiddleName(),
+		AboutMe:    req.GetAboutMe(),
+		Messengers: req.GetMessengers(),
+		Email:      req.GetEmail(),
+		Password:   req.GetPassword(),
+		BirthDate:  birthDate,
+	}
+
+	if err := s.ValidateStruct(updatePayload); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "validate update: %w", err)
+	}
+
+	updateErr := s.auth.UpdateUser(ctx, updatePayload)
+	if updateErr != nil {
+		if errors.Is(updateErr, auth.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, updateErr.Error())
+		}
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &authv1.UpdateUserResponse{Success: true}, nil
 }
 
 func (s *ServerAPI) ResetPassword(ctx context.Context, req *authv1.ResetPasswordRequest) (*authv1.ResetPasswordResponse, error) {

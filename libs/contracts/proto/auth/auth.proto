@@ -1,142 +1,146 @@
-  syntax = "proto3";
+syntax = "proto3";
 
-  package auth;
+package auth;
 
-  option go_package = "leatIt.auth.v1;authv1";
-  import "google/api/annotations.proto";
+option go_package = "leatIt.auth.v1;authv1";
+import "google/api/annotations.proto";
 
-  service Auth {
-    rpc Register (RegisterRequest) returns (RegisterResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/register"
-        body: "*"
-      };
-    }
-
-    rpc VerifyCode(VerifyRequest) returns (VerifyResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/verify"
-        body: "*"
-      };
-    }
-
-    rpc Login (LoginRequest) returns (LoginResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/login"
-        body: "*"
-      };
-    }
-
-    rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
-      option (google.api.http) = {
-        get: "/v1/auth/isadmin/{user_id}"
-      };
-    }
-
-    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
-      option (google.api.http) = {
-        patch: "/v1/auth/user"
-        body: "*"
-      };
-    }
-
-    rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/reset-password"
-        body: "*"
-      };
-    }
-
-    rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/refresh-token"
-        body: "*"
-      };
-    }
-
-    rpc Logout (LogoutRequest) returns (LogoutResponse) {
-      option (google.api.http) = {
-        post: "/v1/auth/logout"
-        body: "*"
-      };
-    }
+service Auth {
+  rpc Register (RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
   }
 
-
-  message RegisterRequest {
-    string name = 1;
-    string surname = 2;
-    string email = 3;
-    string password = 4;
+  rpc Verify(VerifyRequest) returns (VerifyResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/verify"
+      body: "*"
+    };
   }
 
-
-  message RegisterResponse {
-    int64 user_id = 1;
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
   }
 
-  message VerifyRequest {
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/isadmin/{user_id}"
+    };
+  }
+
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v1/auth/user"
+      body: "*"
+    };
+  }
+
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset-password"
+      body: "*"
+    };
+  }
+
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/refresh-token"
+      body: "*"
+    };
+  }
+
+  rpc Logout (LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/logout"
+      body: "*"
+    };
+  }
+}
+
+
+message RegisterRequest {
+  string name = 1;
+  string surname = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+}
+
+message VerifyRequest {
+  string email = 1;
+  string code = 2;
+}
+
+message VerifyResponse {
+  string token = 1;
+  string refresh_token = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  string refreshToken = 2;
+}
+
+message IsAdminRequest {
+  int64 user_id = 1;
+}
+
+message IsAdminResponse {
+  bool is_admin = 1;
+}
+
+message UpdateUserRequest {
+  string user_id = 1;
+  string email = 2;
+  string password = 3;
+  string name = 4;
+  string surname = 5;
+  string middleName = 6;
+  string birth = 7;
+  string aboutMe = 8;
+  map<string, string> messengers = 9;
+}
+
+message UpdateUserResponse {
+  bool success = 1;
+}
+
+message ResetPasswordRequest {
+  oneof identifier {
     string email = 1;
-    string code = 2;
+    string phone_number = 2;
   }
+}
 
-  message VerifyResponse {
-    string token = 1;
-    string refresh_token = 2;
-  }
+message ResetPasswordResponse {
+  bool success = 1;
+}
 
-  message LoginRequest {
-    string email = 1;
-    string password = 2;
-  }
+message LogoutRequest {
+  string refresh_token = 1;
+}
 
-  message LoginResponse {
-    string token = 1;
-    string refreshToken = 2;
-  }
-
-  message IsAdminRequest {
-    int64 user_id = 1;
-  }
-
-  message IsAdminResponse {
-    bool is_admin = 1;
-  }
-
-  message UpdateUserRequest {
-    int64 user_id = 1;
-    string new_email = 2;
-    string new_phone_number = 3;
-    string new_password = 4;
-  }
-
-  message UpdateUserResponse {
-    bool success = 1;
-  }
-
-  message ResetPasswordRequest {
-    oneof identifier {
-      string email = 1;
-      string phone_number = 2;
-    }
-  }
-
-  message ResetPasswordResponse {
-    bool success = 1;
-  }
-
-  message LogoutRequest {
-    string refresh_token = 1;
-  }
-
-  message LogoutResponse {}
+message LogoutResponse {}
 
 
-  message RefreshTokenRequest {
-    string refresh_token = 1;
-  }
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
 
-  message RefreshTokenResponse {
-    string token = 1;
-    string refresh_token = 2;
-  }
+message RefreshTokenResponse {
+  string token = 1;
+  string refresh_token = 2;
+}
