@@ -1,41 +1,31 @@
-# Stage 1: Build the Go binary
 FROM golang:1.23-alpine AS builder
 
-# Установите необходимые пакеты
 RUN apk update && apk add --no-cache git
 
-# Установите рабочую директорию
 WORKDIR /app
+COPY go.work .
+COPY notificationService ./notificationService
+COPY authService ./authService
+COPY libs/contracts ./libs/contracts
+COPY libs/redis ./libs/redis
+COPY libs/kafka ./libs/kafka
+COPY gateway ./gateway
 
-# Копируйте файлы зависимостей и скачайте модули
-COPY backend/go.mod backend/go.sum ./
-COPY contracts ./
 RUN go mod download
 
-# Копируйте исходный код
 COPY . .
 
-# Соберите приложение
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-service ./backend/cmd/auth/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-service ./authService/cmd/auth/main.go
 
-# Stage 2: Создайте минимальный образ для запуска приложения
 FROM alpine:latest
-
-# Установите необходимые пакеты
 RUN apk --no-cache add ca-certificates
 
-# Рабочая директория
 WORKDIR /root/
+RUN mkdir -p ./authService/config
 
-# Создадим необходимые директории, чтобы соответствовать пути ./backend/config/
-RUN mkdir -p ./backend/config
-
-# Скопируем бинарник
 COPY --from=builder /app/auth-service .
+COPY --from=builder /app/authService/config/local.yaml /app/authService/config/config.yaml
 
-# Скопируем config.yaml (из того же места, куда положили в builder)
-COPY --from=builder /app/backend/config/local.yaml ./local.yaml
+EXPOSE 57442
 
-EXPOSE 50051
-
-CMD ["./auth-service", "--config", "./backend/config/local.yaml"]
+CMD ["./auth-service", "--config", "/app/authService/config/config.yaml"]

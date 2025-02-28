@@ -1,0 +1,10 @@
+go 1.23.3
+
+use (
+	./authService
+	./gateway
+	./libs/contracts
+	./notificationService
+	./libs/kafka
+	libs/redis
+)

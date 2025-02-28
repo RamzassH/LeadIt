@@ -1,0 +1,6 @@
+env: "local"
+smtp:
+  host: smtp.yandex.ru
+  port: 587   # Можно использовать 587 (STARTTLS) или 465 (SSL)
+  user: romankutcyi123@yandex.ru
+  password: axenvwtbizhygkid

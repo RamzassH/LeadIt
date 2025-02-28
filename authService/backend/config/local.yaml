@@ -1,9 +1,0 @@
-env: "local"
-storage_path: "./storage/auth.db"
-storage_connection_string: "postgres://postgres:postgres@authdb:5432/authdb?sslmode=disable"
-token_ttl: 1h
-refresh_token_ttl: 168h
-token_secret: "super_secret_token"
-grpc:
-  port: 57442
-  timout: 10h

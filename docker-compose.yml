@@ -1,58 +1,97 @@
+version: '3.8'
+
+networks:
+  app_net:
+    driver: bridge
+
 services:
-  backend:
-    build:
-      context: ./backend
+  zookeeper:
+    image: wurstmeister/zookeeper
     ports:
-      - "50051:50051"
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
     environment:
-      - REDIS_URL=redis://redis:6379
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
-      - db
-      - redis
-      - minio
+      - zookeeper
 
-  frontend:
-    build:
-      context: ./frontend
+  redis:
+    image: redis:alpine
+    restart: always
     ports:
-      - "3000:3000"
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+
+  gateway:
+    build: ./gateway
+    restart: always
     depends_on:
-      - backend
+      - auth-service
+    environment:
+      GRPC_SERVER_ADDRESS: "auth-service:57442"
+      HTTP_PORT: "8080"
+    ports:
+      - "8080:8080"
 
 
-  db:
+  authdb:
     image: postgres:14
     restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: authdb
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5434:5432"
 
-  redis:
-    image: redis:7
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./authService/Dockerfile
     restart: always
-    ports:
-      - "6379:6379"
-
-  minio:
-    image: minio/minio:latest
-    restart: always
-    ports:
-      - "9000:9000"
+    depends_on:
+      - authdb
+      - redis
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data
+      ENV: ${ENV}
+      GRPC_PORT: ${GRPC_PORT}
+      DATABASE_DSN: ${DATABASE_DSN}
+      TOKEN_TTL: ${TOKEN_TTL}
+      CONFIG_PATH: "/app/authService/config/config.yaml"
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
     volumes:
-      - minio_data:/data
+      - ./authService/config:/app/config
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    command: [ "./auth-service", "--config", "/app/authService/config/config.yaml" ]
 
+
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./notificationService/Dockerfile
+    ports:
+      - "50052:50052"
+      - "8081:8081"
+    depends_on:
+      - kafka
+    command: [ "./notification-service", "--config", "/app/notificationService/config/config.yaml" ]
 volumes:
   db_data:
-  minio_data:
+  redis_data:
