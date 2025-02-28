@@ -5,8 +5,10 @@ import {
 } from "@/components/UI/ProfilePage/Profile/styled/Containers";
 import {ChangeButton, Title} from "@/components/UI/ProfilePage/Profile/styled/Title";
 import {Text} from "@/components/UI/ProfilePage/Profile/styled/Text";
-import React from "react";
+import React, {useRef} from "react";
 import useUserInfoStore from "@/components/UI/ProfilePage/store";
+import EditDescriptionDataWindow
+    from "@/components/UI/ProfilePage/ModalWindow/EditDescriptionDataWindow/EditDescriptionDataWindow";
 
 interface AdditionalInfoProps {
     style?: React.CSSProperties;
@@ -20,6 +22,13 @@ export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
             <br />
         </span>
     ));
+
+    const editDescriptionDataWindowRef = useRef<{ triggerHandleClick: () => void }>(null);
+    const handleEditDescriptionDataButtonClick = () => {
+        if (editDescriptionDataWindowRef.current) {
+            editDescriptionDataWindowRef.current.triggerHandleClick();
+        }
+    };
 
     return (
         <div style={style}>
@@ -35,7 +44,7 @@ export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
                                 О себе
                             </Title>
                             <div style={{marginRight: "auto"}}/>
-                            <ChangeButton>
+                            <ChangeButton onClick={handleEditDescriptionDataButtonClick}>
                                 изменить
                             </ChangeButton>
                         </ContainerRow>
@@ -53,6 +62,7 @@ export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
                         </BackgroundContainer>
                 </Background>
             </BackgroundContainer>
+            <EditDescriptionDataWindow ref={editDescriptionDataWindowRef}/>
         </div>
     )
 }

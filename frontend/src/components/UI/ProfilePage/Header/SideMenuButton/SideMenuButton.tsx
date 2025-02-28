@@ -20,7 +20,7 @@ export default function SideMenuButton({callback}: SideMenuButtonProps) {
     return (
         <SideMenuButtonContainer onClick={handleClick}>
             <SideMenuButtonContent animate={{
-                rotate: isOpen ? -90 : 0, // Поворот на 90 градусов или обратно
+                rotate: isOpen ? 0 : 0, // Поворот на 90 градусов или обратно
             }}
                 transition={{
                 duration: 0.3, // Длительность анимации

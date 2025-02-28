@@ -7,13 +7,15 @@ import SideMenu from "@/components/UI/ProfilePage/SideMenu/SideMenu";
 import React, {useRef} from "react";
 import Header from "@/components/UI/ProfilePage/Header/Header";
 import ProfileComponent from "@/components/UI/ProfilePage/Profile/ProfileComponent";
+import DrawerSideMenu from "@/components/UI/ProfilePage/DrawerSideMenu/DrawerSideMenu";
+import ModalWindow from "@/components/UI/ProfilePage/ModalWindow/ModalWindow";
 
 export default function Profile() {
-    const sideMenuRef = useRef<{ triggerHandleClick: () => void }>(null);
+    const drawerSideMenuRef = useRef<{ triggerHandleClick: () => void }>(null);
 
     const handleButtonClick = () => {
-        if (sideMenuRef.current) {
-            sideMenuRef.current.triggerHandleClick();
+        if (drawerSideMenuRef.current) {
+            drawerSideMenuRef.current.triggerHandleClick();
         }
     };
 
@@ -22,10 +24,12 @@ export default function Profile() {
             <body>
                 <Header menuOpenFunction={handleButtonClick}/>
                 <main>
-                    <SideMenu ref={sideMenuRef}/>
+                    {/*<SideMenu ref={sideMenuRef}/>*/}
+                    <DrawerSideMenu ref={drawerSideMenuRef}/>
                     <ProfileComponent/>
                 </main>
                 <footer>
+                    <ModalWindow/>
                 </footer>
             </body>
         </ThemeProvider>
