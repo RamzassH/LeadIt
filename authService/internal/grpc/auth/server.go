@@ -25,8 +25,7 @@ type Auth interface {
 
 	VerifyCode(
 		ctx context.Context,
-		email string,
-		code string) (token string, refreshToken string, err error)
+		payload models.VerifyUserPayload) (token string, refreshToken string, err error)
 
 	RegisterNewUser(
 		ctx context.Context,
@@ -104,18 +103,13 @@ func (s *ServerAPI) Verify(ctx context.Context, req *authv1.VerifyRequest) (*aut
 		Code:  req.GetCode(),
 	}
 
-	if err := s.ValidateStruct(verifyReq); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	token, refreshToken, err := s.auth.VerifyCode(ctx, req.GetEmail(), req.GetCode())
+	token, refreshToken, err := s.auth.VerifyCode(ctx, verifyReq)
 	if err != nil {
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-
 	if err := setCookieHeader(ctx, token); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -180,7 +174,7 @@ func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*a
 func setCookieHeader(ctx context.Context, token string) error {
 	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
 
-	metaData := metadata.Pairs("Cookie", cookie)
+	metaData := metadata.Pairs("Set-Cookie", cookie)
 	if err := grpc.SetHeader(ctx, metaData); err != nil {
 		return status.Error(codes.Unauthenticated, err.Error())
 	}

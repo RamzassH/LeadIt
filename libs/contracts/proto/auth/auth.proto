@@ -13,13 +13,6 @@ service Auth {
     };
   }
 
-  rpc Verify(VerifyRequest) returns (VerifyResponse) {
-    option (google.api.http) = {
-      post: "/v1/auth/verify"
-      body: "*"
-    };
-  }
-
   rpc Login (LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
       post: "/v1/auth/login"
@@ -27,9 +20,16 @@ service Auth {
     };
   }
 
+  rpc Verify (VerifyRequest) returns (VerifyResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/verify"
+      body: "*"
+    };
+  }
+
   rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
     option (google.api.http) = {
-      get: "/v1/auth/isadmin/{user_id}"
+      get: "/v1/auth/is-admin/{user_id}"
     };
   }
 
@@ -74,16 +74,6 @@ message RegisterResponse {
   int64 user_id = 1;
 }
 
-message VerifyRequest {
-  string email = 1;
-  string code = 2;
-}
-
-message VerifyResponse {
-  string token = 1;
-  string refresh_token = 2;
-}
-
 message LoginRequest {
   string email = 1;
   string password = 2;
@@ -91,7 +81,17 @@ message LoginRequest {
 
 message LoginResponse {
   string token = 1;
-  string refreshToken = 2;
+  string refresh_token = 2;
+}
+
+message VerifyRequest {
+  string code = 1;
+  string email = 2;
+}
+
+message VerifyResponse {
+  string token = 1;
+  string refresh_token = 2;
 }
 
 message IsAdminRequest {
@@ -108,9 +108,9 @@ message UpdateUserRequest {
   string password = 3;
   string name = 4;
   string surname = 5;
-  string middleName = 6;
+  string middle_name = 6;
   string birth = 7;
-  string aboutMe = 8;
+  string about_me = 8;
   map<string, string> messengers = 9;
 }
 

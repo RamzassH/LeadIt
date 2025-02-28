@@ -279,12 +279,12 @@ func (a *Auth) UpdateUser(ctx context.Context, user models.UpdateUserPayload) er
 	return nil
 }
 
-func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token string, refreshToken string, err error) {
+func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPayload) (token string, refreshToken string, err error) {
 	const op = "auth.VerifyCode"
 
 	logger := a.logger.With().Str("operation", op).Logger()
 
-	key := fmt.Sprintf("auth:verefication:%s", email)
+	key := fmt.Sprintf("auth:verefication:%s", verifyPayload.Email)
 	storedCode, err := a.redisStorage.Get(ctx, key)
 	logger.Info().Str("storedKey", key).Msg("Проверка хранения кода в Redis")
 	logger.Info().Str("stored code", storedCode).Msg(storedCode)
@@ -293,7 +293,7 @@ func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token
 			return "", "", fmt.Errorf("%s: %w", op, storage.ErrTokenNotFound)
 		}
 	}
-	if storedCode != code {
+	if storedCode != verifyPayload.Code {
 		logger.Error().Msg("invalid code")
 		return "", "", status.Error(codes.InvalidArgument, "invalid code")
 	}
@@ -301,7 +301,7 @@ func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token
 	_ = a.redisStorage.Del(ctx, key)
 	logger.Info().Msg("user successfully verified")
 
-	user, err := a.userProvider.UserByEmail(ctx, email)
+	user, err := a.userProvider.UserByEmail(ctx, verifyPayload.Email)
 	logger.Info().Interface("user", user).Msg("user found")
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
@@ -329,7 +329,7 @@ func (a *Auth) VerifyCode(ctx context.Context, email string, code string) (token
 		Revoked:   false,
 		CreatedAt: time.Now(),
 	}
-	logger.Debug().Str("email", email).Str("Email", user.Email)
+	logger.Debug().Str("email", verifyPayload.Email).Str("Email", user.Email)
 	logger.Debug().Str("refreshToken", refreshToken).Msg("refresh token")
 
 	if err := a.tokenSaver.SaveRefreshToken(ctx, rt); err != nil {
