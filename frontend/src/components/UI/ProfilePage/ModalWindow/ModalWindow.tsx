@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
+import TextField, {TextFieldProps} from '@mui/material/TextField';
 
-function ModalWindow() {
+interface ModalWindowProps {
+    title?: string;
+    children?: React.ReactNode;
+}
+
+function ModalWindow({title, children}: ModalWindowProps) {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -30,6 +35,22 @@ function ModalWindow() {
         });
     };
 
+    // Клонируем children и добавляем свойство onChange
+    const childrenWithProps = React.Children.map(children, (child) => {
+        // Указываем тип TextFieldProps для child
+        if (React.isValidElement<TextFieldProps>(child)) {
+            return React.cloneElement<TextFieldProps>(child, {
+                onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                    if (child.props.onChange) {
+                        child.props.onChange(event); // Вызов существующего обработчика
+                    }
+                    handleInputChange(event); // Вызов нового обработчика
+                },
+            });
+        }
+        return child;
+    });
+
     const handleSubmit = () => {
         console.log('Данные формы:', formData);
         handleClose(); // Закрываем модальное окно после отправки
@@ -37,9 +58,10 @@ function ModalWindow() {
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>Форма с несколькими полями ввода</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <DialogContent>
-                <TextField
+                {childrenWithProps}
+                {/*<TextField
                     autoFocus
                     margin="dense"
                     name="name"
@@ -69,6 +91,7 @@ function ModalWindow() {
                     value={formData.message}
                     onChange={handleInputChange}
                 />
+                */}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Отмена</Button>

@@ -9,6 +9,7 @@ import React, {useRef} from "react";
 import useUserInfoStore from "@/components/UI/ProfilePage/store";
 import EditDescriptionDataWindow
     from "@/components/UI/ProfilePage/ModalWindow/EditDescriptionDataWindow/EditDescriptionDataWindow";
+import useDescriptionStore from "@/components/UI/ProfilePage/ModalWindow/EditDescriptionDataWindow/store";
 
 interface AdditionalInfoProps {
     style?: React.CSSProperties;
@@ -16,19 +17,13 @@ interface AdditionalInfoProps {
 
 export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
     const description = useUserInfoStore(state => state.info.description);
+    const handleOpen = useDescriptionStore(state => state.handleOpen)
     const formattedText = description.split("\n").map((line, index) => (
         <span key={index}>
             {line}
-            <br />
+            <br/>
         </span>
     ));
-
-    const editDescriptionDataWindowRef = useRef<{ triggerHandleClick: () => void }>(null);
-    const handleEditDescriptionDataButtonClick = () => {
-        if (editDescriptionDataWindowRef.current) {
-            editDescriptionDataWindowRef.current.triggerHandleClick();
-        }
-    };
 
     return (
         <div style={style}>
@@ -44,7 +39,7 @@ export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
                                 О себе
                             </Title>
                             <div style={{marginRight: "auto"}}/>
-                            <ChangeButton onClick={handleEditDescriptionDataButtonClick}>
+                            <ChangeButton onClick={() => {handleOpen({description: description})}}>
                                 изменить
                             </ChangeButton>
                         </ContainerRow>
@@ -62,7 +57,7 @@ export default function AdditionalInfoContainer({style}: AdditionalInfoProps) {
                         </BackgroundContainer>
                 </Background>
             </BackgroundContainer>
-            <EditDescriptionDataWindow ref={editDescriptionDataWindowRef}/>
+            <EditDescriptionDataWindow/>
         </div>
     )
 }

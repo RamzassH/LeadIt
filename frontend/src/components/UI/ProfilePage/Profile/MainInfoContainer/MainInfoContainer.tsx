@@ -13,6 +13,8 @@ import EditPersonalDataWindow
 import {useRef} from "react";
 import EditOrganizationDataWindow
     from "@/components/UI/ProfilePage/ModalWindow/EditOrganizationDataWindow/EditOrganizationDataWindow";
+import useProjectInfoStore from "@/components/UI/ProfilePage/ModalWindow/EditOrganizationDataWindow/store";
+import usePersonalDataStore from "@/components/UI/ProfilePage/ModalWindow/EditPersonalDataWindow/store";
 
 interface MainInfoProps {
 
@@ -25,19 +27,8 @@ interface ComponentProps {
 
 export default function MainInfoContainer({}:MainInfoProps) {
     const info = useUserInfoStore(state => state.info);
-
-    const editPersonalDataWindowRef = useRef<{ triggerHandleClick: () => void }>(null);
-    const handleEditPersonalDataButtonClick = () => {
-        if (editPersonalDataWindowRef.current) {
-            editPersonalDataWindowRef.current.triggerHandleClick();
-        }
-    };
-    const editOrganizationDataWindowRef = useRef<{ triggerHandleClick: () => void }>(null);
-    const handleEditOrganizationDataButtonClick = () => {
-        if (editOrganizationDataWindowRef.current) {
-            editOrganizationDataWindowRef.current.triggerHandleClick();
-        }
-    };
+    const handleOpenPersonalInfo = usePersonalDataStore(state => state.handleOpen)
+    const handleOpenProjectInfo = useProjectInfoStore(state => state.handleOpen)
 
     const contactInfo: ComponentProps[] = [
         {name: "Имя", value: info.fullName.name},
@@ -65,7 +56,12 @@ export default function MainInfoContainer({}:MainInfoProps) {
                                         Контактная информация
                                     </Title>
                                     <div style={{marginRight: "auto"}}/>
-                                    <ChangeButton onClick={handleEditPersonalDataButtonClick}>
+                                    <ChangeButton onClick={() => {handleOpenPersonalInfo(
+                                        {
+                                            ...info.fullName,
+                                            ...info.contacts,
+                                            date: info.date,
+                                    })}}>
                                         изменить
                                     </ChangeButton>
                                 </ContainerRow>
@@ -85,7 +81,7 @@ export default function MainInfoContainer({}:MainInfoProps) {
                                         Проектная деятельность
                                     </Title>
                                     <div style={{marginRight: "auto"}}/>
-                                    <ChangeButton onClick={handleEditOrganizationDataButtonClick}>
+                                    <ChangeButton onClick={() => {handleOpenProjectInfo(info.projectInfo)}}>
                                         изменить
                                     </ChangeButton>
                                 </ContainerRow>
@@ -99,8 +95,8 @@ export default function MainInfoContainer({}:MainInfoProps) {
                     </Background>
                 </ContainerColumn>
             </BackgroundContainer>
-            <EditPersonalDataWindow ref={editPersonalDataWindowRef}/>
-            <EditOrganizationDataWindow ref={editOrganizationDataWindowRef}/>
+            <EditPersonalDataWindow/>
+            <EditOrganizationDataWindow/>
         </div>
     )
 }

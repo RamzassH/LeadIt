@@ -6,62 +6,19 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import useUserInfoStore from "@/components/UI/ProfilePage/store";
+import useProjectInfoStore from "@/components/UI/ProfilePage/ModalWindow/EditOrganizationDataWindow/store";
 
 interface EditOrganizationDataProps {
 
 }
 
-const EditOrganizationDataWindow = forwardRef((props: EditOrganizationDataProps, ref) => {
+const EditOrganizationDataWindow = () => {
     const info = useUserInfoStore(state => state.info);
     const setProjectInfo = useUserInfoStore(state => state.setProjectInfo);
-
-
-    const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        organization: info.projectInfo.organization,
-        projects: info.projectInfo.projects,
-        position: info.projectInfo.position,
-    });
-
-    const handleClickOpen = () => {
-        setFormData({
-            organization: info.projectInfo.organization,
-            projects: info.projectInfo.projects,
-            position: info.projectInfo.position,
-        })
-        setOpen(true);
-    };
-
-    // С помощью useImperativeHandle мы делаем handleClick доступным для родителя
-    useImperativeHandle(ref, () => ({
-        triggerHandleClick: handleClickOpen
-    }));
-
-    const handleClose = () => {
-        setFormData({
-            organization: info.projectInfo.organization,
-            projects: info.projectInfo.projects,
-            position: info.projectInfo.position,
-        })
-        setOpen(false);
-    };
-
-    const handleInputChange = (event:React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = () => {
-        console.log('Данные формы:', formData);
-        setProjectInfo({projects: formData.projects, position: formData.position, organization: formData.organization});
-        setOpen(false);
-    };
+    const {isOpen, form, handleClose, handleInputChange, handleSubmit} = useProjectInfoStore();
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>Проектная деятельность</DialogTitle>
             <DialogContent>
                 <TextField
@@ -71,7 +28,7 @@ const EditOrganizationDataWindow = forwardRef((props: EditOrganizationDataProps,
                     label="Организация"
                     type="text"
                     fullWidth
-                    value={formData.organization}
+                    value={form.organization}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -80,7 +37,7 @@ const EditOrganizationDataWindow = forwardRef((props: EditOrganizationDataProps,
                     label="Проекты"
                     type="text"
                     fullWidth
-                    value={formData.projects}
+                    value={form.projects}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -89,18 +46,18 @@ const EditOrganizationDataWindow = forwardRef((props: EditOrganizationDataProps,
                     label="Должность"
                     type="text"
                     fullWidth
-                    value={formData.position}
+                    value={form.position}
                     onChange={handleInputChange}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Отмена</Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary">
+                <Button onClick={() => {handleSubmit(setProjectInfo)}} variant="contained" color="primary">
                     Сохранить
                 </Button>
             </DialogActions>
         </Dialog>
     );
-});
+};
 
 export default EditOrganizationDataWindow;

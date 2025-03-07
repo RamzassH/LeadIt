@@ -6,74 +6,27 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import useUserInfoStore from "@/components/UI/ProfilePage/store";
+import usePersonalDataStore, {PersonalData} from "@/components/UI/ProfilePage/ModalWindow/EditPersonalDataWindow/store";
 
 interface EditPersonalDataProps {
 
 }
 
-const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) => {
+const EditPersonalDataWindow = () => {
     const info = useUserInfoStore(state => state.info);
     const setFullName = useUserInfoStore(state => state.setFullName);
     const setDate = useUserInfoStore(state => state.setDate);
     const setContactInfo = useUserInfoStore(state => state.setContactInfo);
+    const {isOpen, form, handleClose, handleInputChange, handleSubmit} = usePersonalDataStore();
 
-    const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: info.fullName.name,
-        surname: info.fullName.surname,
-        patronymic: info.fullName.patronymic,
-        date: info.date,
-        email: info.contacts.email,
-        messenger: info.contacts.messenger,
-    });
-
-    const handleClickOpen = () => {
-        setFormData({
-            name: info.fullName.name,
-            surname: info.fullName.surname,
-            patronymic: info.fullName.patronymic,
-            date: info.date,
-            email: info.contacts.email,
-            messenger: info.contacts.messenger,
-        })
-        setOpen(true);
-    };
-
-    // С помощью useImperativeHandle мы делаем handleClick доступным для родителя
-    useImperativeHandle(ref, () => ({
-        triggerHandleClick: handleClickOpen
-    }));
-
-    const handleClose = () => {
-        setFormData({
-            name: info.fullName.name,
-            surname: info.fullName.surname,
-            patronymic: info.fullName.patronymic,
-            date: info.date,
-            email: info.contacts.email,
-            messenger: info.contacts.messenger,
-        })
-        setOpen(false);
-    };
-
-    const handleInputChange = (event:React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = () => {
-        console.log('Данные формы:', formData);
-        setFullName({name: formData.name, surname: formData.surname, patronymic: formData.patronymic});
-        setDate(formData.date);
-        setContactInfo({email: formData.email, messenger: formData.messenger});
-        setOpen(false);
-    };
+    const setPersonalInfo = (data: PersonalData)=> {
+        setFullName({name: data.name, surname: data.surname, patronymic: data.patronymic});
+        setDate(data.date);
+        setContactInfo({messenger: data.messenger, email: data.email});
+    }
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>Контактная информация</DialogTitle>
             <DialogContent>
                 <TextField
@@ -83,7 +36,7 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Имя"
                     type="text"
                     fullWidth
-                    value={formData.name}
+                    value={form.name}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -92,7 +45,7 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Фамилия"
                     type="text"
                     fullWidth
-                    value={formData.surname}
+                    value={form.surname}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -101,7 +54,7 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Отчество"
                     type="text"
                     fullWidth
-                    value={formData.patronymic}
+                    value={form.patronymic}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -110,7 +63,7 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Дата рождения"
                     type="text"
                     fullWidth
-                    value={formData.date}
+                    value={form.date}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -119,7 +72,7 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Email"
                     type="email"
                     fullWidth
-                    value={formData.email}
+                    value={form.email}
                     onChange={handleInputChange}
                 />
                 <TextField
@@ -128,18 +81,18 @@ const EditPersonalDataWindow = forwardRef((props: EditPersonalDataProps, ref) =>
                     label="Мессенджер"
                     type="text"
                     fullWidth
-                    value={formData.messenger}
+                    value={form.messenger}
                     onChange={handleInputChange}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Отмена</Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary">
+                <Button onClick={() => {handleSubmit(setPersonalInfo)}} variant="contained" color="primary">
                     Сохранить
                 </Button>
             </DialogActions>
         </Dialog>
     );
-});
+};
 
 export default EditPersonalDataWindow;

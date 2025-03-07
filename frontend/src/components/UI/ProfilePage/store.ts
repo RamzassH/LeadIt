@@ -1,6 +1,7 @@
 // store.ts
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import {devtools} from "zustand/middleware";
 
 interface Avatar {
     src: string;
@@ -48,6 +49,7 @@ interface UserState {
 }
 
 const useUserInfoStore = create<UserState>()(
+    devtools(
     immer((set) => ({
         info: {
             avatar: {
@@ -105,6 +107,7 @@ const useUserInfoStore = create<UserState>()(
                 state.info.description = description; // Обновляем описание
             }),
     }))
+    )
 );
 
 export default useUserInfoStore;
