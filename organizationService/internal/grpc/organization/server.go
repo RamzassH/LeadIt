@@ -1,6 +1,7 @@
 package organization
 
 import (
+	organizationv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/organization"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
