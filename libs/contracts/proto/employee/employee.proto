@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package employee;
+
+option go_package = 'leadIt.employee.v1;employeev1';
+import "google/api/annotations.proto";
+
+service Employee {
+  rpc addEmployee (addEmployeeRequest) returns (addEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/add"
+      body: "*"
+    };
+  }
+  rpc getEmployee(getEmployeeRequest) returns (getEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/get"
+      body: "*"
+    };
+  }
+
+  rpc getEmployees(getEmployeesRequest) returns (getEmployeesResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/get-many"
+      body: "*"
+    };
+  }
+
+  rpc updateEmployee(updateEmployeeRequest) returns (updateEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/update"
+      body: "*"
+    };
+  }
+
+  rpc deleteEmployee(deleteEmployeeRequest) returns (deleteEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/delete"
+      body: "*"
+    };
+  }
+
+  rpc inviteEmployee(inviteEmployeeRequest) returns (inviteEmployeeRequest) {
+    option(google.api.http) = {
+      post: "/v1/employee/invite"
+      body: "*"
+    };
+  }
+}
+message EmployeeType {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 organization_id = 3;
+}
+
+message addEmployeeRequest {
+  int64 user_id = 2;
+  int64 organization_id = 3;
+}
+
+message addEmployeeResponse {
+  int64 id = 1;
+}
+
+message getEmployeeRequest {
+  int64 id = 1;
+}
+
+message getEmployeeResponse {
+  EmployeeType employee = 1;
+}
+
+message getEmployeesRequest {
+}
+
+message getEmployeesResponse {
+  repeated EmployeeType employees = 1;
+}
+
+message updateEmployeeRequest {
+  EmployeeType employee = 1;
+}
+
+message updateEmployeeResponse {
+  EmployeeType employee = 1;
+}
+
+message deleteEmployeeRequest {
+  int64 id = 1;
+}
+
+message deleteEmployeeResponse {
+  int64 id = 1;
+}
+
+message inviteEmployeeRequest {
+  int64 user_id = 1;
+}

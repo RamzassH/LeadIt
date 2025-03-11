@@ -1,0 +1,90 @@
+syntax = 'proto3';
+
+package project;
+
+option go_package = "leadIt.project.v1;projectv1";
+import 'google/api/annotations.proto';
+
+service Project {
+  rpc addProject (addProjectRequest) returns (addProjectResponse) {
+    option(google.api.http) = {
+      post: "/v1/project/add"
+      body: "*"
+    };
+  }
+  rpc getProject(getProjectRequest) returns (getProjectResponse) {
+    option(google.api.http) = {
+      post: "/v1/project/get"
+      body: "*"
+    };
+  }
+
+  rpc getProjects(getProjectsRequest) returns (getProjectsResponse) {
+    option(google.api.http) = {
+      post: "/v1/project/get-many"
+      body: "*"
+    };
+  }
+
+  rpc updateProject(updateProjectRequest) returns (updateProjectResponse) {
+    option(google.api.http) = {
+      post: "/v1/project/update"
+      body: "*"
+    };
+  }
+
+  rpc deleteProject(deleteProjectRequest) returns (deleteProjectResponse) {
+    option(google.api.http) = {
+      post: "/v1/project/delete"
+      body: "*"
+    };
+  }
+}
+
+message ProjectType {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 project_id = 4;
+}
+
+message addProjectRequest {
+  string name = 1;
+  string description = 2;
+  string image = 3;
+}
+
+message addProjectResponse {
+  int64 id = 1;
+}
+
+message getProjectRequest {
+  int64 id = 1;
+}
+
+message getProjectResponse {
+  ProjectType project = 1;
+}
+
+message getProjectsRequest {
+}
+
+message getProjectsResponse {
+  repeated ProjectType projects = 1;
+}
+
+message updateProjectRequest {
+  ProjectType project = 1;
+}
+
+message updateProjectResponse {
+  ProjectType project = 1;
+}
+
+message deleteProjectRequest {
+  int64 id = 1;
+}
+
+message deleteProjectResponse {
+  int64 id = 1;
+}

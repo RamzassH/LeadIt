@@ -1,0 +1,7 @@
+env: "local"
+storage_path: "./storage/organization.db"
+storage_connection_string: "postgres://postgres:postgres@organizationdb:5432/organizationdb?sslmode=disable"
+redis_connection_string: "redis://redis:6379/0"
+grpc:
+  port: 57444
+  timeout: 10h

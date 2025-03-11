@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package role;
+
+option go_package = "leadIt.role.v1;rolev1";
+import "google/api/annotations.proto";
+
+service Role {
+  rpc addRole(addRoleRequest) returns (addRoleResponse) {
+    option(google.api.http) = {
+      post: "/v1/role/add"
+      body: "*"
+    };
+  }
+  rpc getRole(getRoleRequest) returns (getRoleResponse) {
+    option(google.api.http) = {
+      post: "/v1/role/get"
+      body: "*"
+    };
+  }
+
+  rpc getRoles(getRolesRequest) returns (getRolesResponse) {
+    option(google.api.http) = {
+      post: "/v1/role/get-many"
+      body: "*"
+    };
+  }
+
+  rpc updateRole(updateRoleRequest) returns (updateRoleResponse) {
+    option(google.api.http) = {
+      post: "/v1/role/update"
+      body: "*"
+    };
+  }
+
+  rpc deleteRole(deleteRoleRequest) returns (deleteRoleResponse) {
+    option(google.api.http) = {
+      post: "/v1/role/delete"
+      body: "*"
+    };
+  }
+}
+
+message RoleType {
+  int64 id = 1;
+  string name = 2;
+  int64 organization_id = 3;
+  repeated string permissions = 4;
+}
+
+message addRoleRequest {
+  string name = 1;
+  string description = 2;
+  string image = 3;
+}
+
+message addRoleResponse {
+  int64 id = 1;
+}
+
+message getRoleRequest {
+  int64 id = 1;
+}
+
+message getRoleResponse {
+  RoleType role = 1;
+}
+
+message getRolesRequest {
+}
+
+message getRolesResponse {
+  repeated RoleType roles = 1;
+}
+
+message updateRoleRequest {
+  RoleType role = 1;
+}
+
+message updateRoleResponse {
+  RoleType role = 1;
+}
+
+message deleteRoleRequest {
+  int64 id = 1;
+}
+
+message deleteRoleResponse {
+  int64 id = 1;
+}

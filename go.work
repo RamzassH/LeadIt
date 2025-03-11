@@ -2,6 +2,7 @@ go 1.23.3
 
 use (
 	./authService
+	./organizationService
 	./gateway
 	./libs/contracts
 	./notificationService
