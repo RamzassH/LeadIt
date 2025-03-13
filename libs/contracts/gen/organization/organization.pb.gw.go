@@ -63,9 +63,15 @@ func request_Organization_GetOrganization_0(ctx context.Context, marshaler runti
 	var (
 		protoReq GetOrganizationRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := client.GetOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -75,9 +81,15 @@ func local_request_Organization_GetOrganization_0(ctx context.Context, marshaler
 	var (
 		protoReq GetOrganizationRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := server.GetOrganization(ctx, &protoReq)
 	return msg, metadata, err
@@ -87,9 +99,18 @@ func request_Organization_GetOrganizations_0(ctx context.Context, marshaler runt
 	var (
 		protoReq GetOrganizationsRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["organizer_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organizer_id")
+	}
+	protoReq.OrganizerId, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organizer_id", err)
 	}
 	msg, err := client.GetOrganizations(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -99,9 +120,18 @@ func local_request_Organization_GetOrganizations_0(ctx context.Context, marshale
 	var (
 		protoReq GetOrganizationsRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["organizer_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organizer_id")
+	}
+	protoReq.OrganizerId, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organizer_id", err)
 	}
 	msg, err := server.GetOrganizations(ctx, &protoReq)
 	return msg, metadata, err
@@ -135,9 +165,18 @@ func request_Organization_DeleteOrganization_0(ctx context.Context, marshaler ru
 	var (
 		protoReq DeleteOrganizationRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := client.DeleteOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -147,9 +186,18 @@ func local_request_Organization_DeleteOrganization_0(ctx context.Context, marsha
 	var (
 		protoReq DeleteOrganizationRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := server.DeleteOrganization(ctx, &protoReq)
 	return msg, metadata, err
@@ -181,13 +229,13 @@ func RegisterOrganizationHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		}
 		forward_Organization_AddOrganization_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Organization_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Organization_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/GetOrganization", runtime.WithHTTPPathPattern("/v1/organization/get"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/GetOrganization", runtime.WithHTTPPathPattern("/v1/organization/get/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -207,7 +255,7 @@ func RegisterOrganizationHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/GetOrganizations", runtime.WithHTTPPathPattern("/v1/organization/get-many"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/GetOrganizations", runtime.WithHTTPPathPattern("/v1/organization/get-many/{organizer_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -247,7 +295,7 @@ func RegisterOrganizationHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/DeleteOrganization", runtime.WithHTTPPathPattern("/v1/organization/delete"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/organization.Organization/DeleteOrganization", runtime.WithHTTPPathPattern("/v1/organization/delete/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -318,11 +366,11 @@ func RegisterOrganizationHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 		forward_Organization_AddOrganization_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Organization_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Organization_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/GetOrganization", runtime.WithHTTPPathPattern("/v1/organization/get"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/GetOrganization", runtime.WithHTTPPathPattern("/v1/organization/get/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -339,7 +387,7 @@ func RegisterOrganizationHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/GetOrganizations", runtime.WithHTTPPathPattern("/v1/organization/get-many"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/GetOrganizations", runtime.WithHTTPPathPattern("/v1/organization/get-many/{organizer_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -373,7 +421,7 @@ func RegisterOrganizationHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/DeleteOrganization", runtime.WithHTTPPathPattern("/v1/organization/delete"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/organization.Organization/DeleteOrganization", runtime.WithHTTPPathPattern("/v1/organization/delete/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -391,10 +439,10 @@ func RegisterOrganizationHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 var (
 	pattern_Organization_AddOrganization_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "organization", "add"}, ""))
-	pattern_Organization_GetOrganization_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "organization", "get"}, ""))
-	pattern_Organization_GetOrganizations_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "organization", "get-many"}, ""))
+	pattern_Organization_GetOrganization_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "organization", "get", "id"}, ""))
+	pattern_Organization_GetOrganizations_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "organization", "get-many", "organizer_id"}, ""))
 	pattern_Organization_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "organization", "update"}, ""))
-	pattern_Organization_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "organization", "delete"}, ""))
+	pattern_Organization_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "organization", "delete", "id"}, ""))
 )
 
 var (

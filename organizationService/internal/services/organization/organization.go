@@ -2,6 +2,7 @@ package organization
 
 import (
 	"context"
+	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/rs/zerolog"
 	"kafka"
 	"time"
@@ -9,26 +10,26 @@ import (
 
 type Organization struct {
 	logger               zerolog.Logger
-	organizationSaver    OrganizationSaver
-	organizationProvider OrganizationProvider
-	roleSaver            RoleSaver
-	roleProvider         RoleProvider
-	employeeSaver        EmployeeSaver
-	employeeProvider     EmployeeProvider
-	projectSaver         ProjectSaver
-	projectProvider      ProjectProvider
+	organizationSaver    Saver
+	organizationProvider Provider
 	redisStorage         Redis
 	kafka                *kafka.Producer
 }
 
-type OrganizationSaver interface{}
-type OrganizationProvider interface{}
-type RoleSaver interface{}
-type RoleProvider interface{}
-type EmployeeSaver interface{}
-type EmployeeProvider interface{}
-type ProjectSaver interface{}
-type ProjectProvider interface{}
+type Saver interface {
+	SaveOrganization(
+		ctx context.Context,
+		payload models.AddOrganizationPayload) (int64, error)
+}
+type Provider interface {
+	GetOrganizationById(ctx context.Context, id int64) (*models.Organization, error)
+
+	GetAllOrganizations(ctx context.Context) ([]models.Organization, error)
+
+	UpdateOrganizationBy(ctx context.Context, payload models.UpdateOrganizationPayload) (int64, error)
+
+	DeleteOrganizationBy(ctx context.Context, id int64) (int64, error)
+}
 
 type Redis interface {
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
@@ -41,14 +42,8 @@ type Redis interface {
 
 func New(
 	logger zerolog.Logger,
-	organizationSaver OrganizationSaver,
-	organizationProvider OrganizationProvider,
-	roleSaver RoleSaver,
-	roleProvider RoleProvider,
-	employeeSaver EmployeeSaver,
-	employeeProvider EmployeeProvider,
-	projectSaver ProjectSaver,
-	projectProvider ProjectProvider,
+	organizationSaver Saver,
+	organizationProvider Provider,
 	redisStorage Redis,
 	kafka *kafka.Producer,
 ) *Organization {
@@ -56,13 +51,27 @@ func New(
 		logger:               logger,
 		organizationSaver:    organizationSaver,
 		organizationProvider: organizationProvider,
-		roleSaver:            roleSaver,
-		roleProvider:         roleProvider,
-		employeeSaver:        employeeSaver,
-		employeeProvider:     employeeProvider,
-		projectSaver:         projectSaver,
-		projectProvider:      projectProvider,
 		redisStorage:         redisStorage,
 		kafka:                kafka,
 	}
+}
+
+func (org *Organization) AddOrganization(
+	ctx context.Context,
+	payload models.AddOrganizationPayload) (int64, error) {
+	panic("implement me")
+}
+func (org *Organization) GetOrganization(ctx context.Context, payload models.GetOrganizationPayload) (*models.Organization, error) {
+	panic("implement me")
+}
+func (org *Organization) GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsPayload) ([]models.Organization, error) {
+	panic("implement me")
+}
+
+func (org *Organization) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (models.Organization, error) {
+	panic("implement me")
+}
+
+func (org *Organization) DeleteOrganization(ctx context.Context, id int64) (int64, error) {
+	panic("implement me")
 }

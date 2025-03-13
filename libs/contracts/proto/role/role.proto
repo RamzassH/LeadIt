@@ -6,34 +6,34 @@ option go_package = "leadIt.role.v1;rolev1";
 import "google/api/annotations.proto";
 
 service Role {
-  rpc addRole(addRoleRequest) returns (addRoleResponse) {
+  rpc addRole(AddRoleRequest) returns (AddRoleResponse) {
     option(google.api.http) = {
       post: "/v1/role/add"
       body: "*"
     };
   }
-  rpc getRole(getRoleRequest) returns (getRoleResponse) {
+  rpc getRole(GetRoleRequest) returns (GetRoleResponse) {
     option(google.api.http) = {
       post: "/v1/role/get"
       body: "*"
     };
   }
 
-  rpc getRoles(getRolesRequest) returns (getRolesResponse) {
+  rpc getRoles(GetRolesRequest) returns (GetRolesResponse) {
     option(google.api.http) = {
       post: "/v1/role/get-many"
       body: "*"
     };
   }
 
-  rpc updateRole(updateRoleRequest) returns (updateRoleResponse) {
+  rpc updateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
     option(google.api.http) = {
       post: "/v1/role/update"
       body: "*"
     };
   }
 
-  rpc deleteRole(deleteRoleRequest) returns (deleteRoleResponse) {
+  rpc deleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
     option(google.api.http) = {
       post: "/v1/role/delete"
       body: "*"
@@ -48,43 +48,43 @@ message RoleType {
   repeated string permissions = 4;
 }
 
-message addRoleRequest {
+message AddRoleRequest {
   string name = 1;
   string description = 2;
   string image = 3;
 }
 
-message addRoleResponse {
+message AddRoleResponse {
   int64 id = 1;
 }
 
-message getRoleRequest {
+message GetRoleRequest {
   int64 id = 1;
 }
 
-message getRoleResponse {
+message GetRoleResponse {
   RoleType role = 1;
 }
 
-message getRolesRequest {
+message GetRolesRequest {
 }
 
-message getRolesResponse {
+message GetRolesResponse {
   repeated RoleType roles = 1;
 }
 
-message updateRoleRequest {
+message UpdateRoleRequest {
   RoleType role = 1;
 }
 
-message updateRoleResponse {
+message UpdateRoleResponse {
   RoleType role = 1;
 }
 
-message deleteRoleRequest {
+message DeleteRoleRequest {
   int64 id = 1;
 }
 
-message deleteRoleResponse {
+message DeleteRoleResponse {
   int64 id = 1;
 }

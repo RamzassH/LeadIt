@@ -6,41 +6,41 @@ option go_package = 'leadIt.employee.v1;employeev1';
 import "google/api/annotations.proto";
 
 service Employee {
-  rpc addEmployee (addEmployeeRequest) returns (addEmployeeResponse) {
+  rpc addEmployee (AddEmployeeRequest) returns (AddEmployeeResponse) {
     option(google.api.http) = {
       post: "/v1/employee/add"
       body: "*"
     };
   }
-  rpc getEmployee(getEmployeeRequest) returns (getEmployeeResponse) {
+  rpc getEmployee(GetEmployeeRequest) returns (GetEmployeeResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/get"
+      post: "/v1/employee/get/{id}"
       body: "*"
     };
   }
 
-  rpc getEmployees(getEmployeesRequest) returns (getEmployeesResponse) {
+  rpc getEmployees(GetEmployeesRequest) returns (GetEmployeesResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/get-many"
+      post: "/v1/employee/get-many/{organization_id}"
       body: "*"
     };
   }
 
-  rpc updateEmployee(updateEmployeeRequest) returns (updateEmployeeResponse) {
+  rpc updateEmployee(UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {
     option(google.api.http) = {
       post: "/v1/employee/update"
       body: "*"
     };
   }
 
-  rpc deleteEmployee(deleteEmployeeRequest) returns (deleteEmployeeResponse) {
+  rpc deleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {
     option(google.api.http) = {
       post: "/v1/employee/delete"
       body: "*"
     };
   }
 
-  rpc inviteEmployee(inviteEmployeeRequest) returns (inviteEmployeeRequest) {
+  rpc inviteEmployee(InviteEmployeeRequest) returns (InviteEmployeeRequest) {
     option(google.api.http) = {
       post: "/v1/employee/invite"
       body: "*"
@@ -53,46 +53,47 @@ message EmployeeType {
   int64 organization_id = 3;
 }
 
-message addEmployeeRequest {
+message AddEmployeeRequest {
   int64 user_id = 2;
   int64 organization_id = 3;
 }
 
-message addEmployeeResponse {
+message AddEmployeeResponse {
   int64 id = 1;
 }
 
-message getEmployeeRequest {
+message GetEmployeeRequest {
   int64 id = 1;
 }
 
-message getEmployeeResponse {
+message GetEmployeeResponse {
   EmployeeType employee = 1;
 }
 
-message getEmployeesRequest {
+message GetEmployeesRequest {
+  int64 organization_id = 1;
 }
 
-message getEmployeesResponse {
+message GetEmployeesResponse {
   repeated EmployeeType employees = 1;
 }
 
-message updateEmployeeRequest {
+message UpdateEmployeeRequest {
   EmployeeType employee = 1;
 }
 
-message updateEmployeeResponse {
+message UpdateEmployeeResponse {
   EmployeeType employee = 1;
 }
 
-message deleteEmployeeRequest {
+message DeleteEmployeeRequest {
   int64 id = 1;
 }
 
-message deleteEmployeeResponse {
+message DeleteEmployeeResponse {
   int64 id = 1;
 }
 
-message inviteEmployeeRequest {
+message InviteEmployeeRequest {
   int64 user_id = 1;
 }

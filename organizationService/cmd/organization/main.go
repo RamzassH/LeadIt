@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"github.com/RamzassH/LeadIt/organizationService/internal/app"
+	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"kafka"
-	"organizationService/internal/app"
-	"organizationService/internal/config"
 	"os"
 	"os/signal"
 	"syscall"
@@ -63,8 +63,6 @@ func main() {
 	application, err := app.New(
 		logger,
 		cfg.GRPC.Port,
-		cfg.TokenTTL,
-		cfg.RefreshTokenTTl,
 		validate,
 		db,
 		redisClient,

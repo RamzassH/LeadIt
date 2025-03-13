@@ -6,34 +6,34 @@ option go_package = "leadIt.project.v1;projectv1";
 import 'google/api/annotations.proto';
 
 service Project {
-  rpc addProject (addProjectRequest) returns (addProjectResponse) {
+  rpc addProject (AddProjectRequest) returns (AddProjectResponse) {
     option(google.api.http) = {
       post: "/v1/project/add"
       body: "*"
     };
   }
-  rpc getProject(getProjectRequest) returns (getProjectResponse) {
+  rpc getProject(GetProjectRequest) returns (GetProjectResponse) {
     option(google.api.http) = {
-      post: "/v1/project/get"
+      post: "/v1/project/get/{id}"
       body: "*"
     };
   }
 
-  rpc getProjects(getProjectsRequest) returns (getProjectsResponse) {
+  rpc getProjects(GetProjectsRequest) returns (GetProjectsResponse) {
     option(google.api.http) = {
-      post: "/v1/project/get-many"
+      post: "/v1/project/get-many/{organization_id}"
       body: "*"
     };
   }
 
-  rpc updateProject(updateProjectRequest) returns (updateProjectResponse) {
+  rpc updateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
     option(google.api.http) = {
       post: "/v1/project/update"
       body: "*"
     };
   }
 
-  rpc deleteProject(deleteProjectRequest) returns (deleteProjectResponse) {
+  rpc deleteProject(DeleteProjectRequest) returns (DeleteProjectResponse) {
     option(google.api.http) = {
       post: "/v1/project/delete"
       body: "*"
@@ -45,46 +45,49 @@ message ProjectType {
   int64 id = 1;
   string name = 2;
   string description = 3;
-  int64 project_id = 4;
+  int64 organization_id = 4;
+  string image = 5;
 }
 
-message addProjectRequest {
+message AddProjectRequest {
   string name = 1;
   string description = 2;
-  string image = 3;
+  int64 organization_id = 3;
+  string image = 4;
 }
 
-message addProjectResponse {
+message AddProjectResponse {
   int64 id = 1;
 }
 
-message getProjectRequest {
+message GetProjectRequest {
   int64 id = 1;
 }
 
-message getProjectResponse {
+message GetProjectResponse {
   ProjectType project = 1;
 }
 
-message getProjectsRequest {
+message GetProjectsRequest {
+  int64 organization_id = 1;
 }
 
-message getProjectsResponse {
+message GetProjectsResponse {
   repeated ProjectType projects = 1;
 }
 
-message updateProjectRequest {
+message UpdateProjectRequest {
   ProjectType project = 1;
 }
 
-message updateProjectResponse {
+message UpdateProjectResponse {
   ProjectType project = 1;
 }
 
-message deleteProjectRequest {
+message DeleteProjectRequest {
   int64 id = 1;
 }
 
-message deleteProjectResponse {
+message DeleteProjectResponse {
   int64 id = 1;
 }

@@ -2,6 +2,7 @@ package grpcapp
 
 import (
 	"fmt"
+	organizationgrpc "github.com/RamzassH/LeadIt/organizationService/internal/grpc/organization"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -19,10 +20,10 @@ func New(
 	log zerolog.Logger,
 	port int,
 	validator *validator.Validate,
-	organizationService organizationgrpc.Organization) *App {
+	organizationService organizationgrpc.Service) *App {
 	gRPCServer := grpc.NewServer()
 
-	organizationgrpc.RegisterGRPCServer(gRPCServer, validate, log, organizationService)
+	organizationgrpc.RegisterGRPCServer(gRPCServer, validator, log, organizationService)
 
 	return &App{
 		logger:     log,
