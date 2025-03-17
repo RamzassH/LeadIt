@@ -17,7 +17,7 @@ export const BackgroundContainer = styled("div")`
     align-items: center;
     
     width: 50%;
-    background: linear-gradient(222.54deg, rgb(9, 54, 70) 12.848%,rgb(35, 85, 99) 57.839%,rgb(56, 111, 123) 75.084%,rgb(85, 147, 156) 89.324%,rgb(120, 189, 196) 100%);;
+    background: linear-gradient(132.54deg, rgb(9, 54, 70) 12.848%,rgb(35, 85, 99) 57.839%,rgb(56, 111, 123) 75.084%,rgb(85, 147, 156) 89.324%,rgb(120, 189, 196) 100%);;
     border-radius: 0 calc(180rem/16) calc(180rem/16) 0;
 
     flex: none;

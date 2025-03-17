@@ -21,7 +21,6 @@ export default function Header({menuOpenFunction}: HeaderProps) {
     return (
         <HeaderContainer>
             <SideMenuButton callback={menuOpenFunction}/>
-            <Logo/>
             <div style={{marginRight: "auto"}}/>
 
             <Tooltip title="Account settings">

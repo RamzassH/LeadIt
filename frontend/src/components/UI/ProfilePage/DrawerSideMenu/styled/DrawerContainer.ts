@@ -19,3 +19,24 @@ export const DrawerBackground = styled("div")`
     gap: 0.375rem;
     padding: calc(20rem/16) calc(32rem/16);
 `;
+
+export const DrawerLogo = styled("div")`
+    width: auto;
+    height: calc(48rem/16);
+    background: linear-gradient(45.00deg, rgb(248, 68, 79),rgb(120, 189, 196));
+    -webkit-background-clip:
+            text;
+    -webkit-text-fill-color:
+            transparent;
+    background-clip:
+            text;
+    text-fill-color:
+            transparent;
+    font-family: Roboto, sans-serif;
+    font-size: calc(36rem/16);
+    font-weight: 400;
+    line-height: calc(48rem/16);
+    letter-spacing: 0;
+    text-align: center;
+`;
+

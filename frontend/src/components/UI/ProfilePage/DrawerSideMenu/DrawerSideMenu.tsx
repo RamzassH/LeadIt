@@ -1,4 +1,8 @@
-import {DrawerContainer, DrawerBackground} from "@/components/UI/ProfilePage/DrawerSideMenu/styled/DrawerContainer";
+import {
+    DrawerContainer,
+    DrawerBackground,
+    DrawerLogo
+} from "@/components/UI/ProfilePage/DrawerSideMenu/styled/DrawerContainer";
 import MenuButton from "@/components/UI/ProfilePage/SideMenu/MenuButton/MenuButton";
 import Icon from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/StyleIcon";
 import VIPIcon from "@/images/icons-svg/VIPIcon";
@@ -41,6 +45,9 @@ const DrawerSideMenu = forwardRef((props: DrawerSideMenuProps, ref) => {
     return (
         <DrawerContainer open={open} onClose={() => {toggleDrawer(false)}}>
             <DrawerBackground>
+                <DrawerLogo>
+                    LeadIt
+                </DrawerLogo>
                 <MenuButton callback={(event) => {}}>
                     <Icon className="first-icon">
                         <VIPIcon />
