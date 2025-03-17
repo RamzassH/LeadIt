@@ -20,13 +20,13 @@ type Saver interface {
 	SaveProject(ctx context.Context, payload models.AddProjectPayload) (int64, error)
 }
 type Provider interface {
-	GetOrganization(ctx context.Context, id int64) (*models.Organization, error)
+	GetProject(ctx context.Context, id int64) (*models.Project, error)
 
-	GetAllOrganizations(ctx context.Context) ([]models.Organization, error)
+	GetAllProjects(ctx context.Context) ([]models.Project, error)
 
-	UpdateOrganization(ctx context.Context, payload models.UpdateProjectPayload) (int64, error)
+	UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (*models.Project, error)
 
-	DeleteOrganization(ctx context.Context, id int64) (int64, error)
+	DeleteProject(ctx context.Context, id int64) (int64, error)
 }
 
 type Redis interface {
@@ -53,17 +53,56 @@ func New(
 	}
 }
 func (p *Project) AddProject(ctx context.Context, payload models.AddProjectPayload) (int64, error) {
-	panic("implement me")
+	const op = "project.AddProject"
+	logger := p.logger.With().Str("operation", op).Logger()
+	logger.Info().Msg("adding project")
+
+	projectId, err := p.projectSaver.SaveProject(ctx, payload)
+	if err != nil {
+		logger.Error().Err(err).Str("operation", op).Msg("failed to save project")
+		return 0, err
+	}
+
+	return projectId, nil
 }
 
 func (p *Project) GetProject(ctx context.Context, id int64) (*models.Project, error) {
-	panic("implement me")
+	const op = "project.GetProject"
+	logger := p.logger.With().Str("operation", op).Logger()
+	logger.Info().Msg("getting project")
+
+	project, err := p.projectProvider.GetProject(ctx, id)
+	if err != nil {
+		logger.Error().Err(err).Str("operation", op).Msg("failed to get project")
+		return nil, err
+	}
+
+	return project, nil
 }
 func (p *Project) GetAllProjects(ctx context.Context) ([]models.Project, error) {
-	panic("implement me")
+	const op = "project.GetAllProjects"
+	logger := p.logger.With().Str("operation", op).Logger()
+	logger.Info().Msg("getting all projects")
+	projects, err := p.projectProvider.GetAllProjects(ctx)
+	if err != nil {
+		logger.Error().Err(err).Str("operation", op).Msg("failed to get all projects")
+		return nil, err
+	}
+
+	return projects, nil
 }
-func (p *Project) UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (int64, error) {
-	panic("implement me")
+func (p *Project) UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (*models.Project, error) {
+	const op = "project.UpdateProject"
+	logger := p.logger.With().Str("operation", op).Logger()
+	logger.Info().Msg("updating project")
+
+	updatedProject, err := p.projectProvider.UpdateProject(ctx, payload)
+	if err != nil {
+		logger.Error().Err(err).Str("operation", op).Msg("failed to update project")
+		return nil, err
+	}
+
+	return updatedProject, nil
 }
 func (p *Project) DeleteProject(ctx context.Context, id int64) (int64, error) {
 	panic("implement me")

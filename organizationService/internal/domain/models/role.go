@@ -8,9 +8,9 @@ type Role struct {
 }
 
 type AddRolePayload struct {
-	Name        string
-	Description string
-	Image       string
+	Name           string
+	OrganizationID string
+	Permissions    string
 }
 
 type UpdateRolePayload struct {
