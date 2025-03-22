@@ -1,15 +1,17 @@
+"use client"
 import HeaderContainer from "@/components/UI/ProfilePage/Header/styles/HeaderContainer";
 import React from "react";
 import SideMenuButton from "@/components/UI/ProfilePage/Header/SideMenuButton/SideMenuButton";
-import Logo from "@/components/UI/ProfilePage/Header/Logo/Logo";
 import {Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip} from "@mui/material";
 import {Logout, PersonAdd, Settings } from "@mui/icons-material";
+import {useRouter} from "next/navigation";
 
 interface HeaderProps {
     menuOpenFunction: () => void;
 }
 
 export default function Header({menuOpenFunction}: HeaderProps) {
+    const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -71,8 +73,8 @@ export default function Header({menuOpenFunction}: HeaderProps) {
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-                <MenuItem onClick={handleClose}>
+            >   {/*
+                            <MenuItem onClick={handleClose}>
                     <Avatar /> Profile
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
@@ -92,6 +94,13 @@ export default function Header({menuOpenFunction}: HeaderProps) {
                     Settings
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                        <Logout fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                </MenuItem>
+                */}
+                <MenuItem onClick={(event: React.MouseEvent<HTMLElement>) => {router?.push("/auth")}}>
                     <ListItemIcon>
                         <Logout fontSize="small" />
                     </ListItemIcon>
