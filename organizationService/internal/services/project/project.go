@@ -20,9 +20,9 @@ type Saver interface {
 	SaveProject(ctx context.Context, payload models.AddProjectPayload) (int64, error)
 }
 type Provider interface {
-	GetProject(ctx context.Context, id int64) (*models.Project, error)
+	GetProjectById(ctx context.Context, id int64) (project *models.Project, err error)
 
-	GetAllProjects(ctx context.Context) ([]models.Project, error)
+	GetAllProjects(ctx context.Context, organizationId int64) (projects []models.Project, err error)
 
 	UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (*models.Project, error)
 
@@ -71,7 +71,7 @@ func (p *Project) GetProject(ctx context.Context, id int64) (*models.Project, er
 	logger := p.logger.With().Str("operation", op).Logger()
 	logger.Info().Msg("getting project")
 
-	project, err := p.projectProvider.GetProject(ctx, id)
+	project, err := p.projectProvider.GetProjectById(ctx, id)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to get project")
 		return nil, err
@@ -79,11 +79,11 @@ func (p *Project) GetProject(ctx context.Context, id int64) (*models.Project, er
 
 	return project, nil
 }
-func (p *Project) GetAllProjects(ctx context.Context) ([]models.Project, error) {
+func (p *Project) GetAllProjects(ctx context.Context, organizationId int64) ([]models.Project, error) {
 	const op = "project.GetAllProjects"
 	logger := p.logger.With().Str("operation", op).Logger()
 	logger.Info().Msg("getting all projects")
-	projects, err := p.projectProvider.GetAllProjects(ctx)
+	projects, err := p.projectProvider.GetAllProjects(ctx, organizationId)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to get all projects")
 		return nil, err

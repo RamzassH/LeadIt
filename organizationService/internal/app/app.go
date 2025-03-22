@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/RamzassH/LeadIt/organizationService/internal/app/grpc"
+	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/employee"
-	"github.com/RamzassH/LeadIt/organizationService/internal/services/facade"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/organization"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/project"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/role"
@@ -22,8 +22,15 @@ type App struct {
 	validator  *validator.Validate
 }
 
+type Services struct {
+	organization.Organization
+	role.Role
+	project.Project
+	employee.Employee
+}
+
 func New(logger zerolog.Logger,
-	grpcPort int,
+	config *config.Config,
 	validate *validator.Validate,
 	db *sql.DB,
 	redisClient *redis.Client,
@@ -78,17 +85,14 @@ func New(logger zerolog.Logger,
 		rStorage,
 		kafka)
 
-	facadeService := facade.NewFacade(
-		*organizationService,
-		*roleService,
-		*projectService,
-		*employeeService)
+	services := &Services{
+		Organization: *organizationService,
+		Role:         *roleService,
+		Project:      *projectService,
+		Employee:     *employeeService,
+	}
 
-	grpcApp := grpcapp.New(
-		logger,
-		grpcPort,
-		validate,
-		facadeService)
+	grpcApp := grpcapp.New(logger, config, validate, services)
 
 	return &App{
 		GRPCServer: grpcApp,

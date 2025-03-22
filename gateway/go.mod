@@ -6,7 +6,7 @@ require (
 	github.com/RamzassH/LeadIt/libs/contracts v0.0.0-20250209185459-c146a87bcf1d
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1
 	github.com/rs/cors v1.11.1
-	google.golang.org/grpc v1.70.0
+	google.golang.org/grpc v1.71.0
 )
 
 require (

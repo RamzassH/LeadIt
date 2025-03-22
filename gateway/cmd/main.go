@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
+	organizationv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/organization"
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -15,10 +16,6 @@ import (
 )
 
 func main() {
-	grpcServerAddress := os.Getenv("GRPC_SERVER_ADDRESS")
-	if grpcServerAddress == "" {
-		grpcServerAddress = "localhost:57442"
-	}
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -49,11 +46,20 @@ func main() {
 		}),
 	)
 
+	services := []struct {
+		registerFunc func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error
+		address      string
+	}{
+		{authv1.RegisterAuthHandlerFromEndpoint, os.Getenv("AUTH_GRPC_SERVER_ADDRESS")},
+		{organizationv1.RegisterOrganizationHandlerFromEndpoint, os.Getenv("ORGANIZATION_GRPC_SERVER_ADDRESS")},
+	}
+
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err := authv1.RegisterAuthHandlerFromEndpoint(ctx, mux, grpcServerAddress, opts)
-	if err != nil {
-		log.Fatalf("Не удалось зарегистрировать gateway: %v", err)
+	for _, service := range services {
+		if err := service.registerFunc(ctx, mux, service.address, opts); err != nil {
+			log.Fatalf("Failed to register gRPC service: %v", err)
+		}
 	}
 
 	corsHandler := cors.New(cors.Options{
@@ -64,13 +70,13 @@ func main() {
 		AllowCredentials: true,
 	}).Handler(mux)
 
-	httpPort := os.Getenv("HTTP_PORT")
+	httpPort := os.Getenv("GATEWAY_PORT")
 	if httpPort == "" {
 		httpPort = "8080"
 	}
 
-	log.Printf("Запуск HTTP gateway на порту %s. gRPC сервер: %s", httpPort, grpcServerAddress)
+	log.Printf("Starting HTTP gateway port %s", httpPort)
 	if err := http.ListenAndServe(":"+httpPort, corsHandler); err != nil {
-		log.Fatalf("Ошибка при запуске HTTP сервера: %v", err)
+		log.Fatalf("failed to start HTTP server: %v", err)
 	}
 }

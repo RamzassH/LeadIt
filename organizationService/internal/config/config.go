@@ -12,6 +12,7 @@ type Config struct {
 	StoragePath           string     `yaml:"storage_path" evn-required:"true"`
 	PostgresDSN           string     `yaml:"storage_connection_string" env-required:"true"`
 	RedisConnectionString string     `yaml:"redis_connection_string" env-required:"true"`
+	TokenSecret           string     `yaml:"token_secret" env-required:"true"`
 	GRPC                  GRPCConfig `yaml:"grpc"`
 }
 

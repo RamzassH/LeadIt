@@ -62,7 +62,7 @@ func main() {
 
 	application, err := app.New(
 		logger,
-		cfg.GRPC.Port,
+		cfg,
 		validate,
 		db,
 		redisClient,

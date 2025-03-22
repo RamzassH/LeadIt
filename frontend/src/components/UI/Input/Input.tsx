@@ -52,7 +52,7 @@ export default function Input({
 
         // Передаем измененное значение в onChange
         onChange({
-            target: { name: event.target.name, value: inputValue },
+            target: {name: event.target.name, value: inputValue},
         } as React.ChangeEvent<HTMLInputElement>);
     };
 

@@ -8,16 +8,16 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
-      - "2181:2181"
+      - "${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}"
 
   kafka:
     image: wurstmeister/kafka
     ports:
-      - "9092:9092"
+      - "${KAFKA_PORT}:${KAFKA_PORT}"
     environment:
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:${KAFKA_PORT}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:${KAFKA_PORT}
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
     depends_on:
       - zookeeper
 
@@ -25,75 +25,108 @@ services:
     image: redis:alpine
     restart: always
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 3
-
-
-  gateway:
-    build:
-      context: .
-      dockerfile: ./gateway/Dockerfile
-    restart: always
-    depends_on:
-      - auth-service
-    environment:
-      GRPC_SERVER_ADDRESS: "auth-service:57442"
-      HTTP_PORT: "8080"
-    ports:
-      - "8080:8080"
-
 
   authdb:
     image: postgres:14
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - auth_db_data:/var/lib/postgresql/data
     ports:
-      - "5434:5432"
+      - "${AUTH_DB_PORT}:${AUTH_DB_PORT}"
 
   auth-service:
     build:
-      context: .
       dockerfile: ./authService/Dockerfile
     restart: always
     depends_on:
-      - authdb
-      - redis
+      authdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       ENV: ${ENV}
-      GRPC_PORT: ${GRPC_PORT}
-      DATABASE_DSN: ${DATABASE_DSN}
+      GRPC_PORT: ${AUTH_GRPC_PORT}
+      DATABASE_DSN: ${AUTH_DATABASE_DSN}
       TOKEN_TTL: ${TOKEN_TTL}
-      CONFIG_PATH: "/app/authService/config/config.yaml"
+      CONFIG_PATH: "/app/config/config.yaml"
       REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
     volumes:
       - ./authService/config:/app/config
     ports:
-      - "${GRPC_PORT}:${GRPC_PORT}"
-    command: [ "./auth-service", "--config", "/app/authService/config/config.yaml" ]
+      - "${AUTH_GRPC_PORT}:${AUTH_GRPC_PORT}"
+    command: [ "./auth-service", "--config", "/app/config/config.yaml" ]
 
-
-
-  notification-service:
-    build:
-      context: .
-      dockerfile: ./notificationService/Dockerfile
+  organizationdb:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ORGANIZATION_DB_NAME}
+    volumes:
+      - organization_db_data:/var/lib/postgresql/data
     ports:
-      - "50052:50052"
-      - "8081:8081"
-    depends_on:
-      - kafka
-    command: [ "./notification-service", "--config", "/app/notificationService/config/config.yaml" ]
+      - "${ORGANIZATION_DB_PORT}:${ORGANIZATION_DB_PORT}"
+
+#  organization-service:
+#    build:
+#      dockerfile: ./organizationService/Dockerfile
+#    restart: always
+#    depends_on:
+#      organizationdb:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#    environment:
+#      ENV: ${ENV}
+#      GRPC_PORT: ${ORGANIZATION_GRPC_PORT}
+#      DATABASE_DSN: ${ORGANIZATION_DATABASE_DSN}
+#    volumes:
+#      - ./organizationService/config:/app/config
+#    ports:
+#      - "${ORGANIZATION_GRPC_PORT}:${ORGANIZATION_GRPC_PORT}"
+#    command: [ "./organization-service", "--config", "/app/config/config.yaml" ]
+
+#  notification-service:
+#    build:
+#      dockerfile: ./notificationService/Dockerfile
+#    ports:
+#      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+#      - "${NOTIFICATION_SERVICE_HEALTH_PORT}:${NOTIFICATION_SERVICE_HEALTH_PORT}"
+#    depends_on:
+#      kafka:
+#        condition: service_started
+#    command: [ "./notification-service", "--config", "/app/config/config.yaml" ]
+#
+#  gateway:
+#    build:
+#      dockerfile: ./gateway/Dockerfile
+#    restart: always
+#    depends_on:
+#      auth-service:
+#        condition: service_started
+#      organization-service:
+#        condition: service_started
+#    environment:
+#      AUTH_GRPC_SERVER_ADDRESS: "auth-service:${AUTH_GRPC_PORT}"
+#      ORGANIZATION_GRPC_SERVER_ADDRESS: "organization-service:${ORGANIZATION_GRPC_PORT}"
+#      HTTP_PORT: "${GATEWAY_PORT}"
+#    ports:
+#      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+
 volumes:
-  db_data:
+  organization_db_data:
+  auth_db_data:
   redis_data:

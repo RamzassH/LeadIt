@@ -17,7 +17,7 @@ type Facade struct {
 	emp  employee.Employee
 }
 
-func NewFacade(org organization.Organization, role role.Role, proj project.Project, emp employee.Employee) *Facade {
+func New(org organization.Organization, role role.Role, proj project.Project, emp employee.Employee) *Facade {
 	return &Facade{
 		org:  org,
 		role: role,

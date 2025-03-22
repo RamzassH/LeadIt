@@ -50,8 +50,8 @@ message RoleType {
 
 message AddRoleRequest {
   string name = 1;
-  string description = 2;
-  string image = 3;
+  int64 organization_id = 2;
+  repeated string permissions = 3;
 }
 
 message AddRoleResponse {
@@ -67,6 +67,7 @@ message GetRoleResponse {
 }
 
 message GetRolesRequest {
+  int64 organizationId = 1;
 }
 
 message GetRolesResponse {
