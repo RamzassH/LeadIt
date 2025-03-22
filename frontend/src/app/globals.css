@@ -18,6 +18,13 @@
 }
 */
 
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto.ttf') format('truetype'),
+    url('/fonts/Roboto-Italic.ttf') format('truetype');
+    font-style: normal;
+}
+
 body {
     color: var(--foreground);
     background: var(--background);
