@@ -27,6 +27,13 @@ service Auth {
     };
   }
 
+  rpc Hello (HelloRequest) returns (HelloResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/hello",
+      body: "*"
+    };
+  }
+
   rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
     option (google.api.http) = {
       get: "/v1/auth/is-admin/{user_id}"
@@ -92,6 +99,14 @@ message VerifyRequest {
 message VerifyResponse {
   string token = 1;
   string refresh_token = 2;
+}
+
+message HelloRequest {
+  string some_data = 1;
+}
+
+message HelloResponse {
+  string some_response = 1;
 }
 
 message IsAdminRequest {

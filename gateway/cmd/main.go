@@ -26,6 +26,13 @@ func main() {
 	mux := runtime.NewServeMux(
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
 			md := metadata.New(map[string]string{})
+
+			authHeader := req.Header.Get("Authorization")
+			if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+				tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+				md.Set("authorization", tokenStr)
+			}
+
 			if cookies := req.Cookies(); len(cookies) > 0 {
 				var cookieStrings []string
 				for _, c := range cookies {
@@ -33,6 +40,7 @@ func main() {
 				}
 				md.Set("cookie", strings.Join(cookieStrings, "; "))
 			}
+
 			return md
 		}),
 		runtime.WithErrorHandler(func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {

@@ -1,0 +1,90 @@
+syntax = 'proto3';
+
+package organization;
+
+option go_package = "leadIt.organization.v1;organizationv1";
+import "google/api/annotations.proto";
+
+
+service Organization {
+  rpc addOrganization (AddOrganizationRequest) returns (AddOrganizationResponse) {
+    option(google.api.http) = {
+      post: "/v1/organization/add"
+      body: "*"
+    };
+  }
+  rpc getOrganization(GetOrganizationRequest) returns (GetOrganizationResponse) {
+    option (google.api.http) = {
+      get: "/v1/organization/get/{id}"
+    };
+  }
+  rpc getOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
+    option(google.api.http) = {
+      post: "/v1/organization/get-many/{organizer_id}"
+      body: "*"
+    };
+  }
+
+  rpc updateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
+    option(google.api.http) = {
+      post: "/v1/organization/update"
+      body: "*"
+    };
+  }
+
+  rpc deleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
+    option(google.api.http) = {
+      post: "/v1/organization/delete/{id}"
+      body: "*"
+    };
+  }
+}
+message OrganizationType {
+  int64 id = 1;
+  string name = 2;
+  int64 organizer_id = 3;
+  string description = 4;
+  string organization_image = 5;
+}
+
+message AddOrganizationRequest {
+  string name = 1;
+  string description = 2;
+  string image = 3;
+}
+
+message AddOrganizationResponse {
+  int64 id = 1;
+}
+
+message GetOrganizationRequest {
+  int64 id = 1;
+}
+
+message GetOrganizationResponse {
+  OrganizationType organization = 1;
+}
+
+message GetOrganizationsRequest {
+  int64 organizer_id = 1;
+}
+
+message GetOrganizationsResponse {
+  repeated OrganizationType organizations = 1;
+}
+
+message UpdateOrganizationRequest {
+  OrganizationType organization = 1;
+}
+
+message UpdateOrganizationResponse {
+  OrganizationType organization = 1;
+}
+
+message DeleteOrganizationRequest {
+  int64 id = 1;
+}
+
+message DeleteOrganizationResponse {
+  int64 id = 1;
+}

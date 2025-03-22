@@ -17,3 +17,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 )
+
+replace github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts

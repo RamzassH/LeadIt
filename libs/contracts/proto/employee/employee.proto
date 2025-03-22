@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package employee;
+
+option go_package = 'leadIt.employee.v1;employeev1';
+import "google/api/annotations.proto";
+
+service Employee {
+  rpc addEmployee (AddEmployeeRequest) returns (AddEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/add"
+      body: "*"
+    };
+  }
+  rpc getEmployee(GetEmployeeRequest) returns (GetEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/get/{id}"
+      body: "*"
+    };
+  }
+
+  rpc getEmployees(GetEmployeesRequest) returns (GetEmployeesResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/get-many/{organization_id}"
+      body: "*"
+    };
+  }
+
+  rpc updateEmployee(UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/update"
+      body: "*"
+    };
+  }
+
+  rpc deleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {
+    option(google.api.http) = {
+      post: "/v1/employee/delete"
+      body: "*"
+    };
+  }
+
+  rpc inviteEmployee(InviteEmployeeRequest) returns (InviteEmployeeRequest) {
+    option(google.api.http) = {
+      post: "/v1/employee/invite"
+      body: "*"
+    };
+  }
+}
+message EmployeeType {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 organization_id = 3;
+}
+
+message AddEmployeeRequest {
+  int64 user_id = 2;
+  int64 organization_id = 3;
+}
+
+message AddEmployeeResponse {
+  int64 id = 1;
+}
+
+message GetEmployeeRequest {
+  int64 id = 1;
+}
+
+message GetEmployeeResponse {
+  EmployeeType employee = 1;
+}
+
+message GetEmployeesRequest {
+  int64 organization_id = 1;
+}
+
+message GetEmployeesResponse {
+  repeated EmployeeType employees = 1;
+}
+
+message UpdateEmployeeRequest {
+  EmployeeType employee = 1;
+}
+
+message UpdateEmployeeResponse {
+  EmployeeType employee = 1;
+}
+
+message DeleteEmployeeRequest {
+  int64 id = 1;
+}
+
+message DeleteEmployeeResponse {
+  int64 id = 1;
+}
+
+message InviteEmployeeRequest {
+  int64 user_id = 1;
+}

@@ -4,24 +4,25 @@ RUN apk update && apk add --no-cache git
 
 WORKDIR /app
 
-# Скопируем зависимости
-COPY go.mod go.sum ./
+COPY go.work ./
+
+COPY libs ./libs
+COPY notificationService ./notificationService
+COPY authService ./authService
+COPY gateway ./gateway
+
+WORKDIR /app/gateway
 RUN go mod download
 
-# Скопируем исходный код
-COPY . .
+WORKDIR /app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/bin/gateway ./gateway/cmd/main.go
 
-# Сборка приложения
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gateway ./cmd/gateway/main.go
-
-# Минимальный образ
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Скопируем бинарник
-COPY --from=builder /app/gateway .
+COPY --from=builder /app/bin/gateway .
 
 EXPOSE 8080
 

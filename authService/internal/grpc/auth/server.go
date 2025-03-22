@@ -219,6 +219,12 @@ func (s *ServerAPI) Logout(ctx context.Context, req *authv1.LogoutRequest) (*aut
 	return &authv1.LogoutResponse{}, nil
 }
 
+func (s *ServerAPI) Hello(ctx context.Context, req *authv1.HelloRequest) (*authv1.HelloResponse, error) {
+	return &authv1.HelloResponse{
+		SomeResponse: "Goyda",
+	}, nil
+}
+
 func (s *ServerAPI) UpdateUser(ctx context.Context, req *authv1.UpdateUserRequest) (*authv1.UpdateUserResponse, error) {
 	birthDate, err := time.Parse(time.RFC3339, req.GetBirth())
 
