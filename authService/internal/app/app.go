@@ -6,11 +6,11 @@ import (
 	"github.com/RamzassH/LeadIt/authService/internal/app/grpc"
 	"github.com/RamzassH/LeadIt/authService/internal/services/auth"
 	"github.com/RamzassH/LeadIt/authService/internal/storage/postgreSQL"
+	"github.com/RamzassH/LeadIt/libs/kafka"
+	"github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
-	"kafka"
-	"redisStorage"
 	"time"
 )
 

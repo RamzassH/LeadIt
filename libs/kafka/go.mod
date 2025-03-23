@@ -1,6 +1,6 @@
-module github.com/RamzassH/LeadIt/libs/kafka
+module github.com/RamzassH/libs/kafka
 
-go 1.23
+go 1.24.1
 
 require (
 	github.com/rs/zerolog v1.34.0
@@ -8,12 +8,9 @@ require (
 )
 
 require (
-	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/pierrec/lz4/v4 v4.1.16 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )

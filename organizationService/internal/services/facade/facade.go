@@ -2,6 +2,7 @@ package facade
 
 import (
 	"context"
+	"github.com/RamzassH/LeadIt/organizationService/internal/grpc/interceptors"
 
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/employee"
@@ -31,14 +32,20 @@ func (f *Facade) AddOrganization(ctx context.Context, payload models.AddOrganiza
 }
 
 func (f *Facade) GetOrganization(ctx context.Context, id int64) (*models.Organization, error) {
-	return f.org.GetOrganization(ctx, id)
+	payload := models.GetOrganizationPayload{
+		OrganizationID: id,
+	}
+	return f.org.GetOrganization(ctx, payload)
 }
 
 func (f *Facade) GetAllOrganizations(ctx context.Context) ([]models.Organization, error) {
-	return f.org.GetAllOrganizations(ctx)
+	payload := models.GetOrganizationsPayload{
+		OrganizerID: ctx.Value(interceptors.CtxUserID).(int64),
+	}
+	return f.org.GetAllOrganizations(ctx, payload)
 }
 
-func (f *Facade) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (int64, error) {
+func (f *Facade) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (*models.Organization, error) {
 	return f.org.UpdateOrganization(ctx, payload)
 }
 
@@ -54,11 +61,11 @@ func (f *Facade) GetRole(ctx context.Context, id int64) (*models.Role, error) {
 	return f.role.GetRole(ctx, id)
 }
 
-func (f *Facade) GetAllRoles(ctx context.Context) ([]models.Role, error) {
-	return f.role.GetAllRoles(ctx)
+func (f *Facade) GetAllRoles(ctx context.Context, organizationId int64) ([]models.Role, error) {
+	return f.role.GetAllRoles(ctx, organizationId)
 }
 
-func (f *Facade) UpdateRole(ctx context.Context, payload models.UpdateRolePayload) (int64, error) {
+func (f *Facade) UpdateRole(ctx context.Context, payload models.UpdateRolePayload) (*models.Role, error) {
 	return f.role.UpdateRole(ctx, payload)
 }
 
@@ -74,11 +81,11 @@ func (f *Facade) GetProject(ctx context.Context, id int64) (*models.Project, err
 	return f.proj.GetProject(ctx, id)
 }
 
-func (f *Facade) GetAllProjects(ctx context.Context) ([]models.Project, error) {
-	return f.proj.GetAllProjects(ctx)
+func (f *Facade) GetAllProjects(ctx context.Context, organizationId int64) ([]models.Project, error) {
+	return f.proj.GetAllProjects(ctx, organizationId)
 }
 
-func (f *Facade) UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (int64, error) {
+func (f *Facade) UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (*models.Project, error) {
 	return f.proj.UpdateProject(ctx, payload)
 }
 
@@ -95,11 +102,11 @@ func (f *Facade) GetEmployee(ctx context.Context, id int64) (*models.Employee, e
 	return f.emp.GetEmployee(ctx, id)
 }
 
-func (f *Facade) GetAllEmployees(ctx context.Context) ([]models.Employee, error) {
-	return f.emp.GetAllEmployees(ctx)
+func (f *Facade) GetAllEmployees(ctx context.Context, organizationId int64) ([]models.Employee, error) {
+	return f.emp.GetAllEmployees(ctx, organizationId)
 }
 
-func (f *Facade) UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (int64, error) {
+func (f *Facade) UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (*models.Employee, error) {
 	return f.emp.UpdateEmployee(ctx, payload)
 }
 

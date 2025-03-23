@@ -2,9 +2,10 @@ package project
 
 import (
 	"context"
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/rs/zerolog"
-	"kafka"
+
 	"time"
 )
 

@@ -1,6 +1,6 @@
 module github.com/RamzassH/LeadIt/gateway
 
-go 1.23.3
+go 1.24.1
 
 require (
 	github.com/RamzassH/LeadIt/libs/contracts v0.0.0-20250209185459-c146a87bcf1d

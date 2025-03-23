@@ -3,9 +3,9 @@ package organization
 import (
 	"context"
 	"fmt"
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/rs/zerolog"
-	"kafka"
 	"time"
 )
 

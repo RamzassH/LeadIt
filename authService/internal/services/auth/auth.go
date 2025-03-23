@@ -11,11 +11,11 @@ import (
 	"github.com/RamzassH/LeadIt/authService/internal/lib/jwt"
 	"github.com/RamzassH/LeadIt/authService/internal/lib/verification"
 	"github.com/RamzassH/LeadIt/authService/internal/storage"
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"kafka"
 	"regexp"
 	"time"
 )

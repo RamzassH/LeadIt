@@ -5,13 +5,14 @@ go 1.24.1
 require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
-	github.com/RamzassH/LeadIt/libs/kafka v0.0.0-00010101000000-000000000000
+	github.com/RamzassH/LeadIt/libs/kafka v0.0.0-20250323104901-2e098016fd82
+	github.com/RamzassH/LeadIt/libs/redis v0.0.0-00010101000000-000000000000
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/lib/pq v1.10.9
-	github.com/redis/go-redis/v9 v9.7.1
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.32.0
@@ -53,10 +54,8 @@ require (
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
 
-replace github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts
-
-replace github.com/RamzassH/LeadIt/libs/redis => ../libs/redis
-
-replace github.com/RamzassH/LeadIt/libs/kafka => ../libs/kafka
-
-replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250207221924-e9438ea467c6
+replace (
+	github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts
+	github.com/RamzassH/LeadIt/libs/kafka => ../libs/kafka
+	github.com/RamzassH/LeadIt/libs/redis => ../libs/redis
+)

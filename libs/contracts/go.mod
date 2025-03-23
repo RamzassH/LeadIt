@@ -1,6 +1,6 @@
 module github.com/RamzassH/LeadIt/libs/contracts
 
-go 1.23.3
+go 1.24.1
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1

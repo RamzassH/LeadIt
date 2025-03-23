@@ -1,11 +1,11 @@
 package app
 
 import (
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	server "github.com/RamzassH/LeadIt/notificationService/internal/server/notification"
 	notification "github.com/RamzassH/LeadIt/notificationService/internal/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
-	"kafka"
 	"os"
 	"os/signal"
 	"syscall"

@@ -3,6 +3,8 @@ package app
 import (
 	"database/sql"
 	"fmt"
+	"github.com/RamzassH/LeadIt/libs/kafka"
+	"github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/RamzassH/LeadIt/organizationService/internal/app/grpc"
 	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/employee"
@@ -13,8 +15,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
-	"kafka"
-	"redisStorage"
 )
 
 type App struct {

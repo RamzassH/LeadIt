@@ -5,11 +5,12 @@ go 1.24.1
 require (
 	github.com/RamzassH/LeadIt/libs/contracts v0.0.0-20250322125631-e47e1a1b710c
 	github.com/RamzassH/LeadIt/libs/kafka v0.0.0-00010101000000-000000000000
+	github.com/RamzassH/LeadIt/libs/redis v0.0.0-00010101000000-000000000000
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/lib/pq v1.10.9
-	github.com/redis/go-redis/v9 v9.7.1
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/rs/zerolog v1.34.0
 	google.golang.org/grpc v1.71.0
 )
@@ -42,4 +43,8 @@ require (
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
 
-replace github.com/RamzassH/LeadIt/libs/kafka => ../libs/kafka
+replace (
+	github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts
+	github.com/RamzassH/LeadIt/libs/kafka => ../libs/kafka
+	github.com/RamzassH/LeadIt/libs/redis => ../libs/redis
+)
