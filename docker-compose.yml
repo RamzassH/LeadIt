@@ -44,7 +44,7 @@ services:
     volumes:
       - auth_db_data:/var/lib/postgresql/data
     ports:
-      - "${AUTH_DB_PORT}:${AUTH_DB_PORT}"
+      - "${AUTH_DB_PORT}:${POSTGRESQL_PORT}"
 
   auth-service:
     build:
@@ -65,7 +65,6 @@ services:
       - ./authService/config:/app/config
     ports:
       - "${AUTH_GRPC_PORT}:${AUTH_GRPC_PORT}"
-    command: [ "./auth-service", "--config", "/app/authService/config/config.yaml" ]
 
   organizationdb:
     image: postgres:14
@@ -77,7 +76,7 @@ services:
     volumes:
       - organization_db_data:/var/lib/postgresql/data
     ports:
-      - "${ORGANIZATION_DB_PORT}:${ORGANIZATION_DB_PORT}"
+      - "${ORGANIZATION_DB_PORT}:${POSTGRESQL_PORT}"
 
   organization-service:
     build:
@@ -94,7 +93,6 @@ services:
       - ./organizationService/config:/app/config
     ports:
       - "${ORGANIZATION_GRPC_PORT}:${ORGANIZATION_GRPC_PORT}"
-    command: [ "./organization-service", "--config", "/app/organizationService/config/config.yaml" ]
 
   notification-service:
     build:
@@ -105,7 +103,6 @@ services:
     depends_on:
       kafka:
         condition: service_started
-    command: [ "./notification-service", "--config", "/app/notificationService/config/config.yaml" ]
 
   gateway:
     build:

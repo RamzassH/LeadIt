@@ -24,7 +24,7 @@ type GRPCConfig struct {
 }
 
 func MustLoadConfig() *Config {
-	if cfgInstance == nil {
+	if cfgInstance != nil {
 		return cfgInstance
 	}
 
@@ -53,7 +53,7 @@ func MustLoadConfigByPath(configPath string) *Config {
 func fetchConfigPath() string {
 	var res string
 
-	flag.StringVar(&res, "config", ".env", "config file path")
+	flag.StringVar(&res, "config", "./local.yaml", "config file path")
 	flag.Parse()
 
 	if res == "" {

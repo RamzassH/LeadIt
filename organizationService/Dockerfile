@@ -23,8 +23,8 @@ WORKDIR /app
 RUN mkdir -p ./organizationService/config
 
 COPY --from=builder /organization-service .
-COPY --from=builder /app/organizationService/config/local.yaml /app/config/config.yaml
+COPY --from=builder /app/organizationService/config/local.yaml /app/organizationService/config/config.yaml
 
 EXPOSE 57444
 
-CMD ["/app/organization-service", "--config", "/app/config/config.yaml"]
+CMD ["/app/organization-service", "--config", "/app/organizationService/config/config.yaml"]
