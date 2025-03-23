@@ -1,10 +1,11 @@
 module github.com/RamzassH/LeadIt/authService
 
-go 1.23.3
+go 1.24.1
 
 require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
+	github.com/RamzassH/LeadIt/libs/kafka v0.0.0-00010101000000-000000000000
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.25.0
@@ -28,11 +29,14 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/pierrec/lz4/v4 v4.1.16 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
@@ -52,5 +56,7 @@ require (
 replace github.com/RamzassH/LeadIt/libs/contracts => ../libs/contracts
 
 replace github.com/RamzassH/LeadIt/libs/redis => ../libs/redis
+
+replace github.com/RamzassH/LeadIt/libs/kafka => ../libs/kafka
 
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250207221924-e9438ea467c6

@@ -1,4 +1,4 @@
-module kafka
+module github.com/RamzassH/LeadIt/libs/kafka
 
 go 1.23
 

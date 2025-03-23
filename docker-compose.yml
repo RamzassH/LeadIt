@@ -49,12 +49,11 @@ services:
   auth-service:
     build:
       dockerfile: ./authService/Dockerfile
+      context: .
     restart: always
     depends_on:
-      authdb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - authdb
+      - redis
     environment:
       ENV: ${ENV}
       GRPC_PORT: ${AUTH_GRPC_PORT}
@@ -66,7 +65,7 @@ services:
       - ./authService/config:/app/config
     ports:
       - "${AUTH_GRPC_PORT}:${AUTH_GRPC_PORT}"
-    command: [ "./auth-service", "--config", "/app/config/config.yaml" ]
+    command: [ "./auth-service", "--config", "/app/authService/config/config.yaml" ]
 
   organizationdb:
     image: postgres:14
@@ -80,51 +79,49 @@ services:
     ports:
       - "${ORGANIZATION_DB_PORT}:${ORGANIZATION_DB_PORT}"
 
-#  organization-service:
-#    build:
-#      dockerfile: ./organizationService/Dockerfile
-#    restart: always
-#    depends_on:
-#      organizationdb:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
-#    environment:
-#      ENV: ${ENV}
-#      GRPC_PORT: ${ORGANIZATION_GRPC_PORT}
-#      DATABASE_DSN: ${ORGANIZATION_DATABASE_DSN}
-#    volumes:
-#      - ./organizationService/config:/app/config
-#    ports:
-#      - "${ORGANIZATION_GRPC_PORT}:${ORGANIZATION_GRPC_PORT}"
-#    command: [ "./organization-service", "--config", "/app/config/config.yaml" ]
+  organization-service:
+    build:
+      dockerfile: ./organizationService/Dockerfile
+    restart: always
+    depends_on:
+      - organizationdb
+      - redis
+    environment:
+      ENV: ${ENV}
+      GRPC_PORT: ${ORGANIZATION_GRPC_PORT}
+      DATABASE_DSN: ${ORGANIZATION_DATABASE_DSN}
+    volumes:
+      - ./organizationService/config:/app/config
+    ports:
+      - "${ORGANIZATION_GRPC_PORT}:${ORGANIZATION_GRPC_PORT}"
+    command: [ "./organization-service", "--config", "/app/organizationService/config/config.yaml" ]
 
-#  notification-service:
-#    build:
-#      dockerfile: ./notificationService/Dockerfile
-#    ports:
-#      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
-#      - "${NOTIFICATION_SERVICE_HEALTH_PORT}:${NOTIFICATION_SERVICE_HEALTH_PORT}"
-#    depends_on:
-#      kafka:
-#        condition: service_started
-#    command: [ "./notification-service", "--config", "/app/config/config.yaml" ]
-#
-#  gateway:
-#    build:
-#      dockerfile: ./gateway/Dockerfile
-#    restart: always
-#    depends_on:
-#      auth-service:
-#        condition: service_started
-#      organization-service:
-#        condition: service_started
-#    environment:
-#      AUTH_GRPC_SERVER_ADDRESS: "auth-service:${AUTH_GRPC_PORT}"
-#      ORGANIZATION_GRPC_SERVER_ADDRESS: "organization-service:${ORGANIZATION_GRPC_PORT}"
-#      HTTP_PORT: "${GATEWAY_PORT}"
-#    ports:
-#      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+  notification-service:
+    build:
+      dockerfile: ./notificationService/Dockerfile
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+      - "${NOTIFICATION_SERVICE_HEALTH_PORT}:${NOTIFICATION_SERVICE_HEALTH_PORT}"
+    depends_on:
+      kafka:
+        condition: service_started
+    command: [ "./notification-service", "--config", "/app/notificationService/config/config.yaml" ]
+
+  gateway:
+    build:
+      dockerfile: ./gateway/Dockerfile
+    restart: always
+    depends_on:
+      auth-service:
+        condition: service_started
+      organization-service:
+        condition: service_started
+    environment:
+      AUTH_GRPC_SERVER_ADDRESS: "auth-service:${AUTH_GRPC_PORT}"
+      ORGANIZATION_GRPC_SERVER_ADDRESS: "organization-service:${ORGANIZATION_GRPC_PORT}"
+      HTTP_PORT: "${GATEWAY_PORT}"
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
 
 volumes:
   organization_db_data:

@@ -7,11 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/notificationService/internal/app"
 	"github.com/RamzassH/LeadIt/notificationService/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"kafka"
 )
 
 func main() {

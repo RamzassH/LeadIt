@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/organizationService/internal/app"
 	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"kafka"
 	"os"
 	"os/signal"
 	"syscall"

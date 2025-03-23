@@ -1,4 +1,4 @@
-module redisStorage
+module github.com/RamzassH/LeadIt/libs/redisStorage
 
 go 1.23
 
