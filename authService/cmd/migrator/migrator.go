@@ -20,7 +20,7 @@ func main() {
 		log.Fatal("migrations path is empty")
 	}
 
-	dsn := "postgres://postgres:postgres@localhost:5434/authdb?sslmode=disable"
+	dsn := "postgres://postgres:postgres@localhost:5432/authdb?sslmode=disable"
 
 	migrator, err := migrate.New("file://"+migrationsPath, dsn)
 	if err != nil {
