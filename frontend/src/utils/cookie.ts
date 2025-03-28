@@ -1,18 +1,67 @@
-// Устанавливаем JWT в cookie с флагами Secure и SameSite
-export const setValueInCookie = (name: string, value: string, days: number = 7) => {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Устанавливаем срок действия cookie
-    const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value}; ${expires}; path=/; Secure; SameSite=Strict`;
+/**
+ * Сохраняет данные в localStorage.
+ * @param key - Ключ, по которому будут храниться данные.
+ * @param value - Данные для сохранения (объект, строка, число и т.д.).
+ */
+export const setLocalStorage = <T>(key: string, value: T): void => {
+    if (typeof window === 'undefined') {
+        console.warn('localStorage доступен только в браузере.');
+        return;
+    }
+    try {
+        const serializedValue = JSON.stringify(value);
+        localStorage.setItem(key, serializedValue);
+    } catch (error) {
+        console.error('Ошибка записи в localStorage:', error);
+    }
 };
 
-// Получаем JWT из cookie
-export const getValueFromCookie = (name: string): string | null => {
-    const cookie = document.cookie.split('; ').find(row => row.startsWith(`${name}=`));
-    return cookie ? cookie.split('=')[1] : null;
+/**
+ * Получает данные из localStorage.
+ * @param key - Ключ, по которому хранятся данные.
+ * @returns Данные или null, если их нет или произошла ошибка.
+ */
+export const getLocalStorage = <T>(key: string): T | null => {
+    if (typeof window === 'undefined') {
+        console.warn('localStorage доступен только в браузере.');
+        return null;
+    }
+    try {
+        const serializedValue = localStorage.getItem(key);
+        return serializedValue ? JSON.parse(serializedValue) : null;
+    } catch (error) {
+        console.error('Ошибка чтения из localStorage:', error);
+        return null;
+    }
 };
 
-// Удаляем JWT из cookie
-export const removeValueFromCookie = (name: string) => {
-    document.cookie = `${name}=; path=/; max-age=0; Secure; SameSite=Strict`;
+/**
+ * Удаляет данные из localStorage по ключу.
+ * @param key - Ключ, который нужно удалить.
+ */
+export const removeLocalStorage = (key: string): void => {
+    if (typeof window === 'undefined') {
+        console.warn('localStorage доступен только в браузере.');
+        return;
+    }
+    try {
+        localStorage.removeItem(key);
+    } catch (error) {
+        console.error('Ошибка удаления из localStorage:', error);
+    }
+};
+
+/**
+ * Проверяет, доступен ли localStorage в текущей среде.
+ * @returns true, если localStorage доступен.
+ */
+export const isLocalStorageSupported = (): boolean => {
+    try {
+        const testKey = '__test__';
+        localStorage.setItem(testKey, testKey);
+        localStorage.removeItem(testKey);
+        return true;
+    } catch (error) {
+        return false;
+    }
 };

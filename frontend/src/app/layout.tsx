@@ -1,34 +1,39 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
+'use client';
 import GlobalStyle from "@/app/styled";
-
-const geistSans = localFont({
-    src: "./fonts/GeistVF.woff",
-    variable: "--font-geist-sans",
-    weight: "100 900",
-});
-const geistMono = localFont({
-    src: "./fonts/GeistMonoVF.woff",
-    variable: "--font-geist-mono",
-    weight: "100 900",
-});
-
-export const metadata: Metadata = {
-    title: "Гойда по ссылке в описании",
-    description: "Гойда и этим всё сказано",
-};
+import {metadata} from "./metadata"
+import useGlobalStore from "@/app/store";
+import {useEffect} from "react";
+import {getLocalStorage, setLocalStorage} from "@/utils/cookie";
 
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const globalStore = useGlobalStore();
+
+    useEffect(() => {
+        if (getLocalStorage("isAuth") === null) {
+            setLocalStorage("isAuth", false);
+        }
+        if (getLocalStorage("refreshToken") === null) {
+            setLocalStorage("refreshToken", "");
+        }
+        globalStore.setLogin(getLocalStorage("isAuth") as boolean);
+        globalStore.setRefreshToken(getLocalStorage("refreshToken") as string);
+    }, []);
+
+    useEffect(() => {
+        setLocalStorage("isAuth", globalStore.isLogin);
+    }, [globalStore.isLogin]);
+    useEffect(() => {
+        setLocalStorage("refreshToken", globalStore.refreshToken);
+    }, [globalStore.refreshToken]);
+
     return (
         <html lang="en">
         <GlobalStyle/>
-        <body
-            className={`${geistSans.variable} ${geistMono.variable}`}
-        >
+        <body>
         {children}
         </body>
         </html>

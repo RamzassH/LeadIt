@@ -2,12 +2,14 @@
 import LoginForm from "@/components/UI/AuthPage/LoginForm/LoginForm";
 import CreateAccountForm from "@/components/UI/AuthPage/CreateAccountForm/CreateAccountForm";
 import { useState } from "react";
-import theme from "../../../theme/theme";
+import theme from "../../../../theme/theme";
 import { ThemeProvider } from "@mui/system";
-import { Main } from "@/app/auth/styled/AuthStyled";
+import { Main } from "@/app/(login)/auth/styled/AuthStyled";
 import { motion, AnimatePresence } from "framer-motion";
+import useGlobalStore from "@/app/store";
 
 export default function Auth() {
+    const globalStore = useGlobalStore();
     const [isLoginForm, setLogin] = useState(true);
 
     const showCreateAccountForm = () => {

@@ -1,6 +1,6 @@
 "use client"
 import {ThemeProvider} from "@mui/system";
-import theme from "../../theme/theme";
+import theme from "../../../theme/theme";
 
 export default function Home() {
     return (

@@ -26,9 +26,9 @@ export default function Button({
             type={type} // Устанавливаем атрибут `type` на кнопку
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => callback(event)}
             style={style}
-            className={isReverseBackground ? "reverse-background": ""}
+            className={isReverseBackground ? "reverse-background": undefined}
         >
-            <ButtonText className={isReverseBackground ? "reverse-background": ""}>
+            <ButtonText className={isReverseBackground ? "reverse-background": undefined}>
                 {children}
             </ButtonText>
         </GradientButton >

@@ -25,12 +25,9 @@ export default function Header({menuOpenFunction}: HeaderProps) {
     const exit = (event: React.MouseEvent<HTMLElement>) => {
         globalStore.setLogin(false);
         globalStore.setRefreshToken("")
+        router.push("/auth");
     }
-    useEffect(() => {
-        if (!globalStore.isLogin) {
-            router.push("/auth");
-        }
-    }, [globalStore.isLogin]);
+
     return (
         <HeaderContainer>
             <SideMenuButton callback={menuOpenFunction}/>

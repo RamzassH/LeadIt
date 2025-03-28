@@ -18,6 +18,7 @@ import useGlobalStore from "@/app/store";
 import {useEffect} from "react";
 import LoginModalWindow from "@/components/UI/AuthPage/ModalWindow/LoginModalWindow";
 import {useRouter} from "next/navigation";
+import {getLocalStorage, setLocalStorage} from "@/utils/cookie";
 
 
 interface LoginFormProps {
@@ -43,6 +44,7 @@ export default function LoginForm({ callback }: LoginFormProps) {
     const [login, isLoading, error] = useFetching(async (data) => {
         await new Promise(resolve => setTimeout(resolve, 500));
         const response = await loginAPI(data);
+        console.log(response.data);
         globalStore.setRefreshToken(response.data.refreshToken);
         globalStore.setLogin(true)
     });
@@ -50,13 +52,8 @@ export default function LoginForm({ callback }: LoginFormProps) {
     // Обработчик отправки формы
     const onSubmit = async (data: LoginData) => {
         login({email: data.login, password: data.password});
+        router.push("/profile");
     };
-
-    useEffect(() => {
-        if (globalStore.isLogin) {
-            router.push("/profile");
-        }
-    }, [globalStore.isLogin]);
 
     useEffect(() => {
         if (error) {
