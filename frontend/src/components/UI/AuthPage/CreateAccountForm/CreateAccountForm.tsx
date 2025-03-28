@@ -5,13 +5,17 @@ import Button from "@/components/UI/AuthPage/Button/Button";
 import Checkbox from "@/components/UI/AuthPage/Checkbox/Checkbox";
 import Loader from "@/components/UI/AuthPage/Loader/Loader";
 import SuccessMessage from "@/components/UI/AuthPage/SuccessMessage/SuccessMessage";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {
     BackgroundContainer, ButtonContainer,
     Container, Content,
     Form,
     Title, TitleContainer
 } from "@/components/UI/AuthPage/CreateAccountForm/styled/CreateAccountForm";
+import RegisterModalWindow from "@/components/UI/AuthPage/ModalWindow/RegisterModalWindow";
+import {useFetching} from "@/hooks/useFetching";
+import {data} from "framer-motion/m";
+import {registerAPI} from "@/api/auth/register";
 
 interface AccountData {
     surname: string;
@@ -40,35 +44,29 @@ export default function CreateAccountForm({ returnCallback }: CreateAccountFormP
             repeatPassword: "",
         },
     });
+    const [isOpen, setOpen] = useState(false);
+    const [register, isLoading, error] = useFetching(async (data) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await registerAPI(data);
 
-
-    const [isLoading, setLoading] = useState(false);
-    const [isSuccess, setSuccess] = useState(false);
+    })
 
     // Обработчик отправки формы
     const onSubmit = async (data: AccountData) => {
-        console.log('Account Data:', data);
-
-        // Здесь будет логика для отправки данных на сервер
-        setLoading(true);
-
-        // Симуляция отправки данных
-        setTimeout(() => {
-            setLoading(false);
-            setSuccess(true);
-            setTimeout(() => {
-                setSuccess(false);
-                returnCallback(); // Возвращаемся к предыдущему шагу после успешной регистрации
-            }, 5000);
-        }, 5000); // Задержка для имитации асинхронной операции
+        register({name: data.name, surname:data.surname ,email: data.email, password: data.password});
     };
 
-    if (isLoading) {
-        return <Loader />;
-    }
+    useEffect(() => {
+        if (isLoading) {
+            setOpen(true);
+        }
+    }, [isLoading]);
 
-    if (isSuccess) {
-        return <SuccessMessage message="Аккаунт успешно создан" />;
+    const registerCallback = () => {
+        setOpen(false);
+        if (!error) {
+            returnCallback()
+        }
     }
 
     return (
@@ -195,6 +193,13 @@ export default function CreateAccountForm({ returnCallback }: CreateAccountFormP
                         Войти
                     </Button>
                 </ButtonContainer>
+                <RegisterModalWindow open={isOpen} callback={registerCallback} handleClose={() => {}}>
+                    {isLoading ?
+                        null:
+                        error ? "Ошибочка вышла. Пользователь не создан" :
+                            "Пользователь успешно создан. На указанный email, отправлено письмо для верификации."
+                    }
+                </RegisterModalWindow>
             </Content>
         </Container>
     );

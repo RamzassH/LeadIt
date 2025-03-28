@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import Input from "@/components/UI/AuthPage/Input/Input";
 import Button from "@/components/UI/AuthPage/Button/Button";
 import Checkbox from "@/components/UI/AuthPage/Checkbox/Checkbox";
-import {loginUser} from "@/api/AuthService/AuthService"
 import Loader from "@/components/UI/AuthPage/Loader/Loader";
 import {
     BackgroundContainer, ButtonContainer,
@@ -12,6 +11,14 @@ import {
     Title,
     TitleContainer
 } from "@/components/UI/AuthPage/LoginForm/styled/LoginForm";
+import {useFetching} from "@/hooks/useFetching";
+import {data} from "framer-motion/m";
+import {loginAPI} from "@/api/auth/login";
+import useGlobalStore from "@/app/store";
+import {useEffect} from "react";
+import LoginModalWindow from "@/components/UI/AuthPage/ModalWindow/LoginModalWindow";
+import {useRouter} from "next/navigation";
+
 
 interface LoginFormProps {
     callback: () => void;
@@ -28,15 +35,32 @@ export default function LoginForm({ callback }: LoginFormProps) {
         handleSubmit,
         formState: { errors },
         setError,
+        setValue,
         clearErrors,
     } = useForm<LoginData>();
+    const router = useRouter();
+    const globalStore = useGlobalStore();
+    const [login, isLoading, error] = useFetching(async (data) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await loginAPI(data);
+        globalStore.setRefreshToken(response.data.refreshToken);
+        globalStore.setLogin(true)
+    });
 
     // Обработчик отправки формы
     const onSubmit = async (data: LoginData) => {
-        try {
-            console.log(data.login, data.password)
-            loginUser(data.login, data.password)
-        } catch (error) {
+        login({email: data.login, password: data.password});
+    };
+
+    useEffect(() => {
+        if (globalStore.isLogin) {
+            router.push("/profile");
+        }
+    }, [globalStore.isLogin]);
+
+    useEffect(() => {
+        if (error) {
+            setValue("password", "")
             setError("login", {
                 type: "manual",
                 message: "",
@@ -46,15 +70,11 @@ export default function LoginForm({ callback }: LoginFormProps) {
                 message: "Ошибка авторизации. Попробуйте снова.",
             });
         }
-    };
+    }, [error]);
 
     const handleCreateAccount = () => {
         callback();
     };
-
-    //if (false) {
-    //    return <Loader />;
-    //}
 
     return (
         <Container>
@@ -128,6 +148,7 @@ export default function LoginForm({ callback }: LoginFormProps) {
                             Войти
                         </Button>
                     </ButtonContainer>
+                    <LoginModalWindow open={isLoading} handleClose={() => {}}/>
                 </Content>
             </BackgroundContainer>
         </Container>

@@ -1,11 +1,9 @@
 import React from "react";
-import styles from "./Loader.module.css"; // Импорт стилей
+import {CircularLoader} from "@/components/UI/AuthPage/Loader/styled/styled";
 
 export default function Loader() {
     return (
-        <div className={styles.loader}>
-            <div className={styles.spinner}></div>
-        </div>
+        <CircularLoader/>
     );
 };
 

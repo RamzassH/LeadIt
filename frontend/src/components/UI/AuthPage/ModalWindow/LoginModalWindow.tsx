@@ -1,5 +1,5 @@
 import React from 'react';
-import ModalWindow from "@/components/UI/ModalWindowTeamplate/ModalWindow";
+import ModalWindow from "@/components/UI/ModalWindowTemplate/ModalWindow";
 import Loader from "@/components/UI/AuthPage/Loader/Loader";
 
 interface ModalWindowProps {

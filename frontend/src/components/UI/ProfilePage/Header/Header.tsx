@@ -1,10 +1,11 @@
 "use client"
 import HeaderContainer from "@/components/UI/ProfilePage/Header/styles/HeaderContainer";
-import React from "react";
+import React, {useEffect} from "react";
 import SideMenuButton from "@/components/UI/ProfilePage/Header/SideMenuButton/SideMenuButton";
 import {Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip} from "@mui/material";
 import {Logout, PersonAdd, Settings } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
+import useGlobalStore from "@/app/store";
 
 interface HeaderProps {
     menuOpenFunction: () => void;
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export default function Header({menuOpenFunction}: HeaderProps) {
     const router = useRouter();
+    const globalStore = useGlobalStore();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -20,6 +22,15 @@ export default function Header({menuOpenFunction}: HeaderProps) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const exit = (event: React.MouseEvent<HTMLElement>) => {
+        globalStore.setLogin(false);
+        globalStore.setRefreshToken("")
+    }
+    useEffect(() => {
+        if (!globalStore.isLogin) {
+            router.push("/auth");
+        }
+    }, [globalStore.isLogin]);
     return (
         <HeaderContainer>
             <SideMenuButton callback={menuOpenFunction}/>
@@ -100,7 +111,7 @@ export default function Header({menuOpenFunction}: HeaderProps) {
                     Logout
                 </MenuItem>
                 */}
-                <MenuItem onClick={(event: React.MouseEvent<HTMLElement>) => {router?.push("/auth")}}>
+                <MenuItem onClick={exit}>
                     <ListItemIcon>
                         <Logout fontSize="small" />
                     </ListItemIcon>

@@ -4,7 +4,7 @@ import theme from "../../../../theme/theme";
 import Header from "@/components/UI/ProfilePage/Header/Header";
 import DrawerSideMenu from "@/components/UI/ProfilePage/DrawerSideMenu/DrawerSideMenu";
 import ProfileComponent from "@/components/UI/ProfilePage/Profile/ProfileComponent";
-import ModalWindow from "@/components/UI/ProfilePage/ModalWindow/ModalWindow";
+import ModalWindow from "@/components/UI/ModalWindowTemplate/ModalWindow";
 import React, {useRef} from "react";
 import Graph from "@/components/UI/OrganizationPages/StructurePage/Graph/Graph";
 
