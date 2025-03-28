@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/organizationService/internal/app"
 	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/go-playground/validator/v10"
+	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -28,7 +28,7 @@ func main() {
 
 	validate := validator.New()
 
-	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	db, err := sqlx.Open("postgres", cfg.PostgresDSN)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to connect to database")
 		os.Exit(1)

@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/organizationService/internal/storage"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
 type RoleStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewRoleStorage(db *sql.DB) (*RoleStorage, error) {
+func NewRoleStorage(db *sqlx.DB) (*RoleStorage, error) {
 	if db == nil {
 		return nil, fmt.Errorf("datatabase connection is nil")
 	}

@@ -40,7 +40,7 @@ func (ns *NotificationService) SendEmailNotification(ctx context.Context, to, su
 	auth := smtp.PlainAuth("", ns.smtp.User, ns.smtp.Password, ns.smtp.Host)
 
 	msg := []byte(fmt.Sprintf(
-		"From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n%s",
+		"From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n%s",
 		ns.smtp.User, to, subject, body,
 	))
 

@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/organizationService/internal/storage"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
 type EmployeeStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewEmployeeStorage(db *sql.DB) (*EmployeeStorage, error) {
+func NewEmployeeStorage(db *sqlx.DB) (*EmployeeStorage, error) {
 	if db == nil {
 		return nil, fmt.Errorf("datatabase connection is nil")
 	}

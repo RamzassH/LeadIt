@@ -6,15 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
+	"github.com/RamzassH/LeadIt/organizationService/internal/grpc/interceptors"
 	"github.com/RamzassH/LeadIt/organizationService/internal/storage"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
 type OrganizationStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewOrganizationStorage(db *sql.DB) (*OrganizationStorage, error) {
+func NewOrganizationStorage(db *sqlx.DB) (*OrganizationStorage, error) {
 	if db == nil {
 		return nil, fmt.Errorf("datatabase connection is nil")
 	}
@@ -32,7 +34,7 @@ func (s *OrganizationStorage) SaveOrganization(
 	VALUES ($1, $2, $3, $4)
 	RETURNING id`
 
-	organizerID, ok := ctx.Value("user_id").(int64)
+	organizerID, ok := ctx.Value(interceptors.CtxUserID).(int64)
 	if !ok {
 		return 0, fmt.Errorf("%s: %w", op, errors.New("missing organizer id in context"))
 	}
@@ -51,10 +53,11 @@ func (s *OrganizationStorage) SaveOrganization(
 	return organizationId, nil
 }
 
-func (s *OrganizationStorage) GetOrganizationById(ctx context.Context, id int64) (organization *models.Organization, err error) {
+func (s *OrganizationStorage) GetOrganizationById(ctx context.Context, id int64) (*models.Organization, error) {
 	const op = "storage.getOrganizationById"
 
-	err = storage.GetById(ctx, s.db, "organizations", id, &organization)
+	var org models.Organization
+	err := storage.GetById(ctx, s.db, "organizations", id, &org)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {
 			return nil, fmt.Errorf("%s: %w", op, err)
@@ -62,12 +65,16 @@ func (s *OrganizationStorage) GetOrganizationById(ctx context.Context, id int64)
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return organization, nil
+	return &org, nil
 }
 func (s *OrganizationStorage) GetAllOrganizations(ctx context.Context, organizerId int64) ([]models.Organization, error) {
 	const op = "storage.getAllOrganizations"
 
-	rows, err := s.db.QueryContext(ctx, `SELECT * FROM organizations WHERE organizer_id=$1;`, organizerId)
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT id, name, organizer_id, description, organization_image 
+    			FROM organizations 
+   				WHERE organizer_id=$1;`,
+		organizerId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -80,8 +87,8 @@ func (s *OrganizationStorage) GetAllOrganizations(ctx context.Context, organizer
 		if err := rows.Scan(
 			&org.ID,
 			&org.Name,
-			&org.Description,
 			&org.OrganizerID,
+			&org.Description,
 			&org.OrganizationImage,
 		); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)

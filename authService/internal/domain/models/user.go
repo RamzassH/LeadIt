@@ -15,15 +15,15 @@ type User struct {
 }
 
 type UpdateUserPayload struct {
-	ID         int64             `json:"id" validate:"required,min=1"`
+	UserId     int64             `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Name       string            `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
 	Surname    string            `json:"surname,omitempty" validate:"omitempty,min=1,max=100"`
-	MiddleName string            `json:"middleName,omitempty" validate:"omitempty,min=1,max=100"`
-	AboutMe    string            `json:"aboutMe,omitempty" validate:"omitempty,min=1,max=100"`
+	MiddleName string            `json:"middle_name,omitempty" validate:"omitempty,min=1,max=100"`
+	AboutMe    string            `json:"about_me,omitempty" validate:"omitempty,min=1,max=100"`
 	Messengers map[string]string `json:"messengers,omitempty" validate:"omitempty"`
 	Email      string            `json:"email,omitempty" validate:"omitempty,email"`
 	Password   string            `json:"password,omitempty" validate:"omitempty"`
-	BirthDate  time.Time         `json:"birthDate,omitempty" validate:"omitempty,date"`
+	BirthDate  time.Time         `json:"birth,omitempty" validate:"omitempty"`
 }
 
 type RegisterUserPayload struct {
@@ -39,8 +39,7 @@ type LoginUserPayload struct {
 }
 
 type VerifyUserPayload struct {
-	Email string `json:"email,omitempty" validate:"required"`
-	Code  string `json:"code,omitempty" validate:"required"`
+	Code string `json:"code,omitempty" validate:"required"`
 }
 
 type IsAdminPayload struct {

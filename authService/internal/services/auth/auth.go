@@ -74,7 +74,7 @@ type UserProvider interface {
 	UserByEmail(ctx context.Context, email string) (user models.User, err error)
 	UserById(ctx context.Context, id int64) (user models.User, err error)
 	IsAdmin(ctx context.Context, uid int64) (isAdmin bool, err error)
-	UpdateUser(ctx context.Context, user models.User) error
+	UpdateUser(ctx context.Context, user models.UpdateUserPayload) error
 	VerifyUser(ctx context.Context, userID int64) error
 }
 
@@ -215,10 +215,10 @@ func (a *Auth) RegisterNewUser(ctx context.Context, user models.RegisterUserPayl
 		logger.Error().Err(err).Msg("failed to generate verification code")
 	}
 
-	userVerificationKey := fmt.Sprintf("auth:verefication:%s", user.Email)
+	userVerificationKey := fmt.Sprintf("auth:verefication:%s", code)
 	logger.Info().Str("key stored set", userVerificationKey).Msg("key stored")
 
-	redisErr := a.redisStorage.Set(ctx, userVerificationKey, code, VerificationCodeTTL)
+	redisErr := a.redisStorage.Set(ctx, userVerificationKey, userEntity.Email, VerificationCodeTTL)
 
 	if redisErr != nil {
 		logger.Error().Err(err).Msg("failed to set user verification code")
@@ -250,30 +250,23 @@ func (a *Auth) RegisterNewUser(ctx context.Context, user models.RegisterUserPayl
 	return id, nil
 }
 
-func (a *Auth) UpdateUser(ctx context.Context, user models.UpdateUserPayload) error {
-	const op = "auth.UpdateUser"
-	logger := a.logger.With().Str("operation", op).Logger()
+func (a *Auth) UpdateUser(ctx context.Context, updatePayload models.UpdateUserPayload) error {
+	const op = "Auth.UpdateUser"
 
-	hashPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		logger.Error().Err(err).Str("operation", op).Msg("failed to generate hash password")
+	var hashedPassword []byte
+	if updatePayload.Password != "" {
+		var err error
+		hashedPassword, err = bcrypt.GenerateFromPassword([]byte(updatePayload.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return fmt.Errorf("%s: password hashing failed: %w", op, err)
+		}
+	}
+
+	user := updatePayload
+	user.Password = string(hashedPassword)
+
+	if err := a.userProvider.UpdateUser(ctx, user); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
-	}
-
-	userPayload := models.User{
-		ID:         user.ID,
-		Name:       user.Name,
-		Surname:    user.Surname,
-		MiddleName: user.MiddleName,
-		Email:      user.Email,
-		PassHash:   hashPass,
-		BirthDate:  user.BirthDate,
-	}
-
-	updateErr := a.userProvider.UpdateUser(ctx, userPayload)
-	if updateErr != nil {
-		logger.Error().Err(updateErr).Msg("failed to update user")
-		return fmt.Errorf("%s: %w", op, updateErr)
 	}
 
 	return nil
@@ -284,16 +277,16 @@ func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPa
 
 	logger := a.logger.With().Str("operation", op).Logger()
 
-	key := fmt.Sprintf("auth:verefication:%s", verifyPayload.Email)
-	storedCode, err := a.redisStorage.Get(ctx, key)
+	key := fmt.Sprintf("auth:verefication:%s", verifyPayload.Code)
+	storedEmail, err := a.redisStorage.Get(ctx, key)
 	logger.Info().Str("storedKey", key).Msg("Проверка хранения кода в Redis")
-	logger.Info().Str("stored code", storedCode).Msg(storedCode)
+	logger.Info().Str("stored email", storedEmail).Msg(storedEmail)
 	if err != nil {
 		if errors.Is(err, storage.ErrTokenNotFound) {
 			return "", "", fmt.Errorf("%s: %w", op, storage.ErrTokenNotFound)
 		}
 	}
-	if storedCode != verifyPayload.Code {
+	if storedEmail == "" {
 		logger.Error().Msg("invalid code")
 		return "", "", status.Error(codes.InvalidArgument, "invalid code")
 	}
@@ -301,7 +294,7 @@ func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPa
 	_ = a.redisStorage.Del(ctx, key)
 	logger.Info().Msg("user successfully verified")
 
-	user, err := a.userProvider.UserByEmail(ctx, verifyPayload.Email)
+	user, err := a.userProvider.UserByEmail(ctx, storedEmail)
 	logger.Info().Interface("user", user).Msg("user found")
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
@@ -329,7 +322,7 @@ func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPa
 		Revoked:   false,
 		CreatedAt: time.Now(),
 	}
-	logger.Debug().Str("email", verifyPayload.Email).Str("Email", user.Email)
+	logger.Debug().Str("email", storedEmail).Str("Email", user.Email)
 	logger.Debug().Str("refreshToken", refreshToken).Msg("refresh token")
 
 	if err := a.tokenSaver.SaveRefreshToken(ctx, rt); err != nil {

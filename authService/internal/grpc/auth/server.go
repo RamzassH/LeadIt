@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"strconv"
 	"time"
 )
 
@@ -99,8 +98,7 @@ func (s *ServerAPI) Register(ctx context.Context, req *authv1.RegisterRequest) (
 
 func (s *ServerAPI) Verify(ctx context.Context, req *authv1.VerifyRequest) (*authv1.VerifyResponse, error) {
 	verifyReq := models.VerifyUserPayload{
-		Email: req.GetEmail(),
-		Code:  req.GetCode(),
+		Code: req.GetCode(),
 	}
 
 	token, refreshToken, err := s.auth.VerifyCode(ctx, verifyReq)
@@ -115,7 +113,6 @@ func (s *ServerAPI) Verify(ctx context.Context, req *authv1.VerifyRequest) (*aut
 	}
 
 	return &authv1.VerifyResponse{
-		Token:        token,
 		RefreshToken: refreshToken,
 	}, nil
 }
@@ -172,9 +169,12 @@ func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*a
 }
 
 func setCookieHeader(ctx context.Context, token string) error {
-	cookie := fmt.Sprintf("access_token=%s; HttpOnly; Secure; Path=/", token)
+	cookie := fmt.Sprintf(
+		"access_token=%s; HttpOnly; Secure; Path=/; SameSite=None",
+		token,
+	)
 
-	metaData := metadata.Pairs("Set-Cookie", cookie)
+	metaData := metadata.Pairs("set-cookie", cookie)
 	if err := grpc.SetHeader(ctx, metaData); err != nil {
 		return status.Error(codes.Unauthenticated, err.Error())
 	}
@@ -227,14 +227,12 @@ func (s *ServerAPI) Hello(ctx context.Context, req *authv1.HelloRequest) (*authv
 
 func (s *ServerAPI) UpdateUser(ctx context.Context, req *authv1.UpdateUserRequest) (*authv1.UpdateUserResponse, error) {
 	birthDate, err := time.Parse(time.RFC3339, req.GetBirth())
-
-	userId, err := strconv.ParseInt(req.GetUserId(), 10, 64)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid user id")
+		return nil, status.Error(codes.InvalidArgument, "invalid date format, use RFC3339")
 	}
 
 	updatePayload := models.UpdateUserPayload{
-		ID:         userId,
+		UserId:     req.GetUserId(),
 		Name:       req.GetName(),
 		Surname:    req.GetSurname(),
 		MiddleName: req.GetMiddleName(),
@@ -249,10 +247,10 @@ func (s *ServerAPI) UpdateUser(ctx context.Context, req *authv1.UpdateUserReques
 		return nil, status.Errorf(codes.InvalidArgument, "validate update: %w", err)
 	}
 
-	updateErr := s.auth.UpdateUser(ctx, updatePayload)
-	if updateErr != nil {
-		if errors.Is(updateErr, auth.ErrUserNotFound) {
-			return nil, status.Error(codes.NotFound, updateErr.Error())
+	err = s.auth.UpdateUser(ctx, updatePayload)
+	if err != nil {
+		if errors.Is(err, auth.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
 		}
 		return nil, status.Error(codes.Internal, "internal error")
 	}

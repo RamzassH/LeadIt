@@ -1,7 +1,6 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/libs/redis"
@@ -13,6 +12,7 @@ import (
 	"github.com/RamzassH/LeadIt/organizationService/internal/services/role"
 	"github.com/RamzassH/LeadIt/organizationService/internal/storage/postgreSQL"
 	"github.com/go-playground/validator/v10"
+	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 )
@@ -32,7 +32,7 @@ type Services struct {
 func New(logger zerolog.Logger,
 	config *config.Config,
 	validate *validator.Validate,
-	db *sql.DB,
+	db *sqlx.DB,
 	redisClient *redis.Client,
 	kafka *kafka.Producer) (*App, error) {
 

@@ -2,6 +2,7 @@ package postgreSQL
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/RamzassH/LeadIt/authService/internal/domain/models"
@@ -67,8 +68,13 @@ func (s *Storage) SaveUser(ctx context.Context, user models.User) (int64, error)
 	return id, nil
 }
 
-func (s *Storage) UpdateUser(ctx context.Context, updatePayload models.User) error {
+func (s *Storage) UpdateUser(ctx context.Context, updatePayload models.UpdateUserPayload) error {
 	const op = "storage.updateUser"
+	messengersJSON, err := json.Marshal(updatePayload.Messengers)
+	if err != nil {
+		return fmt.Errorf("%s: failed to marshal messengers: %w", op, err)
+	}
+
 	query := `UPDATE users 
 			SET
 			    email = $1,
@@ -76,21 +82,21 @@ func (s *Storage) UpdateUser(ctx context.Context, updatePayload models.User) err
 			    name = $3,
 			    surname = $4,
 			    middle_name = $5,
-			    birth_date = $6
+			    birth_date = $6,
 				about_me = $7,
-			    messengers=$8,
+			    messengers=$8
 			WHERE id = $9`
 
 	res, err := s.db.ExecContext(ctx, query,
 		updatePayload.Email,
-		updatePayload.PassHash,
+		updatePayload.Password,
 		updatePayload.Name,
 		updatePayload.Surname,
 		updatePayload.MiddleName,
 		updatePayload.BirthDate,
 		updatePayload.AboutMe,
-		updatePayload.Messengers,
-		updatePayload.ID)
+		messengersJSON,
+		updatePayload.UserId)
 
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -101,7 +107,7 @@ func (s *Storage) UpdateUser(ctx context.Context, updatePayload models.User) err
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("%s: user not found, id=%d", op, updatePayload.ID)
+		return fmt.Errorf("%s: user not found, id=%d", op, updatePayload.UserId)
 	}
 
 	return nil

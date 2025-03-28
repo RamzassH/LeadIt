@@ -20,10 +20,10 @@ service Auth {
     };
   }
 
+
   rpc Verify (VerifyRequest) returns (VerifyResponse) {
     option (google.api.http) = {
-      post: "/v1/auth/verify"
-      body: "*"
+      get: "/v1/auth/verify/{code}"
     };
   }
 
@@ -93,12 +93,10 @@ message LoginResponse {
 
 message VerifyRequest {
   string code = 1;
-  string email = 2;
 }
 
 message VerifyResponse {
-  string token = 1;
-  string refresh_token = 2;
+  string refresh_token = 1;
 }
 
 message HelloRequest {
@@ -118,7 +116,7 @@ message IsAdminResponse {
 }
 
 message UpdateUserRequest {
-  string user_id = 1;
+  int64 user_id = 1;
   string email = 2;
   string password = 3;
   string name = 4;

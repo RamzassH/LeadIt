@@ -2,9 +2,11 @@ package organization
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/RamzassH/LeadIt/libs/kafka"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
+	"github.com/RamzassH/LeadIt/organizationService/internal/storage"
 	"github.com/rs/zerolog"
 	"time"
 )
@@ -69,8 +71,10 @@ func (org *Organization) AddOrganization(
 	logger.Info().Str("operation", op).Msg("adding organization")
 	organization, err := org.organizationProvider.GetOrganizationByName(ctx, payload.Name)
 	if err != nil {
-		logger.Error().Err(err).Str("operation", op).Msg(err.Error())
-		return 0, err
+		if !errors.Is(err, storage.ErrNotFound) {
+			logger.Error().Err(err).Str("operation", op).Msg(err.Error())
+			return 0, err
+		}
 	}
 	if organization != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)

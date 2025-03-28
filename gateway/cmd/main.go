@@ -7,6 +7,7 @@ import (
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +40,16 @@ func main() {
 			}
 
 			return md
+		}),
+		runtime.WithForwardResponseOption(func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+			if md, ok := runtime.ServerMetadataFromContext(ctx); ok {
+				if values := md.HeaderMD.Get("Set-Cookie"); len(values) > 0 {
+					for _, v := range values {
+						w.Header().Add("Set-Cookie", v)
+					}
+				}
+			}
+			return nil
 		}),
 		runtime.WithErrorHandler(func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
 			log.Printf("Ошибка %s", err)

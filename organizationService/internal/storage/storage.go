@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 )
 
 var AllowedTables = map[string]struct{}{
@@ -25,22 +26,13 @@ type Executor interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
-func GetById(ctx context.Context, db Executor, table string, id int64, dest interface{}) error {
+func GetById(ctx context.Context, db sqlx.ExtContext, table string, id int64, dest interface{}) error {
 	if _, ok := AllowedTables[table]; !ok {
 		return ErrInvalidTable
 	}
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", table)
-	row := db.QueryRowContext(ctx, query, id)
-
-	if err := row.Scan(dest); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("%w: table=%s id=%d", ErrNotFound, table, id)
-		}
-		return fmt.Errorf("scan error: %w", err)
-	}
-
-	return nil
+	return sqlx.GetContext(ctx, db, dest, query, id)
 }
 
 func Delete(ctx context.Context, db Executor, table string, id int64) (rowsAffected int64, err error) {
