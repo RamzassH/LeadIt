@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package fileStorage;
+
+option go_package = 'leadIt.fileStorage.v1;fileStoragev1';
+import "google/api/annotations.proto";
+
+service FileStorage {
+    rpc uploadFileChunk (stream UploadFileChunkRequest) returns (UploadFileResponse) {
+        option(google.api.http) = {
+            post: "/v1/fileStorage/upload"
+            body: "*"
+        };
+    };
+}
+
+message UploadFileChunkRequest {
+    int64 id = 1;
+}
+
+message UploadFileResponse {
+    int64 id = 1;
+}
