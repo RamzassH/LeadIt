@@ -8,6 +8,16 @@ import (
 	"time"
 )
 
+type RedisStore interface {
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+	Del(ctx context.Context, key string) error
+	HSet(ctx context.Context, key, field string, value interface{}) error
+	HGet(ctx context.Context, key, field string) (string, error)
+	HGetAll(ctx context.Context, key string) (map[string]string, error)
+	HDel(ctx context.Context, key string, fields ...string) error
+}
+
 type Redis struct {
 	client *redis.Client
 	logger zerolog.Logger

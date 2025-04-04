@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package tag;
+
+option go_package = "leadIt.tag.v1;tagv1";
+
+import "google/api/annotations.proto";
+
+service Tag {
+  rpc CreateTag(CreateTagRequest) returns (CreateTagResponse) {
+    option(google.api.http) = {
+      post: "/v1/tags"
+      body: "*"
+    };
+  }
+
+  rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {
+    option(google.api.http) = {
+      get: "/v1/projects/{project_id}/tags"
+    };
+  }
+
+  rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tags/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse) {
+    option(google.api.http) = {
+      delete: "/v1/tags/{id}"
+    };
+  }
+}
+
+message TagType {
+  int64 id = 1;
+  string name = 2;
+  string color = 3;
+  int64 project_id = 4;
+}
+
+message CreateTagRequest {
+  string name = 1;
+  string color = 2;
+  int64 project_id = 3;
+}
+
+message CreateTagResponse {
+  int64 id = 1;
+}
+
+message GetTagsRequest {
+  int64  project_id = 1;
+}
+
+message GetTagsResponse {
+  repeated TagType tags = 1;
+}
+
+message UpdateTagRequest {
+  int64 id = 1;
+  string name = 2;
+  string color = 3;
+}
+
+message UpdateTagResponse {
+  TagType tag = 1;
+}
+
+message DeleteTagRequest {
+  int64 id = 1;
+}
+
+message DeleteTagResponse {
+  int64 id = 1;
+}

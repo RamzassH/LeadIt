@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package task;
+
+option go_package = "leadIt.task.v1;taskv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service Task {
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
+    option(google.api.http) = {
+      post: "/v1/tasks"
+      body: "*"
+    };
+  }
+
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
+    option(google.api.http) = {
+      get: "/v1/tasks/{id}"
+    };
+  }
+
+  rpc GetTasksByProject(GetTasksByProjectRequest) returns (GetTasksByProjectResponse) {
+    option(google.api.http) = {
+      get: "/v1/projects/{project_id}/tasks"
+    };
+  }
+
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}"
+      body: "*"
+    };
+  }
+
+  rpc ChangeStatus(ChangeStatusRequest) returns (ChangeStatusResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}/status"
+      body: "*"
+    };
+  }
+
+  rpc AddTag(AddTagRequest) returns (AddTagResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}/tag/add"
+      body: "*"
+    };
+  }
+
+  rpc RemoveTag(RemoveTagRequest) returns (RemoveTagResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}/tag/remove"
+      body: "*"
+    };
+  }
+
+  rpc SetSolver(SetSolverRequest) returns (SetSolverResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}/solver"
+      body: "*"
+    };
+  }
+
+  rpc SetTaskState(SetTaskStateRequest) returns (SetTaskStateResponse) {
+    option(google.api.http) = {
+      patch: "/v1/tasks/{id}/state"
+      body: "*"
+    };
+  }
+
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option(google.api.http) = {
+      delete: "/v1/tasks/{id}"
+    };
+  }
+
+}
+message TaskType {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 project_id = 4;
+  int64 setter_id = 5;
+  int64 solver_id = 6;
+  int64 progress_bar_id = 7;
+  int64 current_status_id = 8;
+  int64 allocated_time = 9;
+  int64 wasted_time = 10;
+  bool active = 11;
+  google.protobuf.Timestamp last_start_time = 12;
+}
+
+message CreateTaskRequest {
+  string name = 1;
+  string description = 2;
+  int64 project_id = 3;
+  int64 setter_id = 4;
+  int64 solver_id = 5;
+  int64 progress_bar_id = 6;
+  int64 current_status_id = 7;
+  int64 allocated_time = 8;
+  int64 sprint_id = 9;
+}
+
+message CreateTaskResponse {
+  int64 id = 1;
+}
+
+message GetTaskRequest {
+  int64 id = 1;
+}
+
+message GetTaskResponse {
+  TaskType task = 1;
+}
+
+message GetTasksByProjectRequest {
+  int64 project_id = 1;
+}
+
+message GetTasksByProjectResponse {
+  repeated TaskType tasks = 1;
+}
+
+message ChangeStatusRequest {
+  int64 id = 1;
+  int64 current_status_id = 2;
+}
+
+message ChangeStatusResponse {
+  int64 current_status_id = 1;
+}
+
+message AddTagRequest {
+  int64 id = 1;
+  int64 tag_id = 2;
+}
+
+message AddTagResponse {
+  int64 tag_id = 1;
+}
+
+message RemoveTagRequest {
+  int64 id = 1;
+  int64 tag_id = 2;
+}
+
+message RemoveTagResponse {
+  int64 rows_affected = 1;
+}
+
+message SetSolverRequest {
+  int64 id = 1;
+  int64 new_solver_id = 2;
+}
+
+message SetSolverResponse {
+  int64 new_solver_id = 1;
+}
+
+message UpdateTaskRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 solver_id = 4;
+  int64 progress_bar_id = 5;
+  int64 current_status_id = 6;
+  int64 allocated_time = 7;
+  int64 wasted_time = 8;
+  int64 sprint_id = 9;
+}
+
+message SetTaskStateRequest {
+  int64 id = 1;
+  bool state = 2;
+}
+
+message SetTaskStateResponse {
+  bool success = 1;
+}
+
+message UpdateTaskResponse {
+  TaskType task = 1;
+}
+
+message DeleteTaskRequest {
+  int64 id = 1;
+}
+
+message DeleteTaskResponse {
+  int64 id = 1;
+}

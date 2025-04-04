@@ -6,43 +6,41 @@ option go_package = 'leadIt.employee.v1;employeev1';
 import "google/api/annotations.proto";
 
 service Employee {
-  rpc addEmployee (AddEmployeeRequest) returns (AddEmployeeResponse) {
+  rpc CreateEmployee (CreateEmployeeRequest) returns (CreateEmployeeResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/add"
-      body: "*"
-    };
-  }
-  rpc getEmployee(GetEmployeeRequest) returns (GetEmployeeResponse) {
-    option(google.api.http) = {
-      post: "/v1/employee/get/{id}"
+      post: "/v1/employees"
       body: "*"
     };
   }
 
-  rpc getEmployees(GetEmployeesRequest) returns (GetEmployeesResponse) {
+  rpc GetEmployee(GetEmployeeRequest) returns (GetEmployeeResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/get-many/{organization_id}"
+      get: "/v1/employees/{id}"
+    };
+  }
+
+  rpc GetEmployees(GetEmployeesRequest) returns (GetEmployeesResponse) {
+    option(google.api.http) = {
+      get: "/v1/organizations/{organization_id}/employees"
+    };
+  }
+
+  rpc UpdateEmployeeRole(UpdateEmployeeRoleRequest) returns (UpdateEmployeeRoleResponse) {
+    option(google.api.http) = {
+      patch: "/v1/employees/{id}/role/{role_id}"
       body: "*"
     };
   }
 
-  rpc updateEmployee(UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {
+  rpc DeleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/update"
-      body: "*"
+      delete: "/v1/employees/{id}"
     };
   }
 
-  rpc deleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {
+  rpc InviteEmployee(InviteEmployeeRequest) returns (InviteEmployeeResponse) {
     option(google.api.http) = {
-      post: "/v1/employee/delete"
-      body: "*"
-    };
-  }
-
-  rpc inviteEmployee(InviteEmployeeRequest) returns (InviteEmployeeRequest) {
-    option(google.api.http) = {
-      post: "/v1/employee/invite"
+      post: "/v1/employees/invite"
       body: "*"
     };
   }
@@ -53,12 +51,12 @@ message EmployeeType {
   int64 organization_id = 3;
 }
 
-message AddEmployeeRequest {
+message CreateEmployeeRequest {
   int64 user_id = 2;
   int64 organization_id = 3;
 }
 
-message AddEmployeeResponse {
+message CreateEmployeeResponse {
   int64 id = 1;
 }
 
@@ -78,12 +76,13 @@ message GetEmployeesResponse {
   repeated EmployeeType employees = 1;
 }
 
-message UpdateEmployeeRequest {
-  EmployeeType employee = 1;
+message UpdateEmployeeRoleRequest {
+  int64 id = 1;
+  int64 role_id = 2;
 }
 
-message UpdateEmployeeResponse {
-  EmployeeType employee = 1;
+message UpdateEmployeeRoleResponse {
+  int64 id = 1;
 }
 
 message DeleteEmployeeRequest {
@@ -96,4 +95,8 @@ message DeleteEmployeeResponse {
 
 message InviteEmployeeRequest {
   int64 user_id = 1;
+}
+
+message InviteEmployeeResponse {
+  bool success = 1;
 }

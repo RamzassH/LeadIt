@@ -12,6 +12,7 @@ import (
 	"github.com/RamzassH/LeadIt/authService/internal/lib/verification"
 	"github.com/RamzassH/LeadIt/authService/internal/storage"
 	"github.com/RamzassH/LeadIt/libs/kafka"
+	redisStorage "github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -45,7 +46,7 @@ type Auth struct {
 	userSaver       UserSaver
 	userProvider    UserProvider
 	tokenSaver      TokenSaver
-	redisStorage    Redis
+	redisStorage    redisStorage.RedisStore
 	kafka           *kafka.Producer
 	tokenTTL        time.Duration
 	refreshTokenTTL time.Duration
@@ -78,15 +79,6 @@ type UserProvider interface {
 	VerifyUser(ctx context.Context, userID int64) error
 }
 
-type Redis interface {
-	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
-	Del(ctx context.Context, key string) error
-	HSet(ctx context.Context, key, field string, value interface{}) error
-	HGet(ctx context.Context, key, field string) (string, error)
-	HGetAll(ctx context.Context, key string) (map[string]string, error)
-}
-
 const VerificationCodeTTL = 15 * time.Minute
 
 func New(
@@ -94,7 +86,7 @@ func New(
 	userSaver UserSaver,
 	userProvider UserProvider,
 	tokenSaver TokenSaver,
-	redisStorage Redis,
+	redisStorage redisStorage.RedisStore,
 	kafka *kafka.Producer,
 	tokenTTL time.Duration,
 	refreshTokenTTL time.Duration) *Auth {

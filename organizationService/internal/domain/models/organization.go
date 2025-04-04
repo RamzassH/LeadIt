@@ -1,31 +1,30 @@
 package models
 
-type Organization struct {
-	ID                int64  `db:"id"`
-	Name              string `db:"name"`
-	OrganizerID       int64  `db:"organizer_id"`
-	Description       string `db:"description"`
-	OrganizationImage string `db:"organization_image"`
+type OrganizationDTO struct {
+	ID          int64  `db:"id"`
+	Name        string `db:"name"`
+	OrganizerID int64  `db:"organizer_id"`
+	Description string `db:"description"`
+	Image       string `db:"image"`
 }
 
-type GetOrganizationPayload struct {
+type GetOrganizationDTO struct {
 	OrganizationID int64
 }
 
-type GetOrganizationsPayload struct {
+type GetOrganizationsDTO struct {
 	OrganizerID int64
 }
 
-type AddOrganizationPayload struct {
+type CreateOrganizationDTO struct {
 	Name              string
 	Description       string
 	OrganizationImage string
 }
 
-type UpdateOrganizationPayload struct {
-	ID                int64
-	Name              string
-	OrganizerID       int64
-	Description       string
-	OrganizationImage string
+type UpdateOrganizationDTO struct {
+	ID          int64
+	Name        string
+	Description string
+	Image       string
 }

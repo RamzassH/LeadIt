@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package comment;
+
+option go_package = "leadIt.comment.v1;commentv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service Comment {
+  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
+    option(google.api.http) = {
+      post: "/v1/comments"
+      body: "*"
+    };
+  }
+
+  rpc GetCommentsForTask(GetCommentsForTaskRequest) returns (GetCommentsForTaskResponse) {
+    option(google.api.http) = {
+      get: "/v1/tasks/{task_id}/comments"
+    };
+  }
+
+  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
+    option(google.api.http) = {
+      patch: "/v1/comments/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
+    option(google.api.http) = {
+      delete: "/v1/comments/{id}"
+    };
+  }
+}
+
+message CommentType {
+  int64 id = 1;
+  int64 task_id = 2;
+  google.protobuf.Timestamp date = 3;
+  int64 user_id = 4;
+  string body = 5;
+}
+
+message CreateCommentRequest {
+  int64 task_id = 1;
+  int64 user_id = 2;
+  string body = 3;
+}
+
+message CreateCommentResponse {
+  int64 comment_id = 1;
+}
+
+message GetCommentsForTaskRequest {
+  int64 task_id = 1;
+}
+
+message GetCommentsForTaskResponse {
+  repeated CommentType comments = 1;
+}
+
+message UpdateCommentRequest {
+  int64 id = 1;
+  string body = 2;
+}
+
+message UpdateCommentResponse {
+  CommentType updated_comment = 1;
+}
+
+message DeleteCommentRequest {
+  int64 id = 1;
+}
+
+message DeleteCommentResponse {
+  int64 id = 1;
+}

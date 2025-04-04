@@ -1,0 +1,8 @@
+env: "local"
+storage_path: "./storage/task.db"
+storage_connection_string: "postgres://postgres:postgres@taskdb:5436/taskdb?sslmode=disable"
+redis_connection_string: "redis://redis:6379"
+token_secret: "super_secret_token"
+grpc:
+  port: 57446
+  timeout: 10h

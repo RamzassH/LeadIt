@@ -5,51 +5,42 @@ import (
 	"errors"
 	"fmt"
 	"github.com/RamzassH/LeadIt/libs/kafka"
+	redisStorage "github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/organizationService/internal/storage"
 	"github.com/rs/zerolog"
-	"time"
 )
 
 type Organization struct {
 	logger               zerolog.Logger
 	organizationSaver    Saver
 	organizationProvider Provider
-	redisStorage         Redis
+	redisStorage         redisStorage.RedisStore
 	kafka                *kafka.Producer
 }
 
 type Saver interface {
-	SaveOrganization(
+	Save(
 		ctx context.Context,
-		payload models.AddOrganizationPayload) (int64, error)
+		payload models.CreateOrganizationDTO) (int64, error)
 }
 type Provider interface {
-	GetOrganizationById(ctx context.Context, id int64) (*models.Organization, error)
+	GetById(ctx context.Context, id int64) (*models.OrganizationDTO, error)
 
-	GetOrganizationByName(ctx context.Context, name string) (*models.Organization, error)
+	GetByName(ctx context.Context, name string) (*models.OrganizationDTO, error)
 
-	GetAllOrganizations(ctx context.Context, organizerId int64) ([]models.Organization, error)
+	GetManyByOrganizerId(ctx context.Context, organizerId int64) ([]models.OrganizationDTO, error)
 
-	UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (*models.Organization, error)
+	Update(ctx context.Context, payload models.UpdateOrganizationDTO) (*models.OrganizationDTO, error)
 
-	DeleteOrganization(ctx context.Context, id int64) (int64, error)
-}
-
-type Redis interface {
-	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
-	Del(ctx context.Context, key string) error
-	HSet(ctx context.Context, key, field string, value interface{}) error
-	HGet(ctx context.Context, key, field string) (string, error)
-	HGetAll(ctx context.Context, key string) (map[string]string, error)
+	Delete(ctx context.Context, id int64) (int64, error)
 }
 
 func New(
 	logger zerolog.Logger,
 	organizationSaver Saver,
 	organizationProvider Provider,
-	redisStorage Redis,
+	redisStorage redisStorage.RedisStore,
 	kafka *kafka.Producer,
 ) *Organization {
 	return &Organization{
@@ -61,15 +52,15 @@ func New(
 	}
 }
 
-func (org *Organization) AddOrganization(
+func (org *Organization) CreateOrganization(
 	ctx context.Context,
-	payload models.AddOrganizationPayload) (int64, error) {
+	payload models.CreateOrganizationDTO) (int64, error) {
 	const op = "organization.AddOrganization"
 
 	logger := org.logger.With().Str("operation", "AddOrganization").Logger()
 
 	logger.Info().Str("operation", op).Msg("adding organization")
-	organization, err := org.organizationProvider.GetOrganizationByName(ctx, payload.Name)
+	organization, err := org.organizationProvider.GetByName(ctx, payload.Name)
 	if err != nil {
 		if !errors.Is(err, storage.ErrNotFound) {
 			logger.Error().Err(err).Str("operation", op).Msg(err.Error())
@@ -80,7 +71,7 @@ func (org *Organization) AddOrganization(
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	organizationId, err := org.organizationSaver.SaveOrganization(ctx, payload)
+	organizationId, err := org.organizationSaver.Save(ctx, payload)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to save organization")
 		return 0, err
@@ -90,12 +81,12 @@ func (org *Organization) AddOrganization(
 
 }
 
-func (org *Organization) GetOrganization(ctx context.Context, payload models.GetOrganizationPayload) (*models.Organization, error) {
+func (org *Organization) GetOrganization(ctx context.Context, payload models.GetOrganizationDTO) (*models.OrganizationDTO, error) {
 	const op = "organization.GetOrganization"
 	logger := org.logger.With().Str("operation", "GetOrganization").Logger()
 
 	logger.Info().Str("operation", op).Msg("getting organization")
-	organization, err := org.organizationProvider.GetOrganizationById(ctx, payload.OrganizationID)
+	organization, err := org.organizationProvider.GetById(ctx, payload.OrganizationID)
 
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to get organization")
@@ -105,11 +96,11 @@ func (org *Organization) GetOrganization(ctx context.Context, payload models.Get
 	return organization, nil
 }
 
-func (org *Organization) GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsPayload) ([]models.Organization, error) {
+func (org *Organization) GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsDTO) ([]models.OrganizationDTO, error) {
 	const op = "organization.GetAllOrganizations"
 	logger := org.logger.With().Str("operation", op).Logger()
 	logger.Info().Msg("getting all organizations")
-	organizations, err := org.organizationProvider.GetAllOrganizations(ctx, payload.OrganizerID)
+	organizations, err := org.organizationProvider.GetManyByOrganizerId(ctx, payload.OrganizerID)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to get all organizations")
 		return nil, err
@@ -118,12 +109,12 @@ func (org *Organization) GetAllOrganizations(ctx context.Context, payload models
 	return organizations, nil
 }
 
-func (org *Organization) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (*models.Organization, error) {
+func (org *Organization) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationDTO) (*models.OrganizationDTO, error) {
 	const op = "organization.UpdateOrganization"
 	logger := org.logger.With().Str("operation", "UpdateOrganization").Logger()
 	logger.Info().Str("operation", op).Msg("updating organization")
 
-	organization, err := org.organizationProvider.UpdateOrganization(ctx, payload)
+	organization, err := org.organizationProvider.Update(ctx, payload)
 
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to update organization")
@@ -138,7 +129,7 @@ func (org *Organization) DeleteOrganization(ctx context.Context, id int64) (int6
 	logger := org.logger.With().Str("operation", "DeleteOrganization").Logger()
 	logger.Info().Str("operation", op).Msg("deleting organization")
 
-	organizationID, err := org.organizationProvider.DeleteOrganization(ctx, id)
+	organizationID, err := org.organizationProvider.Delete(ctx, id)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", op).Msg("failed to delete organization")
 		return 0, err

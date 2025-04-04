@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ServerAPI) AddProject(ctx context.Context, req *projectv1.AddProjectRequest) (*projectv1.AddProjectResponse, error) {
-	payload := models.AddProjectPayload{
+func (s *ServerAPI) CreateProject(ctx context.Context, req *projectv1.CreateProjectRequest) (*projectv1.CreateProjectResponse, error) {
+	payload := models.CreateProjectDTO{
 		Name:           req.GetName(),
 		Description:    req.GetDescription(),
 		OrganizationID: req.GetOrganizationId(),
@@ -25,7 +25,7 @@ func (s *ServerAPI) AddProject(ctx context.Context, req *projectv1.AddProjectReq
 		return nil, status.Errorf(codes.Internal, "failed to add project: %v", err)
 	}
 
-	return &projectv1.AddProjectResponse{Id: projectID}, nil
+	return &projectv1.CreateProjectResponse{Id: projectID}, nil
 }
 func (s *ServerAPI) GetProject(ctx context.Context, req *projectv1.GetProjectRequest) (*projectv1.GetProjectResponse, error) {
 	if req.GetId() == 0 {
@@ -74,12 +74,11 @@ func (s *ServerAPI) GetProjects(ctx context.Context, req *projectv1.GetProjectsR
 }
 
 func (s *ServerAPI) UpdateProject(ctx context.Context, req *projectv1.UpdateProjectRequest) (*projectv1.UpdateProjectResponse, error) {
-	payload := models.UpdateProjectPayload{
-		ID:             req.Project.Id,
-		Name:           req.Project.Name,
-		Description:    req.Project.Description,
-		OrganizationID: req.Project.OrganizationId,
-		Image:          req.Project.Image,
+	payload := models.UpdateProjectDTO{
+		ID:          req.GetId(),
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Image:       req.GetImage(),
 	}
 
 	if err := s.ValidateStruct(payload); err != nil {
@@ -94,10 +93,10 @@ func (s *ServerAPI) UpdateProject(ctx context.Context, req *projectv1.UpdateProj
 	return &projectv1.UpdateProjectResponse{
 		Project: &projectv1.ProjectType{
 			Id:             updatedProject.ID,
-			Name:           req.Project.Name,
-			Description:    req.Project.Description,
-			OrganizationId: req.Project.OrganizationId,
-			Image:          req.Project.Image,
+			Name:           updatedProject.Name,
+			Description:    updatedProject.Description,
+			OrganizationId: updatedProject.OrganizationID,
+			Image:          updatedProject.Image,
 		},
 	}, nil
 }

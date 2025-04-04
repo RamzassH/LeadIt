@@ -24,10 +24,10 @@ func NewOrganizationStorage(db *sqlx.DB) (*OrganizationStorage, error) {
 	return &OrganizationStorage{db: db}, nil
 }
 
-func (s *OrganizationStorage) SaveOrganization(
+func (s *OrganizationStorage) Save(
 	ctx context.Context,
-	payload models.AddOrganizationPayload) (organizationId int64, err error) {
-	const op = "storage.saveOrganization"
+	payload models.CreateOrganizationDTO) (organizationId int64, err error) {
+	const op = "OrganizationStorage.Save"
 
 	query := `
 	INSERT INTO organizations (name, description, organizer_id, organization_image)
@@ -53,10 +53,10 @@ func (s *OrganizationStorage) SaveOrganization(
 	return organizationId, nil
 }
 
-func (s *OrganizationStorage) GetOrganizationById(ctx context.Context, id int64) (*models.Organization, error) {
-	const op = "storage.getOrganizationById"
+func (s *OrganizationStorage) GetById(ctx context.Context, id int64) (*models.OrganizationDTO, error) {
+	const op = "OrganizationStorage.GetById"
 
-	var org models.Organization
+	var org models.OrganizationDTO
 	err := storage.GetById(ctx, s.db, "organizations", id, &org)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {
@@ -67,8 +67,37 @@ func (s *OrganizationStorage) GetOrganizationById(ctx context.Context, id int64)
 
 	return &org, nil
 }
-func (s *OrganizationStorage) GetAllOrganizations(ctx context.Context, organizerId int64) ([]models.Organization, error) {
-	const op = "storage.getAllOrganizations"
+
+func (s *OrganizationStorage) GetByName(ctx context.Context, name string) (*models.OrganizationDTO, error) {
+	const op = "OrganizationStorage.GetByName"
+
+	row := s.db.QueryRowContext(ctx,
+		`SELECT id, name, description, organizer_id, organization_image 
+        FROM organizations WHERE name = $1`,
+		name,
+	)
+
+	var org models.OrganizationDTO
+	err := row.Scan(
+		&org.ID,
+		&org.Name,
+		&org.Description,
+		&org.OrganizerID,
+		&org.Image,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrNotFound)
+		}
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &org, nil
+}
+
+func (s *OrganizationStorage) GetManyByOrganizerId(ctx context.Context, organizerId int64) ([]models.OrganizationDTO, error) {
+	const op = "OrganizationStorage.GetManyByOrganizerId"
 
 	rows, err := s.db.QueryContext(ctx,
 		`SELECT id, name, organizer_id, description, organization_image 
@@ -80,16 +109,16 @@ func (s *OrganizationStorage) GetAllOrganizations(ctx context.Context, organizer
 	}
 	defer rows.Close()
 
-	var organizations []models.Organization
+	var organizations []models.OrganizationDTO
 
 	for rows.Next() {
-		var org models.Organization
+		var org models.OrganizationDTO
 		if err := rows.Scan(
 			&org.ID,
 			&org.Name,
 			&org.OrganizerID,
 			&org.Description,
-			&org.OrganizationImage,
+			&org.Image,
 		); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
@@ -103,8 +132,8 @@ func (s *OrganizationStorage) GetAllOrganizations(ctx context.Context, organizer
 	return organizations, nil
 }
 
-func (s *OrganizationStorage) UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (*models.Organization, error) {
-	const op = "storage.updateOrganization"
+func (s *OrganizationStorage) Update(ctx context.Context, payload models.UpdateOrganizationDTO) (*models.OrganizationDTO, error) {
+	const op = "OrganizationStorage.Update"
 
 	query := `
         UPDATE organizations
@@ -118,17 +147,17 @@ func (s *OrganizationStorage) UpdateOrganization(ctx context.Context, payload mo
 	row := s.db.QueryRowContext(ctx, query,
 		payload.Name,
 		payload.Description,
-		payload.OrganizationImage,
+		payload.Image,
 		payload.ID,
 	)
 
-	var organization models.Organization
+	var organization models.OrganizationDTO
 	err := row.Scan(
 		&organization.ID,
 		&organization.Name,
 		&organization.Description,
 		&organization.OrganizerID,
-		&organization.OrganizationImage,
+		&organization.Image,
 	)
 
 	if err != nil {
@@ -141,8 +170,8 @@ func (s *OrganizationStorage) UpdateOrganization(ctx context.Context, payload mo
 	return &organization, nil
 }
 
-func (s *OrganizationStorage) DeleteOrganization(ctx context.Context, id int64) (int64, error) {
-	const op = "storage.DeleteOrganization"
+func (s *OrganizationStorage) Delete(ctx context.Context, id int64) (int64, error) {
+	const op = "OrganizationStorage.Delete"
 
 	rowsAffected, err := storage.Delete(ctx, s.db, "organizations", id)
 	if err != nil {
@@ -153,32 +182,4 @@ func (s *OrganizationStorage) DeleteOrganization(ctx context.Context, id int64) 
 	}
 
 	return rowsAffected, nil
-}
-
-func (s *OrganizationStorage) GetOrganizationByName(ctx context.Context, name string) (*models.Organization, error) {
-	const op = "storage.GetOrganizationByName"
-
-	row := s.db.QueryRowContext(ctx,
-		`SELECT id, name, description, organizer_id, organization_image 
-        FROM organizations WHERE name = $1`,
-		name,
-	)
-
-	var org models.Organization
-	err := row.Scan(
-		&org.ID,
-		&org.Name,
-		&org.Description,
-		&org.OrganizerID,
-		&org.OrganizationImage,
-	)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrNotFound)
-		}
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-
-	return &org, nil
 }

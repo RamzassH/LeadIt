@@ -23,8 +23,8 @@ func NewEmployeeStorage(db *sqlx.DB) (*EmployeeStorage, error) {
 	return &EmployeeStorage{db: db}, nil
 }
 
-func (s *EmployeeStorage) SaveEmployee(ctx context.Context, payload models.AddEmployee) (employeeID int64, err error) {
-	const op = "storage.saveEmployee"
+func (s *EmployeeStorage) Save(ctx context.Context, payload models.CreateEmployeeDTO) (employeeID int64, err error) {
+	const op = "EmployeeStorage.Save"
 
 	query := `
 	INSERT INTO employees (user_id, organization_id
@@ -44,8 +44,8 @@ func (s *EmployeeStorage) SaveEmployee(ctx context.Context, payload models.AddEm
 	return employeeID, nil
 }
 
-func (s *EmployeeStorage) GetEmployeeById(ctx context.Context, id int64) (employee *models.Employee, err error) {
-	const op = "storage.getEmployeeById"
+func (s *EmployeeStorage) GetById(ctx context.Context, id int64) (employee *models.EmployeeDTO, err error) {
+	const op = "EmployeeStorage.GetById"
 
 	err = storage.GetById(ctx, s.db, "employees", id, &employee)
 	if err != nil {
@@ -58,8 +58,8 @@ func (s *EmployeeStorage) GetEmployeeById(ctx context.Context, id int64) (employ
 	return employee, nil
 }
 
-func (s *EmployeeStorage) GetAllEmployees(ctx context.Context, organizationId int64) (employees []models.Employee, err error) {
-	const op = "storage.getAllEmployees"
+func (s *EmployeeStorage) GetManyByOrganizationId(ctx context.Context, organizationId int64) (employees []models.EmployeeDTO, err error) {
+	const op = "EmployeeStorage.GetManyByOrganizationId"
 
 	rows, err := s.db.QueryContext(ctx, `SELECT * FROM employees WHERE organization_id = $1`, organizationId)
 	if err != nil {
@@ -69,7 +69,7 @@ func (s *EmployeeStorage) GetAllEmployees(ctx context.Context, organizationId in
 	defer rows.Close()
 
 	for rows.Next() {
-		var employee models.Employee
+		var employee models.EmployeeDTO
 		if err := rows.Scan(&employee.ID, &employee.UserID, &employee.OrganizationID); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
@@ -84,34 +84,33 @@ func (s *EmployeeStorage) GetAllEmployees(ctx context.Context, organizationId in
 	return employees, nil
 }
 
-func (s *EmployeeStorage) UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (employee *models.Employee, err error) {
-	const op = "storage.updateEmployee"
+func (s *EmployeeStorage) UpdateRole(ctx context.Context, payload models.UpdateEmployeeRoleDTO) (id int64, err error) {
+	const op = "EmployeeStorage.UpdateRole"
 
 	query := `
 		UPDATE employees
 		SET 	
-		    user_id = COALESCE($1, user_id),
-		    organization_id = COALESCE($2, organization_id)
-		WHERE id = $3
-		RETURNING id, user_id, organization_id`
+		    role = COALESCE($1, role)
+		WHERE id = $2
+		RETURNING id`
 
-	row := s.db.QueryRowContext(ctx, query, payload.UserID, payload.OrganizationID, payload.ID)
+	row := s.db.QueryRowContext(ctx, query, payload.RoleID, payload.ID, payload.ID)
 
-	err = row.Scan(&employee.ID, &employee.UserID, &employee.OrganizationID)
+	err = row.Scan(&id)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, storage.ErrNotFound
+			return 0, storage.ErrNotFound
 		}
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return employee, nil
+	return id, nil
 
 }
 
 func (s *EmployeeStorage) DeleteEmployee(ctx context.Context, id int64) (rowsAffected int64, err error) {
-	const op = "storage.deleteEmployee"
+	const op = "EmployeeStorage.Delete"
 
 	rowsAffected, err = storage.Delete(ctx, s.db, "employees", id)
 	if err != nil {
