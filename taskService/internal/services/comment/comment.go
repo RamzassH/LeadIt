@@ -21,8 +21,8 @@ type Saver interface {
 	Save(ctx context.Context, payload models.CreateCommentDTO) (int64, error)
 }
 type Provider interface {
-	GetManyByTaskId(ctx context.Context, id int64) (employee []*models.CommentDTO, err error)
-	Update(ctx context.Context, payload models.UpdateCommentDTO) (employee *models.CommentDTO, err error)
+	GetManyByTaskId(ctx context.Context, id int64) (comment []*models.CommentDTO, err error)
+	Update(ctx context.Context, payload models.UpdateCommentDTO) (comment *models.CommentDTO, err error)
 	Delete(ctx context.Context, id int64) (rowsAffected int64, err error)
 }
 

@@ -66,7 +66,7 @@ func (pb *ProgressBar) CreateProgressBar(ctx context.Context, payload models.Cre
 	return progressBarId, nil
 }
 
-func (pb *ProgressBar) GetProgressBarForProject(ctx context.Context, projectId int64) (*models.ProgressBarDTO, error) {
+func (pb *ProgressBar) GetProgressBarForProject(ctx context.Context, projectId int64) ([]*models.ProgressBarDTO, error) {
 	const op = "ProgressBar.GetProgressBarForProject"
 	logger := pb.logger.With().
 		Str("operation", op).
@@ -84,9 +84,9 @@ func (pb *ProgressBar) GetProgressBarForProject(ctx context.Context, projectId i
 	}
 
 	logger.Info().
-		Int64("progress_bar_id", progressBar.ID).
+		Int64("progress_bar_id", projectId).
 		Msg("Progress bar retrieved")
-	return progressBar, nil
+	return progressBarList, nil
 }
 
 func (pb *ProgressBar) UpdateProgressBar(ctx context.Context, payload models.UpdateProgressBarDTO) (*models.ProgressBarDTO, error) {

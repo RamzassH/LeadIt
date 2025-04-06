@@ -62,7 +62,7 @@ service Task {
     };
   }
 
-  rpc SetTaskState(SetTaskStateRequest) returns (SetTaskStateResponse) {
+  rpc SetTaskIsActive(SetTaskIsActiveRequest) returns (SetTaskIsActiveResponse) {
     option(google.api.http) = {
       patch: "/v1/tasks/{id}/state"
       body: "*"
@@ -171,12 +171,12 @@ message UpdateTaskRequest {
   int64 sprint_id = 9;
 }
 
-message SetTaskStateRequest {
+message SetTaskIsActiveRequest {
   int64 id = 1;
-  bool state = 2;
+  bool is_active = 2;
 }
 
-message SetTaskStateResponse {
+message SetTaskIsActiveResponse {
   bool success = 1;
 }
 

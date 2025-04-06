@@ -35,9 +35,28 @@ func (s *CommentStorage) Save(ctx context.Context, payload models.CreateCommentD
 	return commentId, nil
 }
 
-// TODO implement
-func (s *CommentStorage) GetManyByTaskId(ctx context.Context, id int64) (employee []*models.CommentDTO, err error) {
-	panic("implement me")
+func (s *CommentStorage) GetManyByTaskId(ctx context.Context, id int64) (comments []*models.CommentDTO, err error) {
+	const op = "CommentStorage.GetManyByTaskId"
+
+	rows, err := s.db.QueryxContext(ctx,
+		`SELECT * FROM comments WHERE task_id=$1`, id)
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var comment models.CommentDTO
+		if err := rows.StructScan(&comment); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		comments = append(comments, &comment)
+	}
+
+	return comments, nil
 }
 
 func (s *CommentStorage) Update(ctx context.Context, payload models.UpdateCommentDTO) (*models.CommentDTO, error) {
@@ -45,8 +64,8 @@ func (s *CommentStorage) Update(ctx context.Context, payload models.UpdateCommen
 	query := `
 	UPDATE comments 
 	SET
-	    	body = COALESCE($1, body),
-	WHERE id = $1 RETURNING *;`
+	    body = COALESCE($1, body)
+	WHERE id = $2 RETURNING *;`
 	var updated models.CommentDTO
 	err := s.db.GetContext(ctx, &updated, query, payload.Body, payload.ID)
 	if err != nil {

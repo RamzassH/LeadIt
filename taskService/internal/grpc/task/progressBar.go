@@ -32,19 +32,23 @@ func (s ServerAPI) GetManyProgressBars(ctx context.Context, req *progressbarv1.G
 		return nil, status.Error(codes.InvalidArgument, "invalid project id")
 	}
 
-	progressBar, err := s.service.GetProgressBarForProject(ctx, projectID)
+	progressBarList, err := s.service.GetProgressBarForProject(ctx, projectID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get progress bars: %s", err.Error())
 	}
 
+	var progressBarResponse []*progressbarv1.ProgressBarType
+
+	for _, progressBar := range progressBarList {
+		progressBarResponse = append(progressBarResponse, &progressbarv1.ProgressBarType{
+			Id:        progressBar.ID,
+			Name:      progressBar.Name,
+			ProjectId: progressBar.ProjectID,
+		})
+	}
+
 	return &progressbarv1.GetManyProgressBarsResponse{
-		ProgressBarList: []*progressbarv1.ProgressBarType{
-			{
-				Id:        progressBar.ID,
-				Name:      progressBar.Name,
-				ProjectId: progressBar.ProjectID,
-			},
-		},
+		ProgressBarList: progressBarResponse,
 	}, nil
 }
 

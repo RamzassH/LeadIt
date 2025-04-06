@@ -27,7 +27,7 @@ const (
 	Task_AddTag_FullMethodName            = "/task.Task/AddTag"
 	Task_RemoveTag_FullMethodName         = "/task.Task/RemoveTag"
 	Task_SetSolver_FullMethodName         = "/task.Task/SetSolver"
-	Task_SetTaskState_FullMethodName      = "/task.Task/SetTaskState"
+	Task_SetTaskIsActive_FullMethodName   = "/task.Task/SetTaskIsActive"
 	Task_DeleteTask_FullMethodName        = "/task.Task/DeleteTask"
 )
 
@@ -43,7 +43,7 @@ type TaskClient interface {
 	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
 	RemoveTag(ctx context.Context, in *RemoveTagRequest, opts ...grpc.CallOption) (*RemoveTagResponse, error)
 	SetSolver(ctx context.Context, in *SetSolverRequest, opts ...grpc.CallOption) (*SetSolverResponse, error)
-	SetTaskState(ctx context.Context, in *SetTaskStateRequest, opts ...grpc.CallOption) (*SetTaskStateResponse, error)
+	SetTaskIsActive(ctx context.Context, in *SetTaskIsActiveRequest, opts ...grpc.CallOption) (*SetTaskIsActiveResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error)
 }
 
@@ -135,10 +135,10 @@ func (c *taskClient) SetSolver(ctx context.Context, in *SetSolverRequest, opts .
 	return out, nil
 }
 
-func (c *taskClient) SetTaskState(ctx context.Context, in *SetTaskStateRequest, opts ...grpc.CallOption) (*SetTaskStateResponse, error) {
+func (c *taskClient) SetTaskIsActive(ctx context.Context, in *SetTaskIsActiveRequest, opts ...grpc.CallOption) (*SetTaskIsActiveResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SetTaskStateResponse)
-	err := c.cc.Invoke(ctx, Task_SetTaskState_FullMethodName, in, out, cOpts...)
+	out := new(SetTaskIsActiveResponse)
+	err := c.cc.Invoke(ctx, Task_SetTaskIsActive_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ type TaskServer interface {
 	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
 	RemoveTag(context.Context, *RemoveTagRequest) (*RemoveTagResponse, error)
 	SetSolver(context.Context, *SetSolverRequest) (*SetSolverResponse, error)
-	SetTaskState(context.Context, *SetTaskStateRequest) (*SetTaskStateResponse, error)
+	SetTaskIsActive(context.Context, *SetTaskIsActiveRequest) (*SetTaskIsActiveResponse, error)
 	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error)
 	mustEmbedUnimplementedTaskServer()
 }
@@ -203,8 +203,8 @@ func (UnimplementedTaskServer) RemoveTag(context.Context, *RemoveTagRequest) (*R
 func (UnimplementedTaskServer) SetSolver(context.Context, *SetSolverRequest) (*SetSolverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSolver not implemented")
 }
-func (UnimplementedTaskServer) SetTaskState(context.Context, *SetTaskStateRequest) (*SetTaskStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetTaskState not implemented")
+func (UnimplementedTaskServer) SetTaskIsActive(context.Context, *SetTaskIsActiveRequest) (*SetTaskIsActiveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTaskIsActive not implemented")
 }
 func (UnimplementedTaskServer) DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
@@ -374,20 +374,20 @@ func _Task_SetSolver_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Task_SetTaskState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetTaskStateRequest)
+func _Task_SetTaskIsActive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetTaskIsActiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TaskServer).SetTaskState(ctx, in)
+		return srv.(TaskServer).SetTaskIsActive(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Task_SetTaskState_FullMethodName,
+		FullMethod: Task_SetTaskIsActive_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TaskServer).SetTaskState(ctx, req.(*SetTaskStateRequest))
+		return srv.(TaskServer).SetTaskIsActive(ctx, req.(*SetTaskIsActiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -450,8 +450,8 @@ var Task_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Task_SetSolver_Handler,
 		},
 		{
-			MethodName: "SetTaskState",
-			Handler:    _Task_SetTaskState_Handler,
+			MethodName: "SetTaskIsActive",
+			Handler:    _Task_SetTaskIsActive_Handler,
 		},
 		{
 			MethodName: "DeleteTask",

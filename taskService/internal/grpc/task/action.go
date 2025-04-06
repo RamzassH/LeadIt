@@ -6,6 +6,7 @@ import (
 	"github.com/RamzassH/LeadIt/taskService/internal/domain/models"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s ServerAPI) CreateAction(ctx context.Context, req *actionv1.CreateActionRequest) (*actionv1.CreateActionResponse, error) {
@@ -51,6 +52,8 @@ func (s ServerAPI) GetActionsByTask(ctx context.Context, req *actionv1.GetAction
 			UserId:      action.UserID,
 			TaskId:      action.TaskID,
 			Description: action.Description,
+			Date:        timestamppb.New(action.Date),
+			ActionType:  action.ActionType,
 		})
 	}
 

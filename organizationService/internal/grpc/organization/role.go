@@ -19,7 +19,7 @@ func (s *ServerAPI) AddRole(ctx context.Context, req *rolev1.CreateRoleRequest) 
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	roleID, err := s.service.AddRole(ctx, payload)
+	roleID, err := s.service.CreateRole(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add role: %v", err)
 	}

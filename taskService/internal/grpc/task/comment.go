@@ -4,15 +4,23 @@ import (
 	"context"
 	commentv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/comment"
 	"github.com/RamzassH/LeadIt/taskService/internal/domain/models"
+	"github.com/RamzassH/LeadIt/taskService/internal/grpc/interceptors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s ServerAPI) AddComment(ctx context.Context, req *commentv1.CreateCommentRequest) (*commentv1.CreateCommentResponse, error) {
+func (s ServerAPI) CreateComment(ctx context.Context, req *commentv1.CreateCommentRequest) (*commentv1.CreateCommentResponse, error) {
+	userIDValue := ctx.Value(interceptors.CtxUserID)
+	if userIDValue == nil {
+		return nil, status.Errorf(codes.Unauthenticated, "userID not found in context")
+	}
+
+	userID := userIDValue.(int64)
+
 	payload := models.CreateCommentDTO{
 		TaskID: req.GetTaskId(),
-		UserID: req.GetUserId(),
+		UserID: userID,
 		Body:   req.GetBody(),
 	}
 
@@ -31,7 +39,7 @@ func (s ServerAPI) AddComment(ctx context.Context, req *commentv1.CreateCommentR
 	}, nil
 }
 
-func (s ServerAPI) GetCommentsByTask(ctx context.Context, req *commentv1.GetCommentsForTaskRequest) (*commentv1.GetCommentsForTaskResponse, error) {
+func (s ServerAPI) GetCommentsForTask(ctx context.Context, req *commentv1.GetCommentsForTaskRequest) (*commentv1.GetCommentsForTaskResponse, error) {
 	taskID := req.GetTaskId()
 
 	if taskID == 0 {
@@ -59,9 +67,16 @@ func (s ServerAPI) GetCommentsByTask(ctx context.Context, req *commentv1.GetComm
 }
 
 func (s ServerAPI) UpdateComment(ctx context.Context, req *commentv1.UpdateCommentRequest) (*commentv1.UpdateCommentResponse, error) {
+	userIDValue := ctx.Value(interceptors.CtxUserID)
+	if userIDValue == nil {
+		return nil, status.Errorf(codes.Unauthenticated, "userID not found in context")
+	}
+
+	userID := userIDValue.(int64)
 	payload := models.UpdateCommentDTO{
-		ID:   req.GetId(),
-		Body: req.GetBody(),
+		ID:     req.GetId(),
+		UserID: userID,
+		Body:   req.GetBody(),
 	}
 
 	if err := s.ValidateStruct(payload); err != nil {

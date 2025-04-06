@@ -20,7 +20,7 @@ func (s *ServerAPI) CreateProject(ctx context.Context, req *projectv1.CreateProj
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	projectID, err := s.service.AddProject(ctx, payload)
+	projectID, err := s.service.CreateProject(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add project: %v", err)
 	}

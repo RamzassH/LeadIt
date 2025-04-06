@@ -47,7 +47,7 @@ func (s *Status) CreateStatus(ctx context.Context, payload models.CreateStatusDT
 	const op = "Status.CreateStatus"
 	logger := s.logger.With().
 		Str("operation", op).
-		Int64("project_id", payload.ProjectID).
+		Int64("progress_bar_id", payload.ProgressBarID).
 		Logger()
 
 	logger.Info().Str("status_name", payload.Name).Msg("Creating status")

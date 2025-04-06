@@ -31,9 +31,9 @@ func (s *ProgressBarStorage) Save(ctx context.Context, payload models.CreateProg
 }
 
 func (s *ProgressBarStorage) GetManyByProjectId(ctx context.Context, projectId int64) (progressBar []*models.ProgressBarDTO, err error) {
-	const op = "ProgressBar.GetManyByProjectId"
+	const op = "ProgressBarStorage.GetManyByProjectId"
 
-	rows, err := s.db.QueryContext(ctx, `SELECT * FROM progressbars WHERE project_id = $1`, projectId)
+	rows, err := s.db.QueryxContext(ctx, `SELECT * FROM progressbars WHERE project_id = $1`, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -41,7 +41,7 @@ func (s *ProgressBarStorage) GetManyByProjectId(ctx context.Context, projectId i
 
 	for rows.Next() {
 		var item models.ProgressBarDTO
-		if err := rows.Scan(item.ID, item.Name, item.ProjectID); err != nil {
+		if err := rows.StructScan(&item); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		progressBar = append(progressBar, &item)
@@ -51,11 +51,15 @@ func (s *ProgressBarStorage) GetManyByProjectId(ctx context.Context, projectId i
 
 func (s *ProgressBarStorage) Update(ctx context.Context, payload models.UpdateProgressBarDTO) (*models.ProgressBarDTO, error) {
 	const op = "ProgressBarStorage.Update"
-	query := `UPDATE progressbars SET 
-                        name = COALESCE($1, name),
-                        WHERE id = $1 RETURNING *;`
+	query := `UPDATE progressbars 
+				SET 
+                    name = COALESCE($1, name)
+                WHERE id = $2 RETURNING *;`
+
 	var updated models.ProgressBarDTO
-	err := s.db.GetContext(ctx, &updated, query, payload.Name)
+
+	err := s.db.GetContext(ctx, &updated, query, payload.Name, payload.ID)
+
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

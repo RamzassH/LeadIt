@@ -32,9 +32,9 @@ func (s *TagStorage) Save(ctx context.Context, payload models.CreateTagDTO) (tag
 }
 
 func (s *TagStorage) GetManyByProjectId(ctx context.Context, projectId int64) (tagList []*models.TagDTO, err error) {
-	const op = "Tag.GetManyByProjectId"
+	const op = "TagStorage.GetManyByProjectId"
 
-	rows, err := s.db.QueryContext(ctx, `SELECT * FROM tags WHERE project_id = $1`, projectId)
+	rows, err := s.db.QueryxContext(ctx, `SELECT * FROM tags WHERE project_id = $1`, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -42,7 +42,7 @@ func (s *TagStorage) GetManyByProjectId(ctx context.Context, projectId int64) (t
 
 	for rows.Next() {
 		var item models.TagDTO
-		if err := rows.Scan(item.ID, item.Name, item.ProjectID, item.TagColor); err != nil {
+		if err := rows.StructScan(&item); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		tagList = append(tagList, &item)
@@ -52,10 +52,11 @@ func (s *TagStorage) GetManyByProjectId(ctx context.Context, projectId int64) (t
 
 func (s *TagStorage) Update(ctx context.Context, payload models.UpdateTagDTO) (*models.TagDTO, error) {
 	const op = "TagStorage.Update"
-	query := `UPDATE tags SET 
+	query := `UPDATE tags 
+				SET 
                 name = COALESCE($1, name), 
-                tag_color = COALESCE($2, tag_color),
-                WHERE id = $1 RETURNING *;`
+                tag_color = COALESCE($2, tag_color)
+              WHERE id = $3 RETURNING *;`
 	var updated models.TagDTO
 	err := s.db.GetContext(ctx, &updated, query, payload.Name, payload.TagColor, payload.ID)
 	if err != nil {

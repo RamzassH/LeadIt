@@ -17,6 +17,7 @@ type CreateCommentDTO struct {
 }
 
 type UpdateCommentDTO struct {
-	ID   int64
-	Body string
+	ID     int64
+	UserID int64
+	Body   string
 }

@@ -38,7 +38,7 @@ type Comment interface {
 
 type ProgressBar interface {
 	CreateProgressBar(ctx context.Context, payload models.CreateProgressBarDTO) (int64, error)
-	GetProgressBarForProject(ctx context.Context, projectId int64) (*models.ProgressBarDTO, error)
+	GetProgressBarForProject(ctx context.Context, projectId int64) ([]*models.ProgressBarDTO, error)
 	UpdateProgressBar(ctx context.Context, payload models.UpdateProgressBarDTO) (*models.ProgressBarDTO, error)
 	DeleteProgressBar(ctx context.Context, progressBarId int64) (int64, error)
 }
@@ -61,6 +61,11 @@ type Task interface {
 	GetTask(ctx context.Context, taskId int64) (*models.TaskDTO, error)
 	GetTasksForProject(ctx context.Context, projectId int64) ([]*models.TaskDTO, error)
 	UpdateTask(ctx context.Context, payload models.UpdateTaskDTO) (*models.TaskDTO, error)
+	ChangeStatus(ctx context.Context, payload models.ChangeStatusDTO) (int64, error)
+	AddTag(ctx context.Context, payload models.AddTagDTO) (int64, error)
+	RemoveTag(ctx context.Context, payload models.RemoveTagDTO) (int64, error)
+	SetSolver(ctx context.Context, payload models.SetSolverDTO) (int64, error)
+	SetIsActive(ctx context.Context, taskId int64) error
 	DeleteTask(ctx context.Context, taskId int64) (int64, error)
 }
 

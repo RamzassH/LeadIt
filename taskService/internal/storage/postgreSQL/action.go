@@ -29,7 +29,7 @@ func (s *ActionStorage) Save(ctx context.Context, payload models.CreateActionDTO
 	VALUES ($1, $2, $3, $4)
 	RETURNING id;`
 
-	err = s.db.QueryRowContext(ctx, query, payload.TaskID, payload.UserID, payload.ActionType, payload.ActionType).Scan(&actionId)
+	err = s.db.QueryRowContext(ctx, query, payload.TaskID, payload.UserID, payload.ActionType, payload.Description).Scan(&actionId)
 
 	if err != nil {
 		var pgErr *pq.Error
@@ -47,7 +47,7 @@ func (s *ActionStorage) Save(ctx context.Context, payload models.CreateActionDTO
 func (s *ActionStorage) GetManyByTaskId(ctx context.Context, id int64) (actions []*models.ActionDTO, err error) {
 	const op = "ActionStorage.GetManyByTaskId"
 
-	rows, err := s.db.QueryContext(ctx, `SELECT * FROM actions WHERE task_id = $1`, id)
+	rows, err := s.db.QueryxContext(ctx, `SELECT * FROM actions WHERE task_id = $1`, id)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -56,7 +56,7 @@ func (s *ActionStorage) GetManyByTaskId(ctx context.Context, id int64) (actions 
 
 	for rows.Next() {
 		var action models.ActionDTO
-		if err := rows.Scan(&action.ID, &action.UserID, &action.ActionType, &action.Description); err != nil {
+		if err := rows.StructScan(&action); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 

@@ -45,8 +45,7 @@ message CommentType {
 
 message CreateCommentRequest {
   int64 task_id = 1;
-  int64 user_id = 2;
-  string body = 3;
+  string body = 2;
 }
 
 message CreateCommentResponse {

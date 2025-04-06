@@ -24,6 +24,11 @@ type Provider interface {
 	GetById(ctx context.Context, taskId int64) (task *models.TaskDTO, err error)
 	GetManyByProject(ctx context.Context, projectId int64) (tasks []*models.TaskDTO, err error)
 	Update(ctx context.Context, payload models.UpdateTaskDTO) (updatedTask *models.TaskDTO, err error)
+	ChangeStatus(ctx context.Context, payload models.ChangeStatusDTO) (int64, error)
+	AddTag(ctx context.Context, payload models.AddTagDTO) (int64, error)
+	RemoveTag(ctx context.Context, payload models.RemoveTagDTO) (int64, error)
+	SetSolver(ctx context.Context, payload models.SetSolverDTO) (int64, error)
+	SetIsActive(ctx context.Context, taskId int64) error
 	Delete(ctx context.Context, taskId int64) (rowsAffected int64, err error)
 }
 
@@ -132,6 +137,120 @@ func (t *Task) UpdateTask(ctx context.Context, payload models.UpdateTaskDTO) (*m
 		Str("task_name", updatedTask.Name).
 		Msg("Successfully updated task")
 	return updatedTask, nil
+}
+
+func (t *Task) ChangeStatus(ctx context.Context, payload models.ChangeStatusDTO) (int64, error) {
+	const op = "Task.ChangeStatus"
+
+	logger := t.logger.With().Str("operation", op).Logger()
+
+	logger.Info().
+		Msg("changing task status")
+
+	statusId, err := t.taskProvider.ChangeStatus(ctx, payload)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int64("task_id", payload.TaskID).
+			Msg("failed to change task status")
+		return 0, err
+	}
+
+	logger.Info().
+		Int64("task_id", statusId).
+		Msg("Successfully changed task status")
+	return statusId, nil
+}
+
+func (t *Task) AddTag(ctx context.Context, payload models.AddTagDTO) (int64, error) {
+	const op = "Task.AddTag"
+	logger := t.logger.With().Str("operation", op).Logger()
+
+	logger.Info().
+		Msg("adding tag")
+
+	tagId, err := t.taskProvider.AddTag(ctx, payload)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int64("task_id", payload.TaskID).
+			Msg("failed to add tag")
+		return 0, err
+	}
+
+	logger.Info().
+		Int64("task_id", tagId).
+		Msg("Successfully added tag")
+
+	return tagId, nil
+}
+
+func (t *Task) RemoveTag(ctx context.Context, payload models.RemoveTagDTO) (int64, error) {
+	const op = "Task.RemoveTag"
+	logger := t.logger.With().Str("operation", op).Logger()
+
+	logger.Info().
+		Msg("removing tag")
+
+	rowsAffected, err := t.taskProvider.RemoveTag(ctx, payload)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int64("task_id", payload.TaskID).
+			Msg("failed to remove tag")
+		return 0, err
+	}
+
+	logger.Info().
+		Int64("task_id", payload.TaskID).
+		Msg("Successfully removed tag")
+
+	return rowsAffected, nil
+}
+
+func (t *Task) SetSolver(ctx context.Context, payload models.SetSolverDTO) (int64, error) {
+	const op = "Task.SetSolver"
+	logger := t.logger.With().Str("operation", op).Logger()
+	logger.Info().
+		Msg("setting solver")
+
+	solverId, err := t.taskProvider.SetSolver(ctx, payload)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int64("task_id", payload.TaskID).
+			Msg("failed to set solver")
+		return 0, err
+	}
+
+	return solverId, nil
+}
+
+func (t *Task) SetIsActive(ctx context.Context, taskId int64) error {
+	const op = "Task.SetTaskState"
+	logger := t.logger.With().Str("operation", op).Logger()
+	logger.Info().
+		Msg("setting task state")
+
+	err := t.taskProvider.SetIsActive(ctx, taskId)
+
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Int64("task_id", taskId).
+			Msg("failed to set task state")
+		return err
+	}
+
+	logger.Info().
+		Int64("task_id", taskId).
+		Msg("Successfully set task state")
+
+	return nil
 }
 
 func (t *Task) DeleteTask(ctx context.Context, taskId int64) (int64, error) {

@@ -28,7 +28,7 @@ func (s ServerAPI) CreateStatus(ctx context.Context, req *statusv1.CreateStatusR
 	return &statusv1.CreateStatusResponse{Id: id}, nil
 }
 
-func (s ServerAPI) GetStatusesByProgressBar(ctx context.Context, req *statusv1.GetStatusesByProgressBarRequest) (*statusv1.GetStatusesByProgressBarResponse, error) {
+func (s ServerAPI) GetManyStatusesByProgressBar(ctx context.Context, req *statusv1.GetStatusesByProgressBarRequest) (*statusv1.GetStatusesByProgressBarResponse, error) {
 	pbID := req.GetProgressBarId()
 	if pbID == 0 {
 		return nil, status.Error(codes.InvalidArgument, "invalid progress bar id")

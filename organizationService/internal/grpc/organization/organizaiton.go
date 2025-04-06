@@ -20,7 +20,7 @@ func (s *ServerAPI) CreateOrganization(ctx context.Context, req *organizationv1.
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	OrganizationId, err := s.service.AddOrganization(ctx, addOrganizationReq)
+	OrganizationId, err := s.service.CreateOrganization(ctx, addOrganizationReq)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}

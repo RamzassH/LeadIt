@@ -40,7 +40,7 @@ func New(
 	}
 }
 
-func (a *Action) AddAction(ctx context.Context, payload models.CreateActionDTO) (int64, error) {
+func (a *Action) CreateAction(ctx context.Context, payload models.CreateActionDTO) (int64, error) {
 	const op = "Action.AddAction"
 	logger := a.logger.With().
 		Str("operation", op).
