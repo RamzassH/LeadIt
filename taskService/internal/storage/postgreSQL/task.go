@@ -34,6 +34,17 @@ func (s *TaskStorage) Save(ctx context.Context, payload models.CreateTaskDTO) (t
 	return taskId, nil
 }
 
+func (s *TaskStorage) GetById(ctx context.Context, taskId int64) (task *models.TaskDTO, err error) {
+	const op = "TaskStorage.GetById"
+
+	err = storage.GetById(ctx, s.db, "tasks", taskId, &task)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return task, nil
+}
+
 func (s *TaskStorage) GetManyByProjectId(ctx context.Context, projectId int64) (tasList []*models.TaskDTO, err error) {
 	const op = "TaskStorage.GetManyByProjectId"
 

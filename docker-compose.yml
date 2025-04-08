@@ -104,6 +104,34 @@ services:
       kafka:
         condition: service_started
 
+  taskdb:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${TASK_DB_NAME}
+    volumes:
+      - task_db_data:/var/lib/postgresql/data
+    ports:
+      - "${TASK_DB_PORT}:${POSTGRESQL_PORT}"
+
+  task-service:
+    build:
+      dockerfile: ./taskService/Dockerfile
+    restart: always
+    depends_on:
+      - taskdb
+      - redis
+    environment:
+      ENV: ${ENV}
+      GRPC_PORT: ${TASK_GRPC_PORT}
+      DATABASE_DSN: ${TASK_DATABASE_DSN}
+    volumes:
+      - ./taskService/config:/app/config
+    ports:
+      - "${TASK_GRPC_PORT}:${TASK_GRPC_PORT}"
+
   gateway:
     build:
       dockerfile: ./gateway/Dockerfile
@@ -123,4 +151,5 @@ services:
 volumes:
   organization_db_data:
   auth_db_data:
+  task_db_data:
   redis_data:

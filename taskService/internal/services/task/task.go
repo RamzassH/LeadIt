@@ -22,7 +22,7 @@ type Saver interface {
 }
 type Provider interface {
 	GetById(ctx context.Context, taskId int64) (task *models.TaskDTO, err error)
-	GetManyByProject(ctx context.Context, projectId int64) (tasks []*models.TaskDTO, err error)
+	GetManyByProjectId(ctx context.Context, projectId int64) (tasList []*models.TaskDTO, err error)
 	Update(ctx context.Context, payload models.UpdateTaskDTO) (updatedTask *models.TaskDTO, err error)
 	ChangeStatus(ctx context.Context, payload models.ChangeStatusDTO) (int64, error)
 	AddTag(ctx context.Context, payload models.AddTagDTO) (int64, error)
@@ -102,7 +102,7 @@ func (t *Task) GetTasksForProject(ctx context.Context, projectId int64) ([]*mode
 	logger.Info().
 		Msg("getting tasks for project")
 
-	tasks, err := t.taskProvider.GetManyByProject(ctx, projectId)
+	tasks, err := t.taskProvider.GetManyByProjectId(ctx, projectId)
 	if err != nil {
 		logger.Error().Err(err).Int64("project_id", projectId).Msg("failed to get tasks for project")
 		return nil, fmt.Errorf("%s: %w", op, err)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/RamzassH/LeadIt/libs/kafka"
+	"github.com/RamzassH/LeadIt/taskService/internal/app"
 	"github.com/RamzassH/LeadIt/taskService/internal/config"
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"

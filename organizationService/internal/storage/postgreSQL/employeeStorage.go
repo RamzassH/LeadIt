@@ -109,7 +109,7 @@ func (s *EmployeeStorage) UpdateRole(ctx context.Context, payload models.UpdateE
 
 }
 
-func (s *EmployeeStorage) DeleteEmployee(ctx context.Context, id int64) (rowsAffected int64, err error) {
+func (s *EmployeeStorage) Delete(ctx context.Context, id int64) (rowsAffected int64, err error) {
 	const op = "EmployeeStorage.Delete"
 
 	rowsAffected, err = storage.Delete(ctx, s.db, "employees", id)
