@@ -1,6 +1,6 @@
 package models
 
-type Project struct {
+type ProjectDTO struct {
 	ID             int64  `db:"id"`
 	Name           string `db:"name"`
 	Description    string `db:"description"`
@@ -8,17 +8,16 @@ type Project struct {
 	Image          string `json:"image"`
 }
 
-type AddProjectPayload struct {
+type CreateProjectDTO struct {
 	Name           string
 	Description    string
 	OrganizationID int64
 	Image          string
 }
 
-type UpdateProjectPayload struct {
-	ID             int64
-	Name           string
-	Description    string
-	OrganizationID int64
-	Image          string
+type UpdateProjectDTO struct {
+	ID          int64
+	Name        string
+	Description string
+	Image       string
 }

@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Notification_SendEmailNotification_FullMethodName = "/notification.Notification/sendEmailNotification"
-	Notification_SendKafkaNotification_FullMethodName = "/notification.Notification/sendKafkaNotification"
+	Notification_SendEmailNotification_FullMethodName = "/notification.Notification/SendEmailNotification"
+	Notification_SendKafkaNotification_FullMethodName = "/notification.Notification/SendKafkaNotification"
 )
 
 // NotificationClient is the client API for Notification service.
@@ -146,11 +146,11 @@ var Notification_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*NotificationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "sendEmailNotification",
+			MethodName: "SendEmailNotification",
 			Handler:    _Notification_SendEmailNotification_Handler,
 		},
 		{
-			MethodName: "sendKafkaNotification",
+			MethodName: "SendKafkaNotification",
 			Handler:    _Notification_SendKafkaNotification_Handler,
 		},
 	},

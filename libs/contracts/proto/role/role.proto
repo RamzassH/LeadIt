@@ -3,40 +3,39 @@ syntax = "proto3";
 package role;
 
 option go_package = "leadIt.role.v1;rolev1";
+
 import "google/api/annotations.proto";
 
 service Role {
-  rpc addRole(AddRoleRequest) returns (AddRoleResponse) {
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {
     option(google.api.http) = {
-      post: "/v1/role/add"
-      body: "*"
-    };
-  }
-  rpc getRole(GetRoleRequest) returns (GetRoleResponse) {
-    option(google.api.http) = {
-      post: "/v1/role/get"
+      post: "/v1/roles"
       body: "*"
     };
   }
 
-  rpc getRoles(GetRolesRequest) returns (GetRolesResponse) {
+  rpc GetRole(GetRoleRequest) returns (GetRoleResponse) {
     option(google.api.http) = {
-      post: "/v1/role/get-many"
+      get: "/v1/roles/{id}"
+    };
+  }
+
+  rpc GetRoles(GetRolesRequest) returns (GetRolesResponse) {
+    option(google.api.http) = {
+      get: "/v1/organizations/{organization_id}/roles"
+    };
+  }
+
+  rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
+    option(google.api.http) = {
+      patch: "/v1/roles/{id}"
       body: "*"
     };
   }
 
-  rpc updateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
+  rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
     option(google.api.http) = {
-      post: "/v1/role/update"
-      body: "*"
-    };
-  }
-
-  rpc deleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
-    option(google.api.http) = {
-      post: "/v1/role/delete"
-      body: "*"
+      delete: "/v1/roles/{id}"
     };
   }
 }
@@ -46,15 +45,17 @@ message RoleType {
   string name = 2;
   int64 organization_id = 3;
   repeated string permissions = 4;
+  int64 parent_role_id = 5;
 }
 
-message AddRoleRequest {
+message CreateRoleRequest {
   string name = 1;
   int64 organization_id = 2;
   repeated string permissions = 3;
+  int64 parent_role_id = 4;
 }
 
-message AddRoleResponse {
+message CreateRoleResponse {
   int64 id = 1;
 }
 
@@ -67,7 +68,7 @@ message GetRoleResponse {
 }
 
 message GetRolesRequest {
-  int64 organizationId = 1;
+  int64 organization_id = 1;
 }
 
 message GetRolesResponse {
@@ -75,7 +76,10 @@ message GetRolesResponse {
 }
 
 message UpdateRoleRequest {
-  RoleType role = 1;
+  int64 id = 1;
+  string name = 2;
+  repeated string permissions = 4;
+  int64 parent_role_id = 5;
 }
 
 message UpdateRoleResponse {

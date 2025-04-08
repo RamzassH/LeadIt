@@ -1,4 +1,4 @@
-module github.com/RamzassH/libs/redis
+module github.com/RamzassH/LeadIt/libs/redis
 
 go 1.24.1
 

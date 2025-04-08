@@ -23,8 +23,8 @@ func NewRoleStorage(db *sqlx.DB) (*RoleStorage, error) {
 	return &RoleStorage{db: db}, nil
 }
 
-func (s *RoleStorage) SaveRole(ctx context.Context, payload models.AddRolePayload) (roleId int64, err error) {
-	const op = "storage.saveRole"
+func (s *RoleStorage) Save(ctx context.Context, payload models.CreateRoleDTO) (roleId int64, err error) {
+	const op = "RoleStorage.Save"
 
 	query := `
 			INSERT INTO roles (name, organization_id, permisstions)
@@ -46,8 +46,8 @@ func (s *RoleStorage) SaveRole(ctx context.Context, payload models.AddRolePayloa
 	return roleId, nil
 }
 
-func (s *RoleStorage) GetRoleById(ctx context.Context, id int64) (role *models.Role, err error) {
-	const op = "storage.getRoleById"
+func (s *RoleStorage) GetById(ctx context.Context, id int64) (role *models.RoleDTO, err error) {
+	const op = "RoleStorage.GetById"
 
 	err = storage.GetById(ctx, s.db, "roles", id, &role)
 	if err != nil {
@@ -60,8 +60,8 @@ func (s *RoleStorage) GetRoleById(ctx context.Context, id int64) (role *models.R
 	return role, nil
 }
 
-func (s *RoleStorage) GetAllRoles(ctx context.Context, organizationId int64) (roles []models.Role, err error) {
-	const op = "storage.getAllRoles"
+func (s *RoleStorage) GetManyByOrganizationId(ctx context.Context, organizationId int64) (roles []models.RoleDTO, err error) {
+	const op = "RoleStorage.GetManyByOrganizationId"
 
 	rows, err := s.db.QueryContext(ctx, `SELECT * FROM roles WHERE id = $1`, organizationId)
 	defer rows.Close()
@@ -71,7 +71,7 @@ func (s *RoleStorage) GetAllRoles(ctx context.Context, organizationId int64) (ro
 	}
 
 	for rows.Next() {
-		var role models.Role
+		var role models.RoleDTO
 		if err := rows.Scan(&role.ID, &role.Name, &role.OrganizationID, &role.Permissions); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
@@ -81,19 +81,18 @@ func (s *RoleStorage) GetAllRoles(ctx context.Context, organizationId int64) (ro
 
 	return roles, nil
 }
-func (s *RoleStorage) UpdateRole(ctx context.Context, payload models.UpdateRolePayload) (role *models.Role, err error) {
-	const op = "storage.updateRole"
+func (s *RoleStorage) Update(ctx context.Context, payload models.UpdateRoleDTO) (role *models.RoleDTO, err error) {
+	const op = "RoleStorage.Update"
 
 	query := `
 			UPDATE roles
 			SET 
-			    name = COALESCE($1, name)
-			    organization_id = COALESCE($2, organization_id)
-			    permisstions = COALESCE($3, permisstions)
-			WHERE id = $4
+			    name = COALESCE($1, name),
+			    permisstions = COALESCE($2, permisstions)
+			WHERE id = $3
 			RETURNING id, name, organization_id, permisstions`
 
-	row := s.db.QueryRowContext(ctx, query, payload.Name, payload.OrganizationID, payload.Permissions)
+	row := s.db.QueryRowContext(ctx, query, payload.Name, payload.Permissions)
 
 	err = row.Scan(&role.ID, &role.Name, &role.OrganizationID, &role.Permissions)
 	if err != nil {
@@ -105,8 +104,8 @@ func (s *RoleStorage) UpdateRole(ctx context.Context, payload models.UpdateRoleP
 
 	return role, nil
 }
-func (s *RoleStorage) DeleteRole(ctx context.Context, id int64) (rowsAffected int64, err error) {
-	const op = "storage.deleteRole"
+func (s *RoleStorage) Delete(ctx context.Context, id int64) (rowsAffected int64, err error) {
+	const op = "RoleStorage.Delete"
 
 	rowsAffected, err = storage.Delete(ctx, s.db, "roles", id)
 	if err != nil {

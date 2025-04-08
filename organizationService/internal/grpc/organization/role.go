@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ServerAPI) AddRole(ctx context.Context, req *rolev1.AddRoleRequest) (*rolev1.AddRoleResponse, error) {
-	payload := models.AddRolePayload{
+func (s *ServerAPI) AddRole(ctx context.Context, req *rolev1.CreateRoleRequest) (*rolev1.CreateRoleResponse, error) {
+	payload := models.CreateRoleDTO{
 		Name:           req.GetName(),
 		OrganizationID: req.GetOrganizationId(),
 		Permissions:    req.GetPermissions(),
@@ -19,12 +19,12 @@ func (s *ServerAPI) AddRole(ctx context.Context, req *rolev1.AddRoleRequest) (*r
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	roleID, err := s.service.AddRole(ctx, payload)
+	roleID, err := s.service.CreateRole(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add role: %v", err)
 	}
 
-	return &rolev1.AddRoleResponse{Id: roleID}, nil
+	return &rolev1.CreateRoleResponse{Id: roleID}, nil
 }
 func (s *ServerAPI) GetRole(ctx context.Context, req *rolev1.GetRoleRequest) (*rolev1.GetRoleResponse, error) {
 	if req.GetId() == 0 {
@@ -67,11 +67,10 @@ func (s *ServerAPI) GetRoles(ctx context.Context, req *rolev1.GetRolesRequest) (
 	return &rolev1.GetRolesResponse{Roles: response}, nil
 }
 func (s *ServerAPI) UpdateRole(ctx context.Context, req *rolev1.UpdateRoleRequest) (*rolev1.UpdateRoleResponse, error) {
-	payload := models.UpdateRolePayload{
-		ID:             req.Role.Id,
-		Name:           req.Role.Name,
-		OrganizationID: req.Role.OrganizationId,
-		Permissions:    req.Role.Permissions,
+	payload := models.UpdateRoleDTO{
+		ID:          req.GetId(),
+		Name:        req.GetName(),
+		Permissions: req.GetPermissions(),
 	}
 
 	if err := s.ValidateStruct(payload); err != nil {

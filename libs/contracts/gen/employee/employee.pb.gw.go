@@ -35,27 +35,27 @@ var (
 	_ = metadata.Join
 )
 
-func request_Employee_AddEmployee_0(ctx context.Context, marshaler runtime.Marshaler, client EmployeeClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Employee_CreateEmployee_0(ctx context.Context, marshaler runtime.Marshaler, client EmployeeClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq AddEmployeeRequest
+		protoReq CreateEmployeeRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := client.AddEmployee(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateEmployee(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_Employee_AddEmployee_0(ctx context.Context, marshaler runtime.Marshaler, server EmployeeServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Employee_CreateEmployee_0(ctx context.Context, marshaler runtime.Marshaler, server EmployeeServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq AddEmployeeRequest
+		protoReq CreateEmployeeRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := server.AddEmployee(ctx, &protoReq)
+	msg, err := server.CreateEmployee(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -65,9 +65,6 @@ func request_Employee_GetEmployee_0(ctx context.Context, marshaler runtime.Marsh
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
 	val, ok := pathParams["id"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
@@ -86,9 +83,6 @@ func local_request_Employee_GetEmployee_0(ctx context.Context, marshaler runtime
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
 	val, ok := pathParams["id"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
@@ -107,9 +101,6 @@ func request_Employee_GetEmployees_0(ctx context.Context, marshaler runtime.Mars
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
 	val, ok := pathParams["organization_id"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
@@ -128,9 +119,6 @@ func local_request_Employee_GetEmployees_0(ctx context.Context, marshaler runtim
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
 	val, ok := pathParams["organization_id"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
@@ -143,27 +131,61 @@ func local_request_Employee_GetEmployees_0(ctx context.Context, marshaler runtim
 	return msg, metadata, err
 }
 
-func request_Employee_UpdateEmployee_0(ctx context.Context, marshaler runtime.Marshaler, client EmployeeClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Employee_UpdateEmployeeRole_0(ctx context.Context, marshaler runtime.Marshaler, client EmployeeClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq UpdateEmployeeRequest
+		protoReq UpdateEmployeeRoleRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := client.UpdateEmployee(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	val, ok = pathParams["role_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_id")
+	}
+	protoReq.RoleId, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_id", err)
+	}
+	msg, err := client.UpdateEmployeeRole(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_Employee_UpdateEmployee_0(ctx context.Context, marshaler runtime.Marshaler, server EmployeeServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Employee_UpdateEmployeeRole_0(ctx context.Context, marshaler runtime.Marshaler, server EmployeeServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq UpdateEmployeeRequest
+		protoReq UpdateEmployeeRoleRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := server.UpdateEmployee(ctx, &protoReq)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	val, ok = pathParams["role_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role_id")
+	}
+	protoReq.RoleId, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "role_id", err)
+	}
+	msg, err := server.UpdateEmployeeRole(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -171,9 +193,15 @@ func request_Employee_DeleteEmployee_0(ctx context.Context, marshaler runtime.Ma
 	var (
 		protoReq DeleteEmployeeRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := client.DeleteEmployee(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -183,9 +211,15 @@ func local_request_Employee_DeleteEmployee_0(ctx context.Context, marshaler runt
 	var (
 		protoReq DeleteEmployeeRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 	msg, err := server.DeleteEmployee(ctx, &protoReq)
 	return msg, metadata, err
@@ -221,33 +255,33 @@ func local_request_Employee_InviteEmployee_0(ctx context.Context, marshaler runt
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEmployeeHandlerFromEndpoint instead.
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterEmployeeHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EmployeeServer) error {
-	mux.Handle(http.MethodPost, pattern_Employee_AddEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_Employee_CreateEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/AddEmployee", runtime.WithHTTPPathPattern("/v1/employee/add"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/CreateEmployee", runtime.WithHTTPPathPattern("/v1/employees"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Employee_AddEmployee_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Employee_CreateEmployee_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Employee_AddEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Employee_CreateEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_GetEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Employee_GetEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/GetEmployee", runtime.WithHTTPPathPattern("/v1/employee/get/{id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/GetEmployee", runtime.WithHTTPPathPattern("/v1/employees/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -261,13 +295,13 @@ func RegisterEmployeeHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		}
 		forward_Employee_GetEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_GetEmployees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Employee_GetEmployees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/GetEmployees", runtime.WithHTTPPathPattern("/v1/employee/get-many/{organization_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/GetEmployees", runtime.WithHTTPPathPattern("/v1/organizations/{organization_id}/employees"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -281,33 +315,33 @@ func RegisterEmployeeHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		}
 		forward_Employee_GetEmployees_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_UpdateEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPatch, pattern_Employee_UpdateEmployeeRole_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/UpdateEmployee", runtime.WithHTTPPathPattern("/v1/employee/update"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/UpdateEmployeeRole", runtime.WithHTTPPathPattern("/v1/employees/{id}/role/{role_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Employee_UpdateEmployee_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Employee_UpdateEmployeeRole_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Employee_UpdateEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Employee_UpdateEmployeeRole_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_DeleteEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodDelete, pattern_Employee_DeleteEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/DeleteEmployee", runtime.WithHTTPPathPattern("/v1/employee/delete"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/DeleteEmployee", runtime.WithHTTPPathPattern("/v1/employees/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -327,7 +361,7 @@ func RegisterEmployeeHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/InviteEmployee", runtime.WithHTTPPathPattern("/v1/employee/invite"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/employee.Employee/InviteEmployee", runtime.WithHTTPPathPattern("/v1/employees/invite"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -381,28 +415,28 @@ func RegisterEmployeeHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "EmployeeClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterEmployeeHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EmployeeClient) error {
-	mux.Handle(http.MethodPost, pattern_Employee_AddEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_Employee_CreateEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/AddEmployee", runtime.WithHTTPPathPattern("/v1/employee/add"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/CreateEmployee", runtime.WithHTTPPathPattern("/v1/employees"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Employee_AddEmployee_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Employee_CreateEmployee_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Employee_AddEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Employee_CreateEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_GetEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Employee_GetEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/GetEmployee", runtime.WithHTTPPathPattern("/v1/employee/get/{id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/GetEmployee", runtime.WithHTTPPathPattern("/v1/employees/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -415,11 +449,11 @@ func RegisterEmployeeHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		}
 		forward_Employee_GetEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_GetEmployees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Employee_GetEmployees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/GetEmployees", runtime.WithHTTPPathPattern("/v1/employee/get-many/{organization_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/GetEmployees", runtime.WithHTTPPathPattern("/v1/organizations/{organization_id}/employees"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -432,28 +466,28 @@ func RegisterEmployeeHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		}
 		forward_Employee_GetEmployees_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_UpdateEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPatch, pattern_Employee_UpdateEmployeeRole_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/UpdateEmployee", runtime.WithHTTPPathPattern("/v1/employee/update"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/UpdateEmployeeRole", runtime.WithHTTPPathPattern("/v1/employees/{id}/role/{role_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Employee_UpdateEmployee_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Employee_UpdateEmployeeRole_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Employee_UpdateEmployee_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Employee_UpdateEmployeeRole_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_Employee_DeleteEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodDelete, pattern_Employee_DeleteEmployee_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/DeleteEmployee", runtime.WithHTTPPathPattern("/v1/employee/delete"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/DeleteEmployee", runtime.WithHTTPPathPattern("/v1/employees/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -470,7 +504,7 @@ func RegisterEmployeeHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/InviteEmployee", runtime.WithHTTPPathPattern("/v1/employee/invite"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/employee.Employee/InviteEmployee", runtime.WithHTTPPathPattern("/v1/employees/invite"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -487,19 +521,19 @@ func RegisterEmployeeHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 }
 
 var (
-	pattern_Employee_AddEmployee_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "employee", "add"}, ""))
-	pattern_Employee_GetEmployee_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "employee", "get", "id"}, ""))
-	pattern_Employee_GetEmployees_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "employee", "get-many", "organization_id"}, ""))
-	pattern_Employee_UpdateEmployee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "employee", "update"}, ""))
-	pattern_Employee_DeleteEmployee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "employee", "delete"}, ""))
-	pattern_Employee_InviteEmployee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "employee", "invite"}, ""))
+	pattern_Employee_CreateEmployee_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "employees"}, ""))
+	pattern_Employee_GetEmployee_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "employees", "id"}, ""))
+	pattern_Employee_GetEmployees_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "organizations", "organization_id", "employees"}, ""))
+	pattern_Employee_UpdateEmployeeRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "employees", "id", "role", "role_id"}, ""))
+	pattern_Employee_DeleteEmployee_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "employees", "id"}, ""))
+	pattern_Employee_InviteEmployee_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "employees", "invite"}, ""))
 )
 
 var (
-	forward_Employee_AddEmployee_0    = runtime.ForwardResponseMessage
-	forward_Employee_GetEmployee_0    = runtime.ForwardResponseMessage
-	forward_Employee_GetEmployees_0   = runtime.ForwardResponseMessage
-	forward_Employee_UpdateEmployee_0 = runtime.ForwardResponseMessage
-	forward_Employee_DeleteEmployee_0 = runtime.ForwardResponseMessage
-	forward_Employee_InviteEmployee_0 = runtime.ForwardResponseMessage
+	forward_Employee_CreateEmployee_0     = runtime.ForwardResponseMessage
+	forward_Employee_GetEmployee_0        = runtime.ForwardResponseMessage
+	forward_Employee_GetEmployees_0       = runtime.ForwardResponseMessage
+	forward_Employee_UpdateEmployeeRole_0 = runtime.ForwardResponseMessage
+	forward_Employee_DeleteEmployee_0     = runtime.ForwardResponseMessage
+	forward_Employee_InviteEmployee_0     = runtime.ForwardResponseMessage
 )

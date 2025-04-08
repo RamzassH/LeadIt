@@ -6,37 +6,35 @@ option go_package = "leadIt.project.v1;projectv1";
 import 'google/api/annotations.proto';
 
 service Project {
-  rpc addProject (AddProjectRequest) returns (AddProjectResponse) {
+  rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse) {
     option(google.api.http) = {
-      post: "/v1/project/add"
-      body: "*"
-    };
-  }
-  rpc getProject(GetProjectRequest) returns (GetProjectResponse) {
-    option(google.api.http) = {
-      post: "/v1/project/get/{id}"
+      post: "/v1/projects"
       body: "*"
     };
   }
 
-  rpc getProjects(GetProjectsRequest) returns (GetProjectsResponse) {
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {
     option(google.api.http) = {
-      post: "/v1/project/get-many/{organization_id}"
+      get: "/v1/projects/{id}"
+    };
+  }
+
+  rpc GetProjects(GetProjectsRequest) returns (GetProjectsResponse) {
+    option(google.api.http) = {
+      get: "/v1/organizations/{organization_id}/projects"
+    };
+  }
+
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
+    option(google.api.http) = {
+      patch: "/v1/projects/{id}"
       body: "*"
     };
   }
 
-  rpc updateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
+  rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse) {
     option(google.api.http) = {
-      post: "/v1/project/update"
-      body: "*"
-    };
-  }
-
-  rpc deleteProject(DeleteProjectRequest) returns (DeleteProjectResponse) {
-    option(google.api.http) = {
-      post: "/v1/project/delete"
-      body: "*"
+      delete: "/v1/projects/{id}"
     };
   }
 }
@@ -49,14 +47,14 @@ message ProjectType {
   string image = 5;
 }
 
-message AddProjectRequest {
+message CreateProjectRequest {
   string name = 1;
   string description = 2;
   int64 organization_id = 3;
   string image = 4;
 }
 
-message AddProjectResponse {
+message CreateProjectResponse {
   int64 id = 1;
 }
 
@@ -77,7 +75,10 @@ message GetProjectsResponse {
 }
 
 message UpdateProjectRequest {
-  ProjectType project = 1;
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string image = 5;
 }
 
 message UpdateProjectResponse {
@@ -91,3 +92,4 @@ message DeleteProjectRequest {
 message DeleteProjectResponse {
   int64 id = 1;
 }
+
