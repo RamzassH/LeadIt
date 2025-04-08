@@ -1,14 +1,11 @@
 "use client"
-import "./local.css"
-import MenuButton from "@/components/UI/ProfilePage/SideMenu/MenuButton/MenuButton";
 import theme from "../../../theme/theme";
-import {margin, ThemeProvider} from "@mui/system";
-import SideMenu from "@/components/UI/ProfilePage/SideMenu/SideMenu";
+import {ThemeProvider} from "@mui/system";
 import React, {useRef} from "react";
 import Header from "@/components/UI/ProfilePage/Header/Header";
 import ProfileComponent from "@/components/UI/ProfilePage/Profile/ProfileComponent";
 import DrawerSideMenu from "@/components/UI/ProfilePage/DrawerSideMenu/DrawerSideMenu";
-import ModalWindow from "@/components/UI/ProfilePage/ModalWindow/ModalWindow";
+import {Body, Footer, Main} from "@/app/profile/styled";
 
 export default function Profile() {
     const drawerSideMenuRef = useRef<{ triggerHandleClick: () => void }>(null);
@@ -21,17 +18,16 @@ export default function Profile() {
 
     return (
         <ThemeProvider theme={theme}>
-            <body>
+            <Body>
                 <Header menuOpenFunction={handleButtonClick}/>
-                <main>
+                <Main>
                     {/*<SideMenu ref={sideMenuRef}/>*/}
                     <DrawerSideMenu ref={drawerSideMenuRef}/>
                     <ProfileComponent/>
-                </main>
-                <footer>
-                    <ModalWindow/>
-                </footer>
-            </body>
+                </Main>
+                <Footer>
+                </Footer>
+            </Body>
         </ThemeProvider>
     );
 }
