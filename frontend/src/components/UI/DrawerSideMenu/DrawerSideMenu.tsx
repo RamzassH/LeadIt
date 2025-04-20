@@ -3,7 +3,7 @@ import {
     DrawerContainer,
     DrawerBackground,
     DrawerLogo
-} from "@/components/UI/ProfilePage/DrawerSideMenu/styled/DrawerContainer";
+} from "@/components/UI/DrawerSideMenu/styled/DrawerContainer";
 import MenuButton from "@/components/UI/ProfilePage/SideMenu/MenuButton/MenuButton";
 import Icon from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/StyleIcon";
 import VIPIcon from "@/images/icons-svg/VIPIcon";
@@ -40,10 +40,10 @@ const DrawerSideMenu = forwardRef<DrawerSideMenuRef, DrawerSideMenuProps>((props
     }));
 
     const list1: ButtonContent[] = [
-        { icon: <VIPIcon />, text: "Главная", callback: (event) => {} },
+        { icon: <VIPIcon />, text: "Главная", callback: (event) => {router?.push("/organization")} },
         { icon: <VIPIcon />, text: "Структура", callback: (event) => {router?.push("/organization/structure")} },
-        { icon: <VIPIcon />, text: "Роли", callback: (event) => {} },
-        { icon: <VIPIcon />, text: "Проекты", callback: (event) => {} }
+        { icon: <VIPIcon />, text: "Роли", callback: (event) => {router?.push("/organization/roles")} },
+        { icon: <VIPIcon />, text: "Проекты", callback: (event) => {router?.push("/organization/projects")} },
     ];
 
     return (

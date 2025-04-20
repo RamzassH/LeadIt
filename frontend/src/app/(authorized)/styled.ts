@@ -3,7 +3,7 @@ import {styled} from "@mui/material";
 export const Body = styled("div")`
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh);
 `;
 
 export const Main = styled("main")`
