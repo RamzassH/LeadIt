@@ -26,6 +26,12 @@ func (s *ServerAPI) CreateEmployee(ctx context.Context, req *employeev1.CreateEm
 		return nil, status.Errorf(codes.Internal, "failed to add employee: %v", err)
 	}
 
+	_, err = s.authClient.ReissueAccessTokenWithContext(ctx, &authv1.ReissueTokenWithContextRequest{
+		UserId:         req.GetUserId(),
+		OrganizationId: req.GetOrganizationId(),
+		RoleId:         0,
+	})
+
 	return &employeev1.CreateEmployeeResponse{Id: employeeID}, nil
 }
 func (s *ServerAPI) GetEmployee(ctx context.Context, req *employeev1.GetEmployeeRequest) (*employeev1.GetEmployeeResponse, error) {
