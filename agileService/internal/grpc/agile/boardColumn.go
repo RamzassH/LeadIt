@@ -17,7 +17,7 @@ func (s *ServerApi) CreateColumn(ctx context.Context, req *boardColumnV1.CreateC
 	if err := s.ValidateStruct(payload); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
-	id, err := s.service.CreateColumn(ctx, payload)
+	id, err := s.service.CreateBoardColumn(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create column: %v", err)
 	}
@@ -25,7 +25,7 @@ func (s *ServerApi) CreateColumn(ctx context.Context, req *boardColumnV1.CreateC
 }
 
 func (s *ServerApi) GetColumnsByBoard(ctx context.Context, req *boardColumnV1.GetColumnsByBoardRequest) (*boardColumnV1.GetColumnsByBoardResponse, error) {
-	cols, err := s.service.GetColumnsByBoard(ctx, req.GetBoardId())
+	cols, err := s.service.GetBoardColumnsByBoard(ctx, req.GetBoardId())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch columns: %v", err)
 	}
@@ -49,7 +49,7 @@ func (s *ServerApi) UpdateColumn(ctx context.Context, req *boardColumnV1.UpdateC
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	updated, err := s.service.UpdateColumn(ctx, payload)
+	updated, err := s.service.UpdateBoardColumn(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update column: %v", err)
 	}
@@ -70,7 +70,7 @@ func (s *ServerApi) DeleteColumn(ctx context.Context, req *boardColumnV1.DeleteC
 		return nil, status.Errorf(codes.InvalidArgument, "column id can not be empty")
 	}
 
-	rowsAffected, err := s.service.DeleteColumn(ctx, columnId)
+	rowsAffected, err := s.service.DeleteBoardColumn(ctx, columnId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete column: %v", err)
 	}
