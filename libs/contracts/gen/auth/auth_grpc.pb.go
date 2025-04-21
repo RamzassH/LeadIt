@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName      = "/auth.Auth/Register"
-	Auth_Login_FullMethodName         = "/auth.Auth/Login"
-	Auth_Verify_FullMethodName        = "/auth.Auth/Verify"
-	Auth_IsAdmin_FullMethodName       = "/auth.Auth/IsAdmin"
-	Auth_UpdateUser_FullMethodName    = "/auth.Auth/UpdateUser"
-	Auth_ResetPassword_FullMethodName = "/auth.Auth/ResetPassword"
-	Auth_RefreshToken_FullMethodName  = "/auth.Auth/RefreshToken"
-	Auth_Logout_FullMethodName        = "/auth.Auth/Logout"
+	Auth_Register_FullMethodName                      = "/auth.Auth/Register"
+	Auth_Login_FullMethodName                         = "/auth.Auth/Login"
+	Auth_ReissueAccessTokenWithContext_FullMethodName = "/auth.Auth/ReissueAccessTokenWithContext"
+	Auth_Verify_FullMethodName                        = "/auth.Auth/Verify"
+	Auth_IsAdmin_FullMethodName                       = "/auth.Auth/IsAdmin"
+	Auth_UpdateUser_FullMethodName                    = "/auth.Auth/UpdateUser"
+	Auth_ResetPassword_FullMethodName                 = "/auth.Auth/ResetPassword"
+	Auth_RefreshToken_FullMethodName                  = "/auth.Auth/RefreshToken"
+	Auth_Logout_FullMethodName                        = "/auth.Auth/Logout"
 )
 
 // AuthClient is the client API for Auth service.
@@ -35,6 +36,7 @@ const (
 type AuthClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	ReissueAccessTokenWithContext(ctx context.Context, in *ReissueTokenWithContextRequest, opts ...grpc.CallOption) (*ReissueTokenResponse, error)
 	Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error)
 	IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
@@ -65,6 +67,16 @@ func (c *authClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, Auth_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) ReissueAccessTokenWithContext(ctx context.Context, in *ReissueTokenWithContextRequest, opts ...grpc.CallOption) (*ReissueTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReissueTokenResponse)
+	err := c.cc.Invoke(ctx, Auth_ReissueAccessTokenWithContext_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +149,7 @@ func (c *authClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc
 type AuthServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	ReissueAccessTokenWithContext(context.Context, *ReissueTokenWithContextRequest) (*ReissueTokenResponse, error)
 	Verify(context.Context, *VerifyRequest) (*VerifyResponse, error)
 	IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
@@ -158,6 +171,9 @@ func (UnimplementedAuthServer) Register(context.Context, *RegisterRequest) (*Reg
 }
 func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAuthServer) ReissueAccessTokenWithContext(context.Context, *ReissueTokenWithContextRequest) (*ReissueTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReissueAccessTokenWithContext not implemented")
 }
 func (UnimplementedAuthServer) Verify(context.Context, *VerifyRequest) (*VerifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Verify not implemented")
@@ -230,6 +246,24 @@ func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_ReissueAccessTokenWithContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReissueTokenWithContextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).ReissueAccessTokenWithContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_ReissueAccessTokenWithContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).ReissueAccessTokenWithContext(ctx, req.(*ReissueTokenWithContextRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -356,6 +390,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _Auth_Login_Handler,
+		},
+		{
+			MethodName: "ReissueAccessTokenWithContext",
+			Handler:    _Auth_ReissueAccessTokenWithContext_Handler,
 		},
 		{
 			MethodName: "Verify",

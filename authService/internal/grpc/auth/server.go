@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/RamzassH/LeadIt/authService/internal/config"
 	"github.com/RamzassH/LeadIt/authService/internal/domain/models"
 	"github.com/RamzassH/LeadIt/authService/internal/services/auth"
 	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -33,6 +35,10 @@ type Auth interface {
 	UpdateUser(
 		ctx context.Context,
 		updatePayload models.UpdateUserPayload) (err error)
+
+	GetUserById(
+		ctx context.Context,
+		userId int64) (user *models.User, err error)
 
 	IsAdmin(
 		ctx context.Context,
@@ -166,6 +172,35 @@ func (s *ServerAPI) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (*a
 	return &authv1.IsAdminResponse{
 		IsAdmin: isAdmin,
 	}, nil
+}
+
+func (s *ServerAPI) ReissueAccessTokenWithContext(ctx context.Context, req *authv1.ReissueTokenWithContextRequest) (*authv1.ReissueTokenResponse, error) {
+	user, err := s.auth.GetUserById(ctx, req.UserId)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	claims := map[string]interface{}{
+		"uid":             fmt.Sprintf("%d", user.ID),
+		"email":           user.Email,
+		"organization_id": req.OrganizationId,
+		"role_id":         req.RoleId,
+		"exp":             time.Now().Add(1 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(claims))
+
+	cfg := config.MustLoadConfig()
+	signedToken, err := token.SignedString([]byte(cfg.TokenSecret))
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to sign token")
+	}
+
+	if err := setCookieHeader(ctx, signedToken); err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+
+	return &authv1.ReissueTokenResponse{Token: signedToken}, nil
 }
 
 func setCookieHeader(ctx context.Context, token string) error {

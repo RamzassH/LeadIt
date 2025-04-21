@@ -2,11 +2,13 @@ package task
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/RamzassH/LeadIt/libs/kafka"
 	redisStorage "github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/RamzassH/LeadIt/taskService/internal/domain/models"
 	"github.com/rs/zerolog"
+	"time"
 )
 
 type Task struct {
@@ -70,14 +72,30 @@ func (t *Task) CreateTask(ctx context.Context, payload models.CreateTaskDTO) (in
 		Int64("task_id", taskId).
 		Str("task_name", payload.Name).
 		Msg("Successfully saved task")
+
+	_ = t.redisStorage.Del(ctx, t.TaskListKey(payload.ProjectID))
+
 	return taskId, nil
 }
+
 func (t *Task) GetTask(ctx context.Context, taskId int64) (*models.TaskDTO, error) {
 	const op = "Task.GetTask"
 	logger := t.logger.With().Str("operation", op).Logger()
 
 	logger.Info().
 		Msg("getting task")
+
+	key := t.TaskKey(taskId)
+
+	cachedTask, err := t.redisStorage.Get(ctx, key)
+	if err == nil && cachedTask != "" {
+		var task models.TaskDTO
+		if err := json.Unmarshal([]byte(cachedTask), &task); err == nil {
+			logger.Debug().Int64("task_id", taskId).Msg("task loaded from cache")
+			return &task, nil
+		}
+		logger.Warn().Err(err).Msg("failed to unmarshal cached task")
+	}
 
 	task, err := t.taskProvider.GetById(ctx, taskId)
 	if err != nil {
@@ -86,6 +104,12 @@ func (t *Task) GetTask(ctx context.Context, taskId int64) (*models.TaskDTO, erro
 			Int64("task_id", taskId).
 			Msg("failed to get task")
 		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	data, err := json.Marshal(task)
+	err = t.redisStorage.Set(ctx, key, data, 120*time.Minute)
+	if err != nil {
+		logger.Warn().Msg("failed to save task in cache")
 	}
 
 	logger.Info().
@@ -99,8 +123,17 @@ func (t *Task) GetTasksForProject(ctx context.Context, projectId int64) ([]*mode
 	const op = "Task.GetTasksForProject"
 	logger := t.logger.With().Str("operation", op).Logger()
 
-	logger.Info().
-		Msg("getting tasks for project")
+	key := t.TaskListKey(projectId)
+
+	cached, err := t.redisStorage.Get(ctx, key)
+	if err == nil && cached != "" {
+		var tasks []*models.TaskDTO
+		if err := json.Unmarshal([]byte(cached), &tasks); err == nil {
+			logger.Debug().Int64("project_id", projectId).Msg("tasks loaded from cache")
+			return tasks, nil
+		}
+		logger.Warn().Err(err).Msg("failed to unmarshal cached task list")
+	}
 
 	tasks, err := t.taskProvider.GetManyByProjectId(ctx, projectId)
 	if err != nil {
@@ -108,10 +141,15 @@ func (t *Task) GetTasksForProject(ctx context.Context, projectId int64) ([]*mode
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	logger.Info().
-		Int64("project_id", projectId).
-		Msg("Successfully fetched tasks")
+	if data, err := json.Marshal(tasks); err == nil {
+		if err := t.redisStorage.Set(ctx, key, data, 120*time.Minute); err != nil {
+			logger.Warn().Err(err).Msg("failed to cache task list")
+		}
+	} else {
+		logger.Warn().Err(err).Msg("failed to marshal task")
+	}
 
+	logger.Info().Int64("project_id", projectId).Msg("Successfully fetched tasks")
 	return tasks, nil
 }
 
@@ -132,6 +170,18 @@ func (t *Task) UpdateTask(ctx context.Context, payload models.UpdateTaskDTO) (*m
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	key := t.TaskKey(updatedTask.ID)
+
+	data, err := json.Marshal(updatedTask)
+	if err != nil {
+		logger.Warn().Err(err).Msg("failed to marshal task")
+	} else {
+		err = t.redisStorage.Set(ctx, key, data, 120*time.Minute)
+		if err != nil {
+			logger.Warn().Err(err).Msg("failed to cache task list")
+		}
+	}
+
 	logger.Info().
 		Int64("task_id", updatedTask.ID).
 		Str("task_name", updatedTask.Name).
@@ -141,25 +191,19 @@ func (t *Task) UpdateTask(ctx context.Context, payload models.UpdateTaskDTO) (*m
 
 func (t *Task) ChangeStatus(ctx context.Context, payload models.ChangeStatusDTO) (int64, error) {
 	const op = "Task.ChangeStatus"
-
 	logger := t.logger.With().Str("operation", op).Logger()
 
-	logger.Info().
-		Msg("changing task status")
+	logger.Info().Msg("changing task status")
 
 	statusId, err := t.taskProvider.ChangeStatus(ctx, payload)
-
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int64("task_id", payload.TaskID).
-			Msg("failed to change task status")
+		logger.Error().Err(err).Int64("task_id", payload.TaskID).Msg("failed to change task status")
 		return 0, err
 	}
 
-	logger.Info().
-		Int64("task_id", statusId).
-		Msg("Successfully changed task status")
+	t.RefreshTaskCache(ctx, payload.TaskID)
+
+	logger.Info().Int64("task_id", statusId).Msg("Successfully changed task status")
 	return statusId, nil
 }
 
@@ -167,23 +211,17 @@ func (t *Task) AddTag(ctx context.Context, payload models.AddTagDTO) (int64, err
 	const op = "Task.AddTag"
 	logger := t.logger.With().Str("operation", op).Logger()
 
-	logger.Info().
-		Msg("adding tag")
+	logger.Info().Msg("adding tag")
 
 	tagId, err := t.taskProvider.AddTag(ctx, payload)
-
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int64("task_id", payload.TaskID).
-			Msg("failed to add tag")
+		logger.Error().Err(err).Int64("task_id", payload.TaskID).Msg("failed to add tag")
 		return 0, err
 	}
 
-	logger.Info().
-		Int64("task_id", tagId).
-		Msg("Successfully added tag")
+	t.RefreshTaskCache(ctx, payload.TaskID)
 
+	logger.Info().Int64("task_id", tagId).Msg("Successfully added tag")
 	return tagId, nil
 }
 
@@ -191,88 +229,78 @@ func (t *Task) RemoveTag(ctx context.Context, payload models.RemoveTagDTO) (int6
 	const op = "Task.RemoveTag"
 	logger := t.logger.With().Str("operation", op).Logger()
 
-	logger.Info().
-		Msg("removing tag")
+	logger.Info().Msg("removing tag")
 
 	rowsAffected, err := t.taskProvider.RemoveTag(ctx, payload)
-
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int64("task_id", payload.TaskID).
-			Msg("failed to remove tag")
+		logger.Error().Err(err).Int64("task_id", payload.TaskID).Msg("failed to remove tag")
 		return 0, err
 	}
 
-	logger.Info().
-		Int64("task_id", payload.TaskID).
-		Msg("Successfully removed tag")
+	t.RefreshTaskCache(ctx, payload.TaskID)
 
+	logger.Info().Int64("task_id", payload.TaskID).Msg("Successfully removed tag")
 	return rowsAffected, nil
 }
 
 func (t *Task) SetSolver(ctx context.Context, payload models.SetSolverDTO) (int64, error) {
 	const op = "Task.SetSolver"
 	logger := t.logger.With().Str("operation", op).Logger()
-	logger.Info().
-		Msg("setting solver")
+
+	logger.Info().Msg("setting solver")
 
 	solverId, err := t.taskProvider.SetSolver(ctx, payload)
-
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int64("task_id", payload.TaskID).
-			Msg("failed to set solver")
+		logger.Error().Err(err).Int64("task_id", payload.TaskID).Msg("failed to set solver")
 		return 0, err
 	}
 
+	t.RefreshTaskCache(ctx, payload.TaskID)
+
+	logger.Info().Int64("task_id", payload.TaskID).Msg("Successfully set solver")
 	return solverId, nil
 }
 
 func (t *Task) SetIsActive(ctx context.Context, taskId int64) error {
 	const op = "Task.SetTaskState"
 	logger := t.logger.With().Str("operation", op).Logger()
-	logger.Info().
-		Msg("setting task state")
+
+	logger.Info().Msg("setting task state")
 
 	err := t.taskProvider.SetIsActive(ctx, taskId)
-
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int64("task_id", taskId).
-			Msg("failed to set task state")
+		logger.Error().Err(err).Int64("task_id", taskId).Msg("failed to set task state")
 		return err
 	}
 
-	logger.Info().
-		Int64("task_id", taskId).
-		Msg("Successfully set task state")
+	t.RefreshTaskCache(ctx, taskId)
 
+	logger.Info().Int64("task_id", taskId).Msg("Successfully set task state")
 	return nil
 }
 
 func (t *Task) DeleteTask(ctx context.Context, taskId int64) (int64, error) {
 	const op = "Task.DeleteTask"
-	logger := t.logger.With().
-		Str("operation", op).
-		Int64("task_id", taskId).
-		Logger()
+	logger := t.logger.With().Str("operation", op).Int64("task_id", taskId).Logger()
 
 	logger.Info().Msg("Starting deletion")
 
+	task, err := t.taskProvider.GetById(ctx, taskId)
+	if err != nil {
+		logger.Error().Err(err).Int64("task_id", taskId).Msg("failed to delete task")
+		return 0, err
+	}
+	projectId := task.ProjectID
+
 	rowsAffected, err := t.taskProvider.Delete(ctx, taskId)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Deletion failed")
+		logger.Error().Err(err).Msg("Deletion failed")
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	logger.Info().
-		Int64("rows_affected", rowsAffected).
-		Msg("Task deleted")
+	_ = t.redisStorage.Del(ctx, t.TaskKey(taskId))
+	_ = t.redisStorage.Del(ctx, t.TaskListKey(projectId))
 
+	logger.Info().Int64("rows_affected", rowsAffected).Msg("Task deleted")
 	return rowsAffected, nil
 }

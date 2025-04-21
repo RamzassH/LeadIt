@@ -24,7 +24,7 @@ func main() {
 
 	logger := setupLogger(cfg.Env)
 
-	logger.Info().Str("env", cfg.Env).Msg("Starting organization service")
+	logger.Info().Str("env", cfg.Env).Msg("Starting task service")
 
 	validate := validator.New()
 

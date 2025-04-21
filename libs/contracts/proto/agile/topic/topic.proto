@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package agile;
+
+option go_package = "leadIt.agile.topic.v1; topicV1";
+import "google/api/annotations.proto";
+
+service TopicService {
+  rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {
+    option (google.api.http) = {
+      post: "/v1/topics"
+      body: "*"
+    };
+  }
+  rpc GetTopic(GetTopicRequest) returns (TopicType) {
+    option (google.api.http) = {
+      get: "/v1/topics/{id}"
+    };
+  }
+  rpc GetTopicsByProject(GetTopicsByProjectRequest) returns (GetTopicsByProjectResponse) {
+    option (google.api.http) = {
+      get: "/v1/projects/{project_id}/topics"
+    };
+  }
+  rpc UpdateTopic(UpdateTopicRequest) returns (TopicType) {
+    option (google.api.http) = {
+      patch: "/v1/topics/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteTopic(DeleteTopicRequest) returns (DeleteTopicResponse) {
+    option (google.api.http) = {
+      delete: "/v1/topics/{id}"
+    };
+  }
+}
+
+message TopicType {
+  int64 id = 1;
+  int64 project_id = 2;
+  string name = 3;
+  string description = 4;
+}
+
+message CreateTopicRequest {
+  int64 project_id = 1;
+  string name = 2;
+  string description = 3;
+}
+message CreateTopicResponse {int64 id = 1;}
+message GetTopicRequest {int64 id = 1;}
+message GetTopicsByProjectRequest {int64 project_id = 1;}
+message GetTopicsByProjectResponse {repeated TopicType topics = 1;}
+message UpdateTopicRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+message DeleteTopicRequest {int64 id = 1;}
+message DeleteTopicResponse {int64 id = 1;}
+

@@ -3,6 +3,7 @@ package organization
 import (
 	"context"
 	"fmt"
+	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	employeev1 "github.com/RamzassH/LeadIt/libs/contracts/gen/employee"
 	organizationv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/organization"
 	projectv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/project"
@@ -30,8 +31,7 @@ type Organization interface {
 	GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsDTO) ([]models.OrganizationDTO, error)
 
 	UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationDTO) (*models.OrganizationDTO, error)
-
-	DeleteOrganization(ctx context.Context, id int64) (int64, error)
+	DeleteOrganization(ctx context.Context, organizationID, organizerID int64) (int64, error)
 }
 
 type Role interface {
@@ -64,9 +64,10 @@ type ServerAPI struct {
 	employeev1.UnimplementedEmployeeServer
 	projectv1.UnimplementedProjectServer
 
-	service  Service
-	logger   zerolog.Logger
-	validate *validator.Validate
+	authClient authv1.AuthClient
+	service    Service
+	logger     zerolog.Logger
+	validate   *validator.Validate
 }
 
 func RegisterGRPCServer(
@@ -74,11 +75,13 @@ func RegisterGRPCServer(
 	validate *validator.Validate,
 	logger zerolog.Logger,
 	service Service,
+	authClient authv1.AuthClient,
 ) {
 	server := &ServerAPI{
-		validate: validate,
-		logger:   logger,
-		service:  service,
+		validate:   validate,
+		logger:     logger,
+		service:    service,
+		authClient: authClient,
 	}
 
 	organizationv1.RegisterOrganizationServer(grpcServer, server)

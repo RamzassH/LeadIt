@@ -67,6 +67,7 @@ func (s *CommentStorage) Update(ctx context.Context, payload models.UpdateCommen
 	    body = COALESCE($1, body)
 	WHERE id = $2 RETURNING *;`
 	var updated models.CommentDTO
+
 	err := s.db.GetContext(ctx, &updated, query, payload.Body, payload.ID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)

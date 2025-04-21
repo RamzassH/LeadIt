@@ -16,6 +16,7 @@ type RedisStore interface {
 	HGet(ctx context.Context, key, field string) (string, error)
 	HGetAll(ctx context.Context, key string) (map[string]string, error)
 	HDel(ctx context.Context, key string, fields ...string) error
+	HMSetWithExpire(ctx context.Context, key string, fields map[string]interface{}, expiration time.Duration) error
 }
 
 type Redis struct {
@@ -94,4 +95,14 @@ func (r *Redis) HGetAll(ctx context.Context, key string) (map[string]string, err
 		return nil, fmt.Errorf("%s: %w", op, res.Err())
 	}
 	return res.Result()
+}
+
+func (r *Redis) HMSetWithExpire(ctx context.Context, key string, fields map[string]interface{}, expiration time.Duration) error {
+	const op = "redis HMSetWithExpire"
+	res := r.client.Expire(ctx, key, expiration)
+
+	if res.Err() != nil {
+		return fmt.Errorf("%s: %w", op, res.Err())
+	}
+	return nil
 }

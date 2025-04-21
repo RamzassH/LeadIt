@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package agile;
+
+option go_package = "leadIt.agile.board.v1; boardV1";
+import "google/api/annotations.proto";
+
+service BoardService {
+  rpc CreateBoard(CreateBoardRequest) returns (CreateBoardResponse) {
+    option (google.api.http) = {
+      post: "/v1/boards"
+      body: "*"
+    };
+  }
+  rpc GetBoard(GetBoardRequest) returns (BoardType) {
+    option (google.api.http) = {
+      get: "/v1/boards/{id}"
+    };
+  }
+  rpc UpdateBoard(UpdateBoardRequest) returns (BoardType) {
+    option (google.api.http) = {
+      patch: "/v1/boards/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteBoard(DeleteBoardRequest) returns (DeleteBoardResponse) {
+    option (google.api.http) = {
+      delete: "/v1/boards/{id}"
+    };
+  }
+  rpc GetBoardsByProject(GetBoardsByProjectRequest) returns (GetBoardsByProjectResponse) {
+    option (google.api.http) = {
+      get: "/v1/projects/{project_id}/boards"
+    };
+  }
+}
+
+message BoardType {
+  int64 id = 1;
+  int64 project_id = 2;
+  string name = 3;
+  string description = 4;
+  string type = 5;
+}
+
+message CreateBoardRequest {
+  int64 project_id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+}
+message CreateBoardResponse { int64 id = 1; }
+message GetBoardRequest { int64 id = 1; }
+message UpdateBoardRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+}
+message DeleteBoardRequest { int64 id = 1; }
+message DeleteBoardResponse { int64 id = 1; }
+message GetBoardsByProjectRequest { int64 project_id = 1; }
+message GetBoardsByProjectResponse { repeated BoardType boards = 1; }

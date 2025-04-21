@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "leadIt.agile.task_topic.v1; taskTopicV1";
+package agile;
+
+import "google/api/annotations.proto";
+
+service TaskTopicService {
+  rpc AttachTopicToTask(TaskTopicRequest) returns (TaskTopicResponse) {
+    option (google.api.http) = {
+      post: "/v1/task-topic/attach"
+      body: "*"
+    };
+  }
+  rpc DetachTopicFromTask(TaskTopicRequest) returns (TaskTopicResponse) {
+    option (google.api.http) = {
+      delete: "/v1/task-topic/detach"
+    };
+  }
+}
+
+message TaskTopicRequest {
+  int64 task_id = 1;
+  int64 topic_id = 2;
+}
+message TaskTopicResponse {
+  bool success = 1;
+}

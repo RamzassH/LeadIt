@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package agile;
+
+option go_package = "leadId.agile.board_column.v1; boardColumnV1";
+import "google/api/annotations.proto";
+
+service BoardColumnService {
+  rpc CreateColumn(CreateColumnRequest) returns (CreateColumnResponse) {
+    option (google.api.http) = {
+      post: "/v1/columns"
+      body: "*"
+    };
+  }
+  rpc GetColumnsByBoard(GetColumnsByBoardRequest) returns (GetColumnsByBoardResponse) {
+    option (google.api.http) = {
+      get: "/v1/boards/{board_id}/columns"
+    };
+  }
+  rpc UpdateColumn(UpdateColumnRequest) returns (BoardColumnType) {
+    option (google.api.http) = {
+      patch: "/v1/columns/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteColumn(DeleteColumnRequest) returns (DeleteColumnResponse) {
+    option (google.api.http) = {
+      delete: "/v1/columns/{id}"
+    };
+  }
+}
+
+message BoardColumnType {
+  int64 id = 1;
+  string name = 2;
+  int64 board_id = 3;
+  int32 order = 4;
+}
+
+message CreateColumnRequest {
+  int64 board_id = 1;
+  string name = 2;
+  int32 order = 3;
+}
+message CreateColumnResponse { int64 id = 1; }
+message GetColumnsByBoardRequest { int64 board_id = 1; }
+message GetColumnsByBoardResponse { repeated BoardColumnType columns = 1; }
+message UpdateColumnRequest {
+  int64 id = 1;
+  string name = 2;
+  int32 order = 3;
+}
+message DeleteColumnRequest { int64 id = 1; }
+message DeleteColumnResponse { int64 id = 1; }

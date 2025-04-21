@@ -72,10 +72,10 @@ type UserSaver interface {
 }
 
 type UserProvider interface {
-	UserByEmail(ctx context.Context, email string) (user models.User, err error)
-	UserById(ctx context.Context, id int64) (user models.User, err error)
+	UserByEmail(ctx context.Context, email string) (user *models.User, err error)
+	UserById(ctx context.Context, id int64) (user *models.User, err error)
 	IsAdmin(ctx context.Context, uid int64) (isAdmin bool, err error)
-	UpdateUser(ctx context.Context, user models.UpdateUserPayload) error
+	UpdateUser(ctx context.Context, user *models.UpdateUserPayload) error
 	VerifyUser(ctx context.Context, userID int64) error
 }
 
@@ -128,7 +128,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string) (token 
 		return "", "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	token, err = jwt.NewToken(user, a.tokenTTL)
+	token, err = jwt.NewToken(*user, a.tokenTTL)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate token")
 
@@ -257,11 +257,30 @@ func (a *Auth) UpdateUser(ctx context.Context, updatePayload models.UpdateUserPa
 	user := updatePayload
 	user.Password = string(hashedPassword)
 
-	if err := a.userProvider.UpdateUser(ctx, user); err != nil {
+	if err := a.userProvider.UpdateUser(ctx, &user); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil
+}
+
+func (a *Auth) GetUserById(ctx context.Context, userId int64) (user *models.User, err error) {
+	const op = "Auth.GetUserById"
+
+	logger := a.logger.With().Str("operation", op).Logger()
+	logger.Info().Msg("get user by id")
+
+	user, err = a.userProvider.UserById(ctx, userId)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			logger.Info().Msg("user not found")
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		}
+		logger.Error().Err(err).Msg("failed to get user by id")
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return user, nil
 }
 
 func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPayload) (token string, refreshToken string, err error) {
@@ -294,7 +313,7 @@ func (a *Auth) VerifyCode(ctx context.Context, verifyPayload models.VerifyUserPa
 		}
 	}
 
-	token, err = jwt.NewToken(user, a.tokenTTL)
+	token, err = jwt.NewToken(*user, a.tokenTTL)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate token")
 
@@ -368,7 +387,7 @@ func (a *Auth) RefreshToken(ctx context.Context, refreshToken string) (token str
 		return "", "", fmt.Errorf("%s: %w", op, err)
 	}
 
-	token, err = jwt.NewToken(user, a.tokenTTL)
+	token, err = jwt.NewToken(*user, a.tokenTTL)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate token")
 		return "", "", fmt.Errorf("%s: %w", op, err)

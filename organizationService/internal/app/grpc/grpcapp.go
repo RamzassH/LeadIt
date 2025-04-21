@@ -2,6 +2,7 @@ package grpcapp
 
 import (
 	"fmt"
+	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	"github.com/RamzassH/LeadIt/organizationService/internal/config"
 	"github.com/RamzassH/LeadIt/organizationService/internal/grpc/interceptors"
 	organizationgrpc "github.com/RamzassH/LeadIt/organizationService/internal/grpc/organization"
@@ -9,6 +10,7 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"net"
+	"time"
 )
 
 type App struct {
@@ -23,10 +25,16 @@ func New(
 	cfg *config.Config,
 	validator *validator.Validate,
 	organizationService organizationgrpc.Service) *App {
+	authClient, err := newAuthClient()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create auth client")
+		return nil
+	}
+
 	gRPCServer := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptors.JwtUnaryServerInterceptor(cfg.TokenSecret)))
 
-	organizationgrpc.RegisterGRPCServer(gRPCServer, validator, log, organizationService)
+	organizationgrpc.RegisterGRPCServer(gRPCServer, validator, log, organizationService, authClient)
 
 	return &App{
 		logger:     log,
@@ -71,4 +79,18 @@ func (application *App) Stop() {
 	application.gRPCServer.GracefulStop()
 
 	logger.Str("port", fmt.Sprintf(":%d", application.config.GRPC.Port)).Msg("gRPC server stopped")
+}
+
+func newAuthClient() (authv1.AuthClient, error) {
+	conn, err := grpc.Dial(
+		"auth-service:57442",
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+		grpc.WithTimeout(3*time.Second),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return authv1.NewAuthClient(conn), nil
 }

@@ -17,6 +17,7 @@ type GetOrganizationsDTO struct {
 }
 
 type CreateOrganizationDTO struct {
+	OrganizerID       int64 `json:"organizer_id"`
 	Name              string
 	Description       string
 	OrganizationImage string

@@ -2,10 +2,13 @@ package organization
 
 import (
 	"context"
+	authv1 "github.com/RamzassH/LeadIt/libs/contracts/gen/auth"
 	employeev1 "github.com/RamzassH/LeadIt/libs/contracts/gen/employee"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
+	"github.com/RamzassH/LeadIt/organizationService/internal/grpc/interceptors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strconv"
 )
 
 func (s *ServerAPI) CreateEmployee(ctx context.Context, req *employeev1.CreateEmployeeRequest) (*employeev1.CreateEmployeeResponse, error) {
@@ -67,6 +70,20 @@ func (s *ServerAPI) GetEmployees(ctx context.Context, req *employeev1.GetEmploye
 }
 
 func (s *ServerAPI) UpdateEmployeeRole(ctx context.Context, req *employeev1.UpdateEmployeeRoleRequest) (*employeev1.UpdateEmployeeRoleResponse, error) {
+	organizationIDValue := ctx.Value(interceptors.CtxOrganizationID)
+	if organizationIDValue == nil {
+		return nil, status.Errorf(codes.Unauthenticated, "organizationID not found in context")
+	}
+
+	orgStr, ok := organizationIDValue.(string)
+	if !ok {
+		return nil, status.Errorf(codes.Internal, "organizationID type assertion failed")
+	}
+	organizationID, err := strconv.ParseInt(orgStr, 10, 64)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "invalid organizationID format")
+	}
+
 	payload := models.UpdateEmployeeRoleDTO{
 		ID:     req.GetId(),
 		RoleID: req.RoleId,
@@ -76,15 +93,25 @@ func (s *ServerAPI) UpdateEmployeeRole(ctx context.Context, req *employeev1.Upda
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	_, err := s.service.UpdateEmployeeRole(ctx, payload)
+	updatedEmployeeId, err := s.service.UpdateEmployeeRole(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update employee: %v", err)
 	}
 
+	_, err = s.authClient.ReissueAccessTokenWithContext(ctx, &authv1.ReissueTokenWithContextRequest{
+		UserId:         payload.ID,
+		OrganizationId: organizationID,
+		RoleId:         payload.RoleID,
+	})
+	if err != nil {
+		s.logger.Warn().Err(err).Msg("failed to reissue token after role update")
+	}
+
 	return &employeev1.UpdateEmployeeRoleResponse{
-		Id: payload.ID,
+		Id: updatedEmployeeId,
 	}, nil
 }
+
 func (s *ServerAPI) DeleteEmployee(ctx context.Context, req *employeev1.DeleteEmployeeRequest) (*employeev1.DeleteEmployeeResponse, error) {
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "employee ID is required")

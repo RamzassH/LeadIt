@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package agile;
+
+option go_package = "leadIt.agile.task_board.v1;taskBoardV1";
+import "google/api/annotations.proto";
+
+service TaskBoardService {
+  rpc AttachTaskToBoard(TaskBoardRequest) returns (TaskBoardResponse) {
+    option (google.api.http) = {
+      post: "/v1/task-board/attach"
+      body: "*"
+    };
+  }
+  rpc DetachTaskFromBoard(TaskBoardRequest) returns (TaskBoardResponse) {
+    option (google.api.http) = {
+      delete: "/v1/task-board/detach"
+    };
+  }
+  rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {
+    option (google.api.http) = {
+      patch: "/v1/task-board/move"
+      body: "*"
+    };
+  }
+}
+
+message TaskBoardRequest {
+  int64 task_id = 1;
+  int64 board_id = 2;
+  int64 sprint_id = 3;
+  int64 column_id = 4;
+  int32 order = 5;
+}
+message TaskBoardResponse {
+  bool success = 1;
+}
+
+message MoveTaskRequest {
+  int64 task_id = 1;
+  int64 from_column_id = 2;
+  int64 to_column_id = 3;
+  int32 new_order = 4;
+}
+message MoveTaskResponse {
+  bool success = 1;
+}

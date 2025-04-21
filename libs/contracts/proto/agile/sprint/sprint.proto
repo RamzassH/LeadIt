@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package agile;
+
+option go_package = "leadIt.agile.sprint.v1;sprintV1";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service SprintService {
+  rpc CreateSprint(CreateSprintRequest) returns (CreateSprintResponse) {
+    option (google.api.http) = {
+      post: "/v1/sprints"
+      body: "*"
+    };
+  }
+  rpc GetSprint(GetSprintRequest) returns (SprintType) {
+    option (google.api.http) = {
+      get: "/v1/sprints/{id}"
+    };
+  }
+  rpc UpdateSprint(UpdateSprintRequest) returns (SprintType) {
+    option (google.api.http) = {
+      patch: "/v1/sprints/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteSprint(DeleteSprintRequest) returns (DeleteSprintResponse) {
+    option (google.api.http) = {
+      delete: "/v1/sprints/{id}"
+    };
+  }
+  rpc GetSprintsByProject(GetSprintsByProjectRequest) returns (GetSprintsByProjectResponse) {
+    option (google.api.http) = {
+      get: "/v1/projects/{project_id}/sprints"
+    };
+  }
+  rpc SetSprintIsActive(SetSprintIsActiveRequest) returns (SetSprintIsActiveResponse) {
+    option (google.api.http) = {
+      patch: "/v1/sprints/{id}/active"
+      body: "*"
+    };
+  }
+}
+
+message SprintType {
+  int64 id = 1;
+  int64 project_id = 2;
+  string name = 3;
+  string description = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  bool is_active = 7;
+}
+
+message CreateSprintRequest {
+  int64 project_id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+}
+message CreateSprintResponse { int64 id = 1; }
+message GetSprintRequest { int64 id = 1; }
+message UpdateSprintRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  bool is_active = 6;
+}
+message DeleteSprintRequest { int64 id = 1; }
+message DeleteSprintResponse { int64 id = 1; }
+message GetSprintsByProjectRequest { int64 project_id = 1; }
+message GetSprintsByProjectResponse { repeated SprintType sprints = 1; }
+message SetSprintIsActiveRequest { int64 id = 1; }
+message SetSprintIsActiveResponse { bool success = 1; }

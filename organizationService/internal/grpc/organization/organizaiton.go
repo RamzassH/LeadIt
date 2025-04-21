@@ -10,10 +10,16 @@ import (
 )
 
 func (s *ServerAPI) CreateOrganization(ctx context.Context, req *organizationv1.CreateOrganizationRequest) (*organizationv1.CreateOrganizationResponse, error) {
+	userIDValue := ctx.Value(interceptors.CtxUserID)
+	if userIDValue == nil {
+		return nil, status.Errorf(codes.Unauthenticated, "userID not found in context")
+	}
+
 	addOrganizationReq := models.CreateOrganizationDTO{
 		Name:              req.GetName(),
 		Description:       req.GetDescription(),
 		OrganizationImage: req.GetImage(),
+		OrganizerID:       userIDValue.(int64),
 	}
 
 	if err := s.ValidateStruct(addOrganizationReq); err != nil {
@@ -131,7 +137,12 @@ func (s *ServerAPI) DeleteOrganization(ctx context.Context, req *organizationv1.
 		return nil, status.Error(codes.InvalidArgument, "organization ID is required")
 	}
 
-	deletedID, err := s.service.DeleteOrganization(ctx, req.GetId())
+	userIDValue := ctx.Value(interceptors.CtxUserID)
+	if userIDValue == nil {
+		return nil, status.Errorf(codes.Unauthenticated, "userID not found in context")
+	}
+
+	deletedID, err := s.service.DeleteOrganization(ctx, req.GetId(), userIDValue.(int64))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete organization: %v", err)
 	}

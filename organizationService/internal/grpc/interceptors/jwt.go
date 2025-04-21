@@ -9,11 +9,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type CtxKey string
-
 const (
-	CtxUserID CtxKey = "userID"
-	CtxEmail  CtxKey = "email"
+	CtxUserID         string = "userID"
+	CtxEmail          string = "email"
+	CtxOrganizationID string = "organizationID"
 )
 
 func JwtUnaryServerInterceptor(secret string) grpc.UnaryServerInterceptor {
@@ -52,7 +51,10 @@ func JwtUnaryServerInterceptor(secret string) grpc.UnaryServerInterceptor {
 		}
 		email, _ := claims["email"].(string)
 
+		organizationID, _ := claims["organizationID"].(string)
+
 		newCtx := context.WithValue(ctx, CtxUserID, int64(userID))
+		newCtx = context.WithValue(newCtx, CtxOrganizationID, organizationID)
 		newCtx = context.WithValue(newCtx, CtxEmail, email)
 
 		return handler(newCtx, req)
