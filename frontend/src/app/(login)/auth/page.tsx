@@ -1,7 +1,7 @@
 "use client";
 import LoginForm from "@/components/UI/AuthPage/LoginForm/LoginForm";
 import CreateAccountForm from "@/components/UI/AuthPage/CreateAccountForm/CreateAccountForm";
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import theme from "../../../../theme/theme";
 import { ThemeProvider } from "@mui/system";
 import { Main } from "@/app/(login)/auth/styled/AuthStyled";
@@ -12,7 +12,7 @@ export default function Auth() {
     const globalStore = useGlobalStore();
     const [isLoginForm, setLogin] = useState(true);
 
-    const showCreateAccountForm = () => {
+    const showCreateAccountForm = async () => {
         setLogin(false);
     };
 
