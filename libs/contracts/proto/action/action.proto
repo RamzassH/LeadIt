@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package action;
+
+option go_package = "leadIt.action.v1;actionv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service Action {
+  rpc CreateAction(CreateActionRequest) returns (CreateActionResponse) {
+    option(google.api.http) = {
+      post: "/v1/actions"
+      body: "*"
+    };
+  }
+
+  rpc GetActionsByTask(GetActionsByTaskRequest) returns (GetActionsByTaskResponse) {
+    option(google.api.http) = {
+      get: "/v1/tasks/{task_id}/actions"
+    };
+  }
+}
+
+message ActionType {
+  int64 id = 1;
+  int64 task_id = 2;
+  int64 user_id = 3;
+  string action_type = 4;
+  string description = 5;
+  google.protobuf.Timestamp date = 6;
+}
+
+message CreateActionRequest {
+  int64 task_id = 1;
+  int64 user_id = 2;
+  string action_type = 3;
+  string description = 4;
+}
+
+message CreateActionResponse {
+  int64 id = 1;
+}
+
+message GetActionsByTaskRequest {
+  int64 task_id = 1;
+}
+
+message GetActionsByTaskResponse {
+  repeated ActionType actions = 1;
+}

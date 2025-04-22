@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package status;
+
+option go_package = "leadIt.status.v1;statusv1";
+
+import "google/api/annotations.proto";
+
+service Status {
+  rpc CreateStatus(CreateStatusRequest) returns (CreateStatusResponse) {
+    option(google.api.http) = {
+      post: "/v1/statuses"
+      body: "*"
+    };
+  }
+
+  rpc GetManyStatusesByProgressBar(GetStatusesByProgressBarRequest) returns (GetStatusesByProgressBarResponse) {
+    option(google.api.http) = {
+      get: "/v1/progress-bars/{progress_bar_id}/statuses"
+    };
+  }
+
+  rpc UpdateStatus(UpdateStatusRequest) returns (UpdateStatusResponse) {
+    option(google.api.http) = {
+      patch: "/v1/statuses/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteStatus(DeleteStatusRequest) returns (DeleteStatusResponse) {
+    option(google.api.http) = {
+      delete: "/v1/statuses/{id}"
+    };
+  }
+}
+
+message StatusType {
+  int64 id = 1;
+  int64 progress_bar_id = 2;
+  string name = 3;
+  int32 order = 4;
+  repeated int64 notify_roles_ids = 5;
+}
+
+message CreateStatusRequest {
+  int64 progress_bar_id = 1;
+  string name = 2;
+  int32 order = 3;
+  repeated int64 notify_roles_ids = 4;
+}
+
+message CreateStatusResponse {
+  int64 id = 1;
+}
+
+message GetStatusesByProgressBarRequest {
+  int64 progress_bar_id = 1;
+}
+
+message GetStatusesByProgressBarResponse {
+  repeated StatusType statuses = 1;
+}
+
+message UpdateStatusRequest {
+  int64 id = 1;
+  string name = 3;
+  int32 order = 4;
+  repeated int64 notify_roles_ids = 5;
+}
+
+message UpdateStatusResponse {
+  StatusType updated_status = 1;
+}
+
+message DeleteStatusRequest {
+  int64 id = 1;
+}
+
+message DeleteStatusResponse {
+  int64 id = 1;
+}

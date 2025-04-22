@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ServerAPI) AddEmployee(ctx context.Context, req *employeev1.AddEmployeeRequest) (*employeev1.AddEmployeeResponse, error) {
-	payload := models.AddEmployee{
+func (s *ServerAPI) CreateEmployee(ctx context.Context, req *employeev1.CreateEmployeeRequest) (*employeev1.CreateEmployeeResponse, error) {
+	payload := models.CreateEmployeeDTO{
 		UserID:         req.GetUserId(),
 		OrganizationID: req.GetOrganizationId(),
 	}
@@ -18,12 +18,12 @@ func (s *ServerAPI) AddEmployee(ctx context.Context, req *employeev1.AddEmployee
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	employeeID, err := s.service.AddEmployee(ctx, payload)
+	employeeID, err := s.service.CreateEmployee(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add employee: %v", err)
 	}
 
-	return &employeev1.AddEmployeeResponse{Id: employeeID}, nil
+	return &employeev1.CreateEmployeeResponse{Id: employeeID}, nil
 }
 func (s *ServerAPI) GetEmployee(ctx context.Context, req *employeev1.GetEmployeeRequest) (*employeev1.GetEmployeeResponse, error) {
 	if req.GetId() == 0 {
@@ -65,28 +65,24 @@ func (s *ServerAPI) GetEmployees(ctx context.Context, req *employeev1.GetEmploye
 
 	return &employeev1.GetEmployeesResponse{Employees: response}, nil
 }
-func (s *ServerAPI) UpdateEmployee(ctx context.Context, req *employeev1.UpdateEmployeeRequest) (*employeev1.UpdateEmployeeResponse, error) {
-	payload := models.UpdateEmployee{
-		ID:             req.Employee.Id,
-		UserID:         req.Employee.UserId,
-		OrganizationID: req.Employee.OrganizationId,
+
+func (s *ServerAPI) UpdateEmployeeRole(ctx context.Context, req *employeev1.UpdateEmployeeRoleRequest) (*employeev1.UpdateEmployeeRoleResponse, error) {
+	payload := models.UpdateEmployeeRoleDTO{
+		ID:     req.GetId(),
+		RoleID: req.RoleId,
 	}
 
 	if err := s.ValidateStruct(payload); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	_, err := s.service.UpdateEmployee(ctx, payload)
+	_, err := s.service.UpdateEmployeeRole(ctx, payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update employee: %v", err)
 	}
 
-	return &employeev1.UpdateEmployeeResponse{
-		Employee: &employeev1.EmployeeType{
-			Id:             payload.ID,
-			UserId:         payload.UserID,
-			OrganizationId: payload.OrganizationID,
-		},
+	return &employeev1.UpdateEmployeeRoleResponse{
+		Id: payload.ID,
 	}, nil
 }
 func (s *ServerAPI) DeleteEmployee(ctx context.Context, req *employeev1.DeleteEmployeeRequest) (*employeev1.DeleteEmployeeResponse, error) {

@@ -21,40 +21,40 @@ type Service interface {
 }
 
 type Organization interface {
-	AddOrganization(
+	CreateOrganization(
 		ctx context.Context,
-		payload models.AddOrganizationPayload) (int64, error)
+		payload models.CreateOrganizationDTO) (int64, error)
 
-	GetOrganization(ctx context.Context, payload models.GetOrganizationPayload) (*models.Organization, error)
+	GetOrganization(ctx context.Context, payload models.GetOrganizationDTO) (*models.OrganizationDTO, error)
 
-	GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsPayload) ([]models.Organization, error)
+	GetAllOrganizations(ctx context.Context, payload models.GetOrganizationsDTO) ([]models.OrganizationDTO, error)
 
-	UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationPayload) (*models.Organization, error)
+	UpdateOrganization(ctx context.Context, payload models.UpdateOrganizationDTO) (*models.OrganizationDTO, error)
 
 	DeleteOrganization(ctx context.Context, id int64) (int64, error)
 }
 
 type Role interface {
-	AddRole(ctx context.Context, payload models.AddRolePayload) (int64, error)
-	GetRole(ctx context.Context, id int64) (*models.Role, error)
-	GetAllRoles(ctx context.Context, organizationId int64) ([]models.Role, error)
-	UpdateRole(ctx context.Context, payload models.UpdateRolePayload) (*models.Role, error)
+	CreateRole(ctx context.Context, payload models.CreateRoleDTO) (int64, error)
+	GetRole(ctx context.Context, id int64) (*models.RoleDTO, error)
+	GetAllRoles(ctx context.Context, organizationId int64) ([]models.RoleDTO, error)
+	UpdateRole(ctx context.Context, payload models.UpdateRoleDTO) (*models.RoleDTO, error)
 	DeleteRole(ctx context.Context, id int64) (int64, error)
 }
 
 type Project interface {
-	AddProject(ctx context.Context, payload models.AddProjectPayload) (int64, error)
-	GetProject(ctx context.Context, id int64) (*models.Project, error)
-	GetAllProjects(ctx context.Context, organizationId int64) ([]models.Project, error)
-	UpdateProject(ctx context.Context, payload models.UpdateProjectPayload) (*models.Project, error)
+	CreateProject(ctx context.Context, payload models.CreateProjectDTO) (int64, error)
+	GetProject(ctx context.Context, id int64) (*models.ProjectDTO, error)
+	GetAllProjects(ctx context.Context, organizationId int64) ([]models.ProjectDTO, error)
+	UpdateProject(ctx context.Context, payload models.UpdateProjectDTO) (*models.ProjectDTO, error)
 	DeleteProject(ctx context.Context, id int64) (int64, error)
 }
 
 type Employee interface {
-	AddEmployee(ctx context.Context, payload models.AddEmployee) (int64, error)
-	GetEmployee(ctx context.Context, id int64) (*models.Employee, error)
-	GetAllEmployees(ctx context.Context, organizationId int64) ([]models.Employee, error)
-	UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (*models.Employee, error)
+	CreateEmployee(ctx context.Context, payload models.CreateEmployeeDTO) (int64, error)
+	GetEmployee(ctx context.Context, id int64) (*models.EmployeeDTO, error)
+	GetAllEmployees(ctx context.Context, organizationId int64) ([]models.EmployeeDTO, error)
+	UpdateEmployeeRole(ctx context.Context, payload models.UpdateEmployeeRoleDTO) (int64, error)
 	DeleteEmployee(ctx context.Context, id int64) (int64, error)
 }
 

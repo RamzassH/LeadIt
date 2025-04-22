@@ -7,35 +7,35 @@ import "google/api/annotations.proto";
 
 
 service Organization {
-  rpc addOrganization (AddOrganizationRequest) returns (AddOrganizationResponse) {
+  rpc CreateOrganization (CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option(google.api.http) = {
-      post: "/v1/organization/add"
+      post: "/v1/organizations"
       body: "*"
     };
   }
-  rpc getOrganization(GetOrganizationRequest) returns (GetOrganizationResponse) {
+
+  rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse) {
     option (google.api.http) = {
-      get: "/v1/organization/get/{id}"
+      get: "/v1/organizations/{id}"
     };
   }
-  rpc getOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
+
+  rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse) {
     option(google.api.http) = {
-      post: "/v1/organization/get-many/{organizer_id}"
+      get: "/v1/users/{organizer_id}/organizations"
+    };
+  }
+
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
+    option(google.api.http) = {
+      patch: "/v1/organizations/{id}"
       body: "*"
     };
   }
 
-  rpc updateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
     option(google.api.http) = {
-      post: "/v1/organization/update"
-      body: "*"
-    };
-  }
-
-  rpc deleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
-    option(google.api.http) = {
-      post: "/v1/organization/delete/{id}"
-      body: "*"
+      delete: "/v1/organizations/{id}"
     };
   }
 }
@@ -44,16 +44,16 @@ message OrganizationType {
   string name = 2;
   int64 organizer_id = 3;
   string description = 4;
-  string organization_image = 5;
+  string image = 5;
 }
 
-message AddOrganizationRequest {
+message CreateOrganizationRequest {
   string name = 1;
   string description = 2;
   string image = 3;
 }
 
-message AddOrganizationResponse {
+message CreateOrganizationResponse {
   int64 id = 1;
 }
 
@@ -74,7 +74,10 @@ message GetOrganizationsResponse {
 }
 
 message UpdateOrganizationRequest {
-  OrganizationType organization = 1;
+  int64 id = 1;
+  string name = 2;
+  string description = 4;
+  string image = 5;
 }
 
 message UpdateOrganizationResponse {

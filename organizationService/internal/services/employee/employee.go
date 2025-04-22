@@ -3,43 +3,34 @@ package employee
 import (
 	"context"
 	"github.com/RamzassH/LeadIt/libs/kafka"
+	redisStorage "github.com/RamzassH/LeadIt/libs/redis"
 	"github.com/RamzassH/LeadIt/organizationService/internal/domain/models"
 	"github.com/rs/zerolog"
-	"time"
 )
 
 type Employee struct {
 	logger           zerolog.Logger
 	employeeSaver    Saver
 	employeeProvider Provider
-	redisStorage     Redis
+	redisStorage     redisStorage.RedisStore
 	kafka            *kafka.Producer
 }
 
 type Saver interface {
-	SaveEmployee(ctx context.Context, payload models.AddEmployee) (int64, error)
+	Save(ctx context.Context, payload models.CreateEmployeeDTO) (int64, error)
 }
 type Provider interface {
-	GetEmployeeById(ctx context.Context, id int64) (employee *models.Employee, err error)
-	GetAllEmployees(ctx context.Context, organizationId int64) (employees []models.Employee, err error)
-	UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (employee *models.Employee, err error)
-	DeleteEmployee(ctx context.Context, id int64) (rowsAffected int64, err error)
-}
-
-type Redis interface {
-	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
-	Del(ctx context.Context, key string) error
-	HSet(ctx context.Context, key, field string, value interface{}) error
-	HGet(ctx context.Context, key, field string) (string, error)
-	HGetAll(ctx context.Context, key string) (map[string]string, error)
+	GetById(ctx context.Context, id int64) (employee *models.EmployeeDTO, err error)
+	GetManyByOrganizationId(ctx context.Context, organizationId int64) (employees []models.EmployeeDTO, err error)
+	UpdateRole(ctx context.Context, payload models.UpdateEmployeeRoleDTO) (id int64, err error)
+	Delete(ctx context.Context, id int64) (rowsAffected int64, err error)
 }
 
 func New(
 	logger zerolog.Logger,
 	employeeSaver Saver,
 	employeeProvider Provider,
-	redisStorage Redis,
+	redisStorage redisStorage.RedisStore,
 	kafka *kafka.Producer) *Employee {
 	return &Employee{
 		logger:           logger,
@@ -50,27 +41,27 @@ func New(
 	}
 }
 
-func (e *Employee) AddEmployee(ctx context.Context, payload models.AddEmployee) (int64, error) {
+func (e *Employee) CreateEmployee(ctx context.Context, payload models.CreateEmployeeDTO) (int64, error) {
 	const op = "employee.AddEmployee"
-	logger := e.logger.With().Str("operation", "AddEmployee").Logger()
+	logger := e.logger.With().Str("operation", op).Logger()
 
-	logger.Info().Str("operation", op).Msg("adding employee")
-	employee, err := e.employeeSaver.SaveEmployee(ctx, payload)
+	logger.Info().Msg("adding employee")
+	employee, err := e.employeeSaver.Save(ctx, payload)
 
 	if err != nil {
-		logger.Error().Err(err).Str("operation", "SaveEmployee").Msg(err.Error())
+		logger.Error().Err(err).Msg(err.Error())
 		return 0, err
 	}
 
 	return employee, nil
 }
 
-func (e *Employee) GetEmployee(ctx context.Context, id int64) (*models.Employee, error) {
+func (e *Employee) GetEmployee(ctx context.Context, id int64) (*models.EmployeeDTO, error) {
 	const op = "employee.GetEmployee"
 	logger := e.logger.With().Int64("employeeId", id).Logger()
 
 	logger.Info().Str("operation", op).Msg("getting employee")
-	employee, err := e.employeeProvider.GetEmployeeById(ctx, id)
+	employee, err := e.employeeProvider.GetById(ctx, id)
 
 	if err != nil {
 		logger.Error().Err(err).Str("operation", "GetEmployee").Msg(err.Error())
@@ -80,12 +71,12 @@ func (e *Employee) GetEmployee(ctx context.Context, id int64) (*models.Employee,
 	return employee, nil
 }
 
-func (e *Employee) GetAllEmployees(ctx context.Context, organizationId int64) ([]models.Employee, error) {
+func (e *Employee) GetAllEmployees(ctx context.Context, organizationId int64) ([]models.EmployeeDTO, error) {
 	const op = "employee.GetAllEmployees"
 	logger := e.logger.With().Str("operation", "GetAllEmployees").Logger()
 	logger.Info().Str("operation", op).Msg("getting all employees")
 
-	employee, err := e.employeeProvider.GetAllEmployees(ctx, organizationId)
+	employee, err := e.employeeProvider.GetManyByOrganizationId(ctx, organizationId)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", "GetAllEmployees").Msg(err.Error())
 		return nil, err
@@ -93,25 +84,25 @@ func (e *Employee) GetAllEmployees(ctx context.Context, organizationId int64) ([
 	return employee, nil
 }
 
-func (e *Employee) UpdateEmployee(ctx context.Context, payload models.UpdateEmployee) (*models.Employee, error) {
-	const op = "employee.UpdateEployee"
-	logger := e.logger.With().Str("operation", "UpdateEmployee").Logger()
+func (e *Employee) UpdateEmployeeRole(ctx context.Context, payload models.UpdateEmployeeRoleDTO) (int64, error) {
+	const op = "employee.UpdateEmployee"
+	logger := e.logger.With().Str("operation", op).Logger()
 	logger.Info().Msg("updating employee")
-	employee, err := e.employeeProvider.UpdateEmployee(ctx, payload)
+	employeeId, err := e.employeeProvider.UpdateRole(ctx, payload)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", "UpdateEmployee").Msg(err.Error())
-		return nil, err
+		return 0, err
 	}
 
-	return employee, nil
+	return employeeId, nil
 }
 
 func (e *Employee) DeleteEmployee(ctx context.Context, id int64) (int64, error) {
 	const op = "employee.DeleteEmployee"
-	logger := e.logger.With().Int64("employeeId", id).Logger()
+	logger := e.logger.With().Str("operation", op).Int64("employeeId", id).Logger()
 	logger.Info().Msg("deleting employee")
 
-	deletedId, err := e.employeeProvider.DeleteEmployee(ctx, id)
+	deletedId, err := e.employeeProvider.Delete(ctx, id)
 	if err != nil {
 		logger.Error().Err(err).Str("operation", "DeleteEmployee").Msg(err.Error())
 		return 0, err

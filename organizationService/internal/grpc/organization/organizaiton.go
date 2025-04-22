@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ServerAPI) AddOrganization(ctx context.Context, req *organizationv1.AddOrganizationRequest) (*organizationv1.AddOrganizationResponse, error) {
-	addOrganizationReq := models.AddOrganizationPayload{
+func (s *ServerAPI) CreateOrganization(ctx context.Context, req *organizationv1.CreateOrganizationRequest) (*organizationv1.CreateOrganizationResponse, error) {
+	addOrganizationReq := models.CreateOrganizationDTO{
 		Name:              req.GetName(),
 		Description:       req.GetDescription(),
 		OrganizationImage: req.GetImage(),
@@ -20,18 +20,18 @@ func (s *ServerAPI) AddOrganization(ctx context.Context, req *organizationv1.Add
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	OrganizationId, err := s.service.AddOrganization(ctx, addOrganizationReq)
+	OrganizationId, err := s.service.CreateOrganization(ctx, addOrganizationReq)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	return &organizationv1.AddOrganizationResponse{
+	return &organizationv1.CreateOrganizationResponse{
 		Id: OrganizationId,
 	}, nil
 }
 
 func (s *ServerAPI) GetOrganization(ctx context.Context, req *organizationv1.GetOrganizationRequest) (*organizationv1.GetOrganizationResponse, error) {
-	getOrganizationReq := models.GetOrganizationPayload{
+	getOrganizationReq := models.GetOrganizationDTO{
 		OrganizationID: req.GetId(),
 	}
 
@@ -48,11 +48,11 @@ func (s *ServerAPI) GetOrganization(ctx context.Context, req *organizationv1.Get
 	}
 
 	orgResponse := &organizationv1.OrganizationType{
-		Id:                organization.ID,
-		Name:              organization.Name,
-		Description:       organization.Description,
-		OrganizerId:       organization.OrganizerID,
-		OrganizationImage: organization.OrganizationImage,
+		Id:          organization.ID,
+		Name:        organization.Name,
+		Description: organization.Description,
+		OrganizerId: organization.OrganizerID,
+		Image:       organization.Image,
 	}
 
 	return &organizationv1.GetOrganizationResponse{
@@ -68,7 +68,7 @@ func (s *ServerAPI) GetOrganizations(ctx context.Context, req *organizationv1.Ge
 	}
 
 	userID := userIDValue.(int64)
-	getOrganizationsReq := models.GetOrganizationsPayload{
+	getOrganizationsReq := models.GetOrganizationsDTO{
 		OrganizerID: userID,
 	}
 
@@ -85,11 +85,11 @@ func (s *ServerAPI) GetOrganizations(ctx context.Context, req *organizationv1.Ge
 
 	for _, organization := range organizations {
 		orgResponse = append(orgResponse, &organizationv1.OrganizationType{
-			Id:                organization.ID,
-			Name:              organization.Name,
-			Description:       organization.Description,
-			OrganizerId:       organization.OrganizerID,
-			OrganizationImage: organization.OrganizationImage,
+			Id:          organization.ID,
+			Name:        organization.Name,
+			Description: organization.Description,
+			OrganizerId: organization.OrganizerID,
+			Image:       organization.Image,
 		})
 	}
 
@@ -99,12 +99,11 @@ func (s *ServerAPI) GetOrganizations(ctx context.Context, req *organizationv1.Ge
 }
 
 func (s *ServerAPI) UpdateOrganization(ctx context.Context, req *organizationv1.UpdateOrganizationRequest) (*organizationv1.UpdateOrganizationResponse, error) {
-	updateOrganizationReq := models.UpdateOrganizationPayload{
-		ID:                req.Organization.Id,
-		Name:              req.Organization.Name,
-		Description:       req.Organization.Description,
-		OrganizerID:       req.Organization.OrganizerId,
-		OrganizationImage: req.Organization.OrganizationImage,
+	updateOrganizationReq := models.UpdateOrganizationDTO{
+		ID:          req.GetId(),
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Image:       req.GetImage(),
 	}
 
 	if err := s.ValidateStruct(updateOrganizationReq); err != nil {
@@ -115,11 +114,11 @@ func (s *ServerAPI) UpdateOrganization(ctx context.Context, req *organizationv1.
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	orgResponse := &organizationv1.OrganizationType{
-		Id:                updatedOrganization.ID,
-		Name:              updatedOrganization.Name,
-		Description:       updatedOrganization.Description,
-		OrganizerId:       updatedOrganization.OrganizerID,
-		OrganizationImage: updatedOrganization.OrganizationImage,
+		Id:          updatedOrganization.ID,
+		Name:        updatedOrganization.Name,
+		Description: updatedOrganization.Description,
+		OrganizerId: updatedOrganization.OrganizerID,
+		Image:       updatedOrganization.Image,
 	}
 
 	return &organizationv1.UpdateOrganizationResponse{

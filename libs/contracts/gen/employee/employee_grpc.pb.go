@@ -19,24 +19,24 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Employee_AddEmployee_FullMethodName    = "/employee.Employee/addEmployee"
-	Employee_GetEmployee_FullMethodName    = "/employee.Employee/getEmployee"
-	Employee_GetEmployees_FullMethodName   = "/employee.Employee/getEmployees"
-	Employee_UpdateEmployee_FullMethodName = "/employee.Employee/updateEmployee"
-	Employee_DeleteEmployee_FullMethodName = "/employee.Employee/deleteEmployee"
-	Employee_InviteEmployee_FullMethodName = "/employee.Employee/inviteEmployee"
+	Employee_CreateEmployee_FullMethodName     = "/employee.Employee/CreateEmployee"
+	Employee_GetEmployee_FullMethodName        = "/employee.Employee/GetEmployee"
+	Employee_GetEmployees_FullMethodName       = "/employee.Employee/GetEmployees"
+	Employee_UpdateEmployeeRole_FullMethodName = "/employee.Employee/UpdateEmployeeRole"
+	Employee_DeleteEmployee_FullMethodName     = "/employee.Employee/DeleteEmployee"
+	Employee_InviteEmployee_FullMethodName     = "/employee.Employee/InviteEmployee"
 )
 
 // EmployeeClient is the client API for Employee service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EmployeeClient interface {
-	AddEmployee(ctx context.Context, in *AddEmployeeRequest, opts ...grpc.CallOption) (*AddEmployeeResponse, error)
+	CreateEmployee(ctx context.Context, in *CreateEmployeeRequest, opts ...grpc.CallOption) (*CreateEmployeeResponse, error)
 	GetEmployee(ctx context.Context, in *GetEmployeeRequest, opts ...grpc.CallOption) (*GetEmployeeResponse, error)
 	GetEmployees(ctx context.Context, in *GetEmployeesRequest, opts ...grpc.CallOption) (*GetEmployeesResponse, error)
-	UpdateEmployee(ctx context.Context, in *UpdateEmployeeRequest, opts ...grpc.CallOption) (*UpdateEmployeeResponse, error)
+	UpdateEmployeeRole(ctx context.Context, in *UpdateEmployeeRoleRequest, opts ...grpc.CallOption) (*UpdateEmployeeRoleResponse, error)
 	DeleteEmployee(ctx context.Context, in *DeleteEmployeeRequest, opts ...grpc.CallOption) (*DeleteEmployeeResponse, error)
-	InviteEmployee(ctx context.Context, in *InviteEmployeeRequest, opts ...grpc.CallOption) (*InviteEmployeeRequest, error)
+	InviteEmployee(ctx context.Context, in *InviteEmployeeRequest, opts ...grpc.CallOption) (*InviteEmployeeResponse, error)
 }
 
 type employeeClient struct {
@@ -47,10 +47,10 @@ func NewEmployeeClient(cc grpc.ClientConnInterface) EmployeeClient {
 	return &employeeClient{cc}
 }
 
-func (c *employeeClient) AddEmployee(ctx context.Context, in *AddEmployeeRequest, opts ...grpc.CallOption) (*AddEmployeeResponse, error) {
+func (c *employeeClient) CreateEmployee(ctx context.Context, in *CreateEmployeeRequest, opts ...grpc.CallOption) (*CreateEmployeeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddEmployeeResponse)
-	err := c.cc.Invoke(ctx, Employee_AddEmployee_FullMethodName, in, out, cOpts...)
+	out := new(CreateEmployeeResponse)
+	err := c.cc.Invoke(ctx, Employee_CreateEmployee_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +77,10 @@ func (c *employeeClient) GetEmployees(ctx context.Context, in *GetEmployeesReque
 	return out, nil
 }
 
-func (c *employeeClient) UpdateEmployee(ctx context.Context, in *UpdateEmployeeRequest, opts ...grpc.CallOption) (*UpdateEmployeeResponse, error) {
+func (c *employeeClient) UpdateEmployeeRole(ctx context.Context, in *UpdateEmployeeRoleRequest, opts ...grpc.CallOption) (*UpdateEmployeeRoleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateEmployeeResponse)
-	err := c.cc.Invoke(ctx, Employee_UpdateEmployee_FullMethodName, in, out, cOpts...)
+	out := new(UpdateEmployeeRoleResponse)
+	err := c.cc.Invoke(ctx, Employee_UpdateEmployeeRole_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,9 +97,9 @@ func (c *employeeClient) DeleteEmployee(ctx context.Context, in *DeleteEmployeeR
 	return out, nil
 }
 
-func (c *employeeClient) InviteEmployee(ctx context.Context, in *InviteEmployeeRequest, opts ...grpc.CallOption) (*InviteEmployeeRequest, error) {
+func (c *employeeClient) InviteEmployee(ctx context.Context, in *InviteEmployeeRequest, opts ...grpc.CallOption) (*InviteEmployeeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(InviteEmployeeRequest)
+	out := new(InviteEmployeeResponse)
 	err := c.cc.Invoke(ctx, Employee_InviteEmployee_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -111,12 +111,12 @@ func (c *employeeClient) InviteEmployee(ctx context.Context, in *InviteEmployeeR
 // All implementations must embed UnimplementedEmployeeServer
 // for forward compatibility.
 type EmployeeServer interface {
-	AddEmployee(context.Context, *AddEmployeeRequest) (*AddEmployeeResponse, error)
+	CreateEmployee(context.Context, *CreateEmployeeRequest) (*CreateEmployeeResponse, error)
 	GetEmployee(context.Context, *GetEmployeeRequest) (*GetEmployeeResponse, error)
 	GetEmployees(context.Context, *GetEmployeesRequest) (*GetEmployeesResponse, error)
-	UpdateEmployee(context.Context, *UpdateEmployeeRequest) (*UpdateEmployeeResponse, error)
+	UpdateEmployeeRole(context.Context, *UpdateEmployeeRoleRequest) (*UpdateEmployeeRoleResponse, error)
 	DeleteEmployee(context.Context, *DeleteEmployeeRequest) (*DeleteEmployeeResponse, error)
-	InviteEmployee(context.Context, *InviteEmployeeRequest) (*InviteEmployeeRequest, error)
+	InviteEmployee(context.Context, *InviteEmployeeRequest) (*InviteEmployeeResponse, error)
 	mustEmbedUnimplementedEmployeeServer()
 }
 
@@ -127,8 +127,8 @@ type EmployeeServer interface {
 // pointer dereference when methods are called.
 type UnimplementedEmployeeServer struct{}
 
-func (UnimplementedEmployeeServer) AddEmployee(context.Context, *AddEmployeeRequest) (*AddEmployeeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddEmployee not implemented")
+func (UnimplementedEmployeeServer) CreateEmployee(context.Context, *CreateEmployeeRequest) (*CreateEmployeeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateEmployee not implemented")
 }
 func (UnimplementedEmployeeServer) GetEmployee(context.Context, *GetEmployeeRequest) (*GetEmployeeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEmployee not implemented")
@@ -136,13 +136,13 @@ func (UnimplementedEmployeeServer) GetEmployee(context.Context, *GetEmployeeRequ
 func (UnimplementedEmployeeServer) GetEmployees(context.Context, *GetEmployeesRequest) (*GetEmployeesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEmployees not implemented")
 }
-func (UnimplementedEmployeeServer) UpdateEmployee(context.Context, *UpdateEmployeeRequest) (*UpdateEmployeeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateEmployee not implemented")
+func (UnimplementedEmployeeServer) UpdateEmployeeRole(context.Context, *UpdateEmployeeRoleRequest) (*UpdateEmployeeRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateEmployeeRole not implemented")
 }
 func (UnimplementedEmployeeServer) DeleteEmployee(context.Context, *DeleteEmployeeRequest) (*DeleteEmployeeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEmployee not implemented")
 }
-func (UnimplementedEmployeeServer) InviteEmployee(context.Context, *InviteEmployeeRequest) (*InviteEmployeeRequest, error) {
+func (UnimplementedEmployeeServer) InviteEmployee(context.Context, *InviteEmployeeRequest) (*InviteEmployeeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InviteEmployee not implemented")
 }
 func (UnimplementedEmployeeServer) mustEmbedUnimplementedEmployeeServer() {}
@@ -166,20 +166,20 @@ func RegisterEmployeeServer(s grpc.ServiceRegistrar, srv EmployeeServer) {
 	s.RegisterService(&Employee_ServiceDesc, srv)
 }
 
-func _Employee_AddEmployee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddEmployeeRequest)
+func _Employee_CreateEmployee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateEmployeeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EmployeeServer).AddEmployee(ctx, in)
+		return srv.(EmployeeServer).CreateEmployee(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Employee_AddEmployee_FullMethodName,
+		FullMethod: Employee_CreateEmployee_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmployeeServer).AddEmployee(ctx, req.(*AddEmployeeRequest))
+		return srv.(EmployeeServer).CreateEmployee(ctx, req.(*CreateEmployeeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -220,20 +220,20 @@ func _Employee_GetEmployees_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Employee_UpdateEmployee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateEmployeeRequest)
+func _Employee_UpdateEmployeeRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateEmployeeRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EmployeeServer).UpdateEmployee(ctx, in)
+		return srv.(EmployeeServer).UpdateEmployeeRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Employee_UpdateEmployee_FullMethodName,
+		FullMethod: Employee_UpdateEmployeeRole_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmployeeServer).UpdateEmployee(ctx, req.(*UpdateEmployeeRequest))
+		return srv.(EmployeeServer).UpdateEmployeeRole(ctx, req.(*UpdateEmployeeRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -282,27 +282,27 @@ var Employee_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*EmployeeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "addEmployee",
-			Handler:    _Employee_AddEmployee_Handler,
+			MethodName: "CreateEmployee",
+			Handler:    _Employee_CreateEmployee_Handler,
 		},
 		{
-			MethodName: "getEmployee",
+			MethodName: "GetEmployee",
 			Handler:    _Employee_GetEmployee_Handler,
 		},
 		{
-			MethodName: "getEmployees",
+			MethodName: "GetEmployees",
 			Handler:    _Employee_GetEmployees_Handler,
 		},
 		{
-			MethodName: "updateEmployee",
-			Handler:    _Employee_UpdateEmployee_Handler,
+			MethodName: "UpdateEmployeeRole",
+			Handler:    _Employee_UpdateEmployeeRole_Handler,
 		},
 		{
-			MethodName: "deleteEmployee",
+			MethodName: "DeleteEmployee",
 			Handler:    _Employee_DeleteEmployee_Handler,
 		},
 		{
-			MethodName: "inviteEmployee",
+			MethodName: "InviteEmployee",
 			Handler:    _Employee_InviteEmployee_Handler,
 		},
 	},

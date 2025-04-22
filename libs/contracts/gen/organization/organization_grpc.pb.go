@@ -19,18 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Organization_AddOrganization_FullMethodName    = "/organization.Organization/addOrganization"
-	Organization_GetOrganization_FullMethodName    = "/organization.Organization/getOrganization"
-	Organization_GetOrganizations_FullMethodName   = "/organization.Organization/getOrganizations"
-	Organization_UpdateOrganization_FullMethodName = "/organization.Organization/updateOrganization"
-	Organization_DeleteOrganization_FullMethodName = "/organization.Organization/deleteOrganization"
+	Organization_CreateOrganization_FullMethodName = "/organization.Organization/CreateOrganization"
+	Organization_GetOrganization_FullMethodName    = "/organization.Organization/GetOrganization"
+	Organization_GetOrganizations_FullMethodName   = "/organization.Organization/GetOrganizations"
+	Organization_UpdateOrganization_FullMethodName = "/organization.Organization/UpdateOrganization"
+	Organization_DeleteOrganization_FullMethodName = "/organization.Organization/DeleteOrganization"
 )
 
 // OrganizationClient is the client API for Organization service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrganizationClient interface {
-	AddOrganization(ctx context.Context, in *AddOrganizationRequest, opts ...grpc.CallOption) (*AddOrganizationResponse, error)
+	CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*CreateOrganizationResponse, error)
 	GetOrganization(ctx context.Context, in *GetOrganizationRequest, opts ...grpc.CallOption) (*GetOrganizationResponse, error)
 	GetOrganizations(ctx context.Context, in *GetOrganizationsRequest, opts ...grpc.CallOption) (*GetOrganizationsResponse, error)
 	UpdateOrganization(ctx context.Context, in *UpdateOrganizationRequest, opts ...grpc.CallOption) (*UpdateOrganizationResponse, error)
@@ -45,10 +45,10 @@ func NewOrganizationClient(cc grpc.ClientConnInterface) OrganizationClient {
 	return &organizationClient{cc}
 }
 
-func (c *organizationClient) AddOrganization(ctx context.Context, in *AddOrganizationRequest, opts ...grpc.CallOption) (*AddOrganizationResponse, error) {
+func (c *organizationClient) CreateOrganization(ctx context.Context, in *CreateOrganizationRequest, opts ...grpc.CallOption) (*CreateOrganizationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddOrganizationResponse)
-	err := c.cc.Invoke(ctx, Organization_AddOrganization_FullMethodName, in, out, cOpts...)
+	out := new(CreateOrganizationResponse)
+	err := c.cc.Invoke(ctx, Organization_CreateOrganization_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (c *organizationClient) DeleteOrganization(ctx context.Context, in *DeleteO
 // All implementations must embed UnimplementedOrganizationServer
 // for forward compatibility.
 type OrganizationServer interface {
-	AddOrganization(context.Context, *AddOrganizationRequest) (*AddOrganizationResponse, error)
+	CreateOrganization(context.Context, *CreateOrganizationRequest) (*CreateOrganizationResponse, error)
 	GetOrganization(context.Context, *GetOrganizationRequest) (*GetOrganizationResponse, error)
 	GetOrganizations(context.Context, *GetOrganizationsRequest) (*GetOrganizationsResponse, error)
 	UpdateOrganization(context.Context, *UpdateOrganizationRequest) (*UpdateOrganizationResponse, error)
@@ -114,8 +114,8 @@ type OrganizationServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOrganizationServer struct{}
 
-func (UnimplementedOrganizationServer) AddOrganization(context.Context, *AddOrganizationRequest) (*AddOrganizationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOrganization not implemented")
+func (UnimplementedOrganizationServer) CreateOrganization(context.Context, *CreateOrganizationRequest) (*CreateOrganizationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOrganization not implemented")
 }
 func (UnimplementedOrganizationServer) GetOrganization(context.Context, *GetOrganizationRequest) (*GetOrganizationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrganization not implemented")
@@ -150,20 +150,20 @@ func RegisterOrganizationServer(s grpc.ServiceRegistrar, srv OrganizationServer)
 	s.RegisterService(&Organization_ServiceDesc, srv)
 }
 
-func _Organization_AddOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddOrganizationRequest)
+func _Organization_CreateOrganization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOrganizationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrganizationServer).AddOrganization(ctx, in)
+		return srv.(OrganizationServer).CreateOrganization(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Organization_AddOrganization_FullMethodName,
+		FullMethod: Organization_CreateOrganization_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrganizationServer).AddOrganization(ctx, req.(*AddOrganizationRequest))
+		return srv.(OrganizationServer).CreateOrganization(ctx, req.(*CreateOrganizationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -248,23 +248,23 @@ var Organization_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrganizationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "addOrganization",
-			Handler:    _Organization_AddOrganization_Handler,
+			MethodName: "CreateOrganization",
+			Handler:    _Organization_CreateOrganization_Handler,
 		},
 		{
-			MethodName: "getOrganization",
+			MethodName: "GetOrganization",
 			Handler:    _Organization_GetOrganization_Handler,
 		},
 		{
-			MethodName: "getOrganizations",
+			MethodName: "GetOrganizations",
 			Handler:    _Organization_GetOrganizations_Handler,
 		},
 		{
-			MethodName: "updateOrganization",
+			MethodName: "UpdateOrganization",
 			Handler:    _Organization_UpdateOrganization_Handler,
 		},
 		{
-			MethodName: "deleteOrganization",
+			MethodName: "DeleteOrganization",
 			Handler:    _Organization_DeleteOrganization_Handler,
 		},
 	},
