@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import Input from "@/components/UI/AuthPage/Input/Input";
 import Button from "@/components/UI/AuthPage/Button/Button";
 import Checkbox from "@/components/UI/AuthPage/Checkbox/Checkbox";
-import Loader from "@/components/UI/AuthPage/Loader/Loader";
 import {
     BackgroundContainer, ButtonContainer,
     Container, Content,
@@ -12,13 +11,10 @@ import {
     TitleContainer
 } from "@/components/UI/AuthPage/LoginForm/styled/LoginForm";
 import {useFetching} from "@/hooks/useFetching";
-import {data} from "framer-motion/m";
-import {loginAPI} from "@/api/auth/login";
-import useGlobalStore from "@/app/store";
+import useGlobalStore from "@/store/GlobalStore/store";
 import {useEffect} from "react";
 import LoginModalWindow from "@/components/UI/AuthPage/ModalWindow/LoginModalWindow";
-import {useRouter} from "next/navigation";
-import {getLocalStorage, setLocalStorage} from "@/utils/cookie";
+import {useRouter, useSearchParams} from "next/navigation";
 import {loginServerFunction} from "@/app/(login)/auth/actions";
 
 
@@ -42,16 +38,17 @@ export default function LoginForm({ callback }: LoginFormProps) {
     } = useForm<LoginData>();
     const router = useRouter();
     const globalStore = useGlobalStore();
+    const searchParams = useSearchParams();
     const [loginClientFunction, isLoading, error] = useFetching(async (data) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
         await loginServerFunction(data);
+        console.log("dada")
         globalStore.setLogin(true)
     });
 
     // Обработчик отправки формы
     const onSubmit = async (data: LoginData) => {
         await loginClientFunction({email: data.login, password: data.password});
-        router.push("/profile");
+
     };
 
     useEffect(() => {
@@ -67,6 +64,13 @@ export default function LoginForm({ callback }: LoginFormProps) {
             });
         }
     }, [error]);
+
+    useEffect(() => {
+        if (globalStore.isLogin) {
+            const from = searchParams.get('from') || "/profile";
+            router.push(from);
+        }
+    }, [globalStore.isLogin]);
 
     const handleCreateAccount = () => {
         callback();

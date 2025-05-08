@@ -1,35 +1,34 @@
-import React, {useEffect, useState} from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import ModalWindow, {ModalWindowProps} from "@/components/UI/ModalWindowTemplate/ModalWindow";
-import useProjectStore, {Project} from "@/store/ProjectsPageStore/store";
-import {useFetching} from "@/hooks/useFetching";
-import {createProjectAPI} from "@/api/project/create";
+import React, {useEffect, useState} from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 
-interface ProjectCreateForm {
-    name: string;
-    description: string;
-    organization_id: number;
-    image: string;
+interface CreateOrganizationModalWindowProps extends ModalWindowProps {
+    callback: (data: CreateOrganizationForm) => void;
 }
 
-const CreateProjectModalWindow = ({open, handleClose}: ModalWindowProps) => {
-    const [data, setData] = useState<ProjectCreateForm>({name: "", description: "", organization_id: 1, image: ""});
-    const {addProject} = useProjectStore()
-    const [createProject, isLoadingRequest, errorCreate] = useFetching(async () => {
-        const response = await createProjectAPI(data, "");
-        addProject({...data, id: response.data});
-    })
+export interface CreateOrganizationForm {
+    name: string;
+    image: string;
+    description: string;
+}
+
+const CreateOrganizationModalWindow = ({open, handleClose, callback}: CreateOrganizationModalWindowProps) => {
+    const [form, setForm] = useState<CreateOrganizationForm>({
+        name: '',
+        image: '',
+        description: '',
+    });
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setData({
-            ...data,
+        setForm({
+            ...form,
             [name]: value
-        })
+        });
     }
     const handleSubmit = () => {
-        createProject()
+        callback(form)
         handleClose();
     }
 
@@ -48,39 +47,39 @@ const CreateProjectModalWindow = ({open, handleClose}: ModalWindowProps) => {
         )
     }
     return (
-        <ModalWindow open={open} handleClose={() => {}} actions={actions()} title="Описание">
+        <ModalWindow open={open} handleClose={() => {}} actions={actions()} title="Создание организации">
             <TextField
                 autoFocus
                 margin="dense"
                 name="name"
-                label="Название проекта"
+                label="Название организации"
                 type="text"
                 fullWidth
-                value={data.name}
+                value={form.name}
                 onChange={handleInputChange}
             />
             <TextField
                 margin="dense"
                 name="image"
-                label="Изображение"
+                label="Логотип"
                 type="text"
                 fullWidth
-                value={data.image}
+                value={form.image}
                 onChange={handleInputChange}
             />
             <TextField
                 margin="dense"
                 name="description"
-                label="Описание"
+                label="Описание организации"
                 type="text"
                 fullWidth
                 multiline
                 rows={8}
-                value={data.description}
+                value={form.description}
                 onChange={handleInputChange}
             />
         </ModalWindow>
     );
 };
 
-export default CreateProjectModalWindow;
+export default CreateOrganizationModalWindow;

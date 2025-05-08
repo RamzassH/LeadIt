@@ -1,12 +1,16 @@
 import {Box, IconButton, Tab, Tabs} from '@mui/material';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RolePanel from "@/components/UI/OrganizationPages/RolesPage/RolePanel/RolePanel";
-import Permission from "@/components/UI/OrganizationPages/RolesPage/Permission/Permission";
+import PermissionList from "@/components/UI/OrganizationPages/RolesPage/PermissionList/PermissionList";
 import {ArrowBack} from "@mui/icons-material";
 import RoleVisualization from "@/components/UI/OrganizationPages/RolesPage/RoleVisualization/RoleVisualization";
+import EmployeeList from "@/components/UI/OrganizationPages/RolesPage/EmployeeList/EmployeeList";
+import useRoleStore, {Permission} from "@/store/RolePageStore/store";
+import {updateRoleAPI} from "@/api/role/update";
 
 interface RoleSettingsProps {
-    callback: (roleId: string | null) => void;
+    callback: (roleId: number | null) => void;
+    currentRoleId: number
 }
 
 function a11yProps(index: number) {
@@ -16,36 +20,41 @@ function a11yProps(index: number) {
     };
 }
 
-const RoleTabs: React.FC<RoleSettingsProps> = ({callback}) => {
+const RoleTabs: React.FC<RoleSettingsProps> = ({callback, currentRoleId}) => {
+    const roles = useRoleStore(state => state.roles);
+    const setPermissionsInRole= useRoleStore(state => state.setPermissionsInRole);
     const [value, setValue] = React.useState(0);
-    const [permissions, setPermissions] = useState([
-            {
-                name: 'Создавать проекты',
-                description: 'Дает право создать новый проект в организации',
-                enabled: true,
-            },
-            {
-                name: 'Назначать роли',
-                description: 'Позволяет добавлять сотрудникам новые роли. Выбор ролей ограничен самой высокой ролью владельца.',
-                enabled: false
-            }
-        ]
-    );
+    const [permissions, setPermissions] = useState<Permission[]>([]);
 
-    const handleTogglePermission = (permissionName: string) => {
+    useEffect(() => {
+        const permissionList = roles.find(item => item.id === currentRoleId)?.permissions;
+        if (permissionList) {
+            setPermissions(permissionList);
+        }
+    }, [currentRoleId])
+
+    const handleTogglePermission = (permissionId: string) => {
         setPermissions(prev => prev.map(p =>
-            p.name === permissionName ? { ...p, enabled: !p.enabled } : p
+            p.id === permissionId ? { ...p, state: !p.state } : p
         ));
     };
-
     const handleResetPermissions = () => {
-        setPermissions(prev => prev.map(p => ({ ...p, enabled: false })));
+        setPermissions(prev => prev.map(p => ({ ...p, state: false })));
     };
-
-
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+    const handleSaveChanges = async () => {
+        setPermissionsInRole(currentRoleId, permissions);
+        const role = roles.find(item => item.id == currentRoleId);
+        let perm = []
+        if (role) {
+            for (const item of role.permissions) {
+                perm.push({key: item.id,  value: item.state});
+            }
+            await updateRoleAPI(currentRoleId, {...role, permissions: perm}, '')
+        }
+    }
 
     return (
         <div style={{width:'fit-content', marginLeft:'auto', marginRight:'auto' }}>
@@ -65,10 +74,10 @@ const RoleTabs: React.FC<RoleSettingsProps> = ({callback}) => {
                 <RoleVisualization/>
             </RolePanel>
             <RolePanel index={1} value={value}>
-                <Permission permissions={permissions} onTogglePermission={handleTogglePermission} onResetPermissions={handleResetPermissions}/>
+                <PermissionList permissions={permissions} onTogglePermission={handleTogglePermission} onResetPermissions={handleResetPermissions} onSaveChanges={handleSaveChanges}/>
             </RolePanel>
             <RolePanel index={2} value={value}>
-                Goida 2
+                <EmployeeList/>
             </RolePanel>
         </div>
     );

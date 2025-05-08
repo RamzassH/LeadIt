@@ -16,7 +16,10 @@ export function middleware(request: NextRequest) {
     )) {
         const loginUrl = new URL('/auth', request.url);
         loginUrl.searchParams.set('from', request.nextUrl.pathname);
-        return NextResponse.redirect(loginUrl);
+        //return NextResponse.redirect(loginUrl);
+    } else if (token && request.nextUrl.pathname.startsWith('/auth')) {
+        const loginUrl = new URL('/', request.url);
+        //return NextResponse.redirect(loginUrl);
     }
 
     return NextResponse.next();

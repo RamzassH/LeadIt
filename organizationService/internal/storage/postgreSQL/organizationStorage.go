@@ -30,7 +30,7 @@ func (s *OrganizationStorage) Save(
 	const op = "OrganizationStorage.Save"
 
 	query := `
-	INSERT INTO organizations (name, description, organizer_id, organization_image)
+	INSERT INTO organizations (name, description, organizer_id, image)
 	VALUES ($1, $2, $3, $4)
 	RETURNING id`
 
@@ -72,7 +72,7 @@ func (s *OrganizationStorage) GetByName(ctx context.Context, name string) (*mode
 	const op = "OrganizationStorage.GetByName"
 
 	row := s.db.QueryRowContext(ctx,
-		`SELECT id, name, description, organizer_id, organization_image 
+		`SELECT id, name, description, organizer_id, image 
         FROM organizations WHERE name = $1`,
 		name,
 	)
@@ -100,7 +100,7 @@ func (s *OrganizationStorage) GetManyByOrganizerId(ctx context.Context, organize
 	const op = "OrganizationStorage.GetManyByOrganizerId"
 
 	rows, err := s.db.QueryContext(ctx,
-		`SELECT id, name, organizer_id, description, organization_image 
+		`SELECT id, name, organizer_id, description, image 
     			FROM organizations 
    				WHERE organizer_id=$1;`,
 		organizerId)
@@ -140,9 +140,9 @@ func (s *OrganizationStorage) Update(ctx context.Context, payload models.UpdateO
         SET 
             name = COALESCE($1, name),
             description = COALESCE($2, description),
-            organization_image = COALESCE($3, organization_image)
+            image = COALESCE($3, image)
         WHERE id = $4
-        RETURNING id, name, description, organizer_id, organization_image`
+        RETURNING id, name, description, organizer_id, image`
 
 	row := s.db.QueryRowContext(ctx, query,
 		payload.Name,

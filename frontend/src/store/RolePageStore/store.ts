@@ -8,28 +8,28 @@ interface User {
     name: string
 }
 
-interface Permission {
+export interface Permission {
     id: string,
     name: string,
     description: string,
     state: boolean
 }
 
-interface Role {
-    id: string,
+export interface Role {
+    id: number,
     name: string,
-    permission: Permission[],
-    users: User[]
+    organization_id: number
+    permissions: Permission[],
+    parent_role_id: number,
 }
 
 interface State {
     roles: Role[]
 
+    setRoles: (roles: Role[]) => void
     addRole: (role: Role) => void,
-    deleteRole: (id: string) => void,
-    addUserInRole: (idRole: string, user: User) => void,
-    deleteUserInRole: (idRole: string, idUser: string) => void,
-    setStateInPermission: (idRole: string, idPermission: string, value: boolean) => void
+    deleteRole: (id: number) => void,
+    setPermissionsInRole: (idRole: number, value: Permission[]) => void
 }
 
 const useRoleStore = create<State>()(
@@ -37,33 +37,21 @@ const useRoleStore = create<State>()(
         immer((set) => ({
             roles: [],
 
+
+            setRoles: (roles) => set((state) => {
+               state.roles = roles;
+            }),
             addRole: (role: Role) => set((state) => {
                 state.roles.push(role);
             }),
-            deleteRole: (id: string) => set((state) => {
+            deleteRole: (id: number) => set((state) => {
                 state.roles = state.roles.filter(role => role.id !== id);
             }),
 
-            addUserInRole: (idRole: string, user:User) => set((state) => {
+            setPermissionsInRole: (idRole: number, value: Permission[]) => set((state) => {
                 const role = state.roles.find(role => role.id === idRole);
                 if (role) {
-                    role.users.push(user);
-                }
-            }),
-            deleteUserInRole: (idRole: string, idUser:string) => set((state) => {
-                const role = state.roles.find(role => role.id === idRole);
-                if (role) {
-                    role.users = role.users.filter(user => user.name !== idUser);
-                }
-            }),
-
-            setStateInPermission: (idRole: string, idPermission:string, value:boolean) => set((state) => {
-                const role = state.roles.find(role => role.id === idRole);
-                if (role) {
-                    const permission = role.permission.find(p => p.id === idPermission);
-                    if (permission) {
-                        permission.state = value;
-                    }
+                    role.permissions = value;
                 }
             }),
         }))

@@ -8,18 +8,12 @@ import {
     StyledList,
     StyledPaper
 } from "@/components/UI/OrganizationPages/ProjectsPage/ProjectList/styled/styled";
-
-// Тип для проекта
-export interface Project {
-    id: string;
-    name: string;
-    description?: string;
-}
+import {Project} from "@/store/ProjectsPageStore/store";
 
 // Пропсы компонента
 interface ProjectListProps {
     projects: Project[];
-    onProjectClick: (projectId: string) => void;
+    onProjectClick: (projectId: number) => void;
     onAddProject: () => void;
 }
 

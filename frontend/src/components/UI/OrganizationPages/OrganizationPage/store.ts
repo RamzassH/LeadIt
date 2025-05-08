@@ -9,7 +9,7 @@ interface Logo {
     positionY: number;
 }
 
-export interface Organization {
+interface Organization {
     name: string;
     director: string;
 }

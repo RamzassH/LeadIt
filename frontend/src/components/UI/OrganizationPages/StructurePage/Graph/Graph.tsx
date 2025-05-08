@@ -16,6 +16,7 @@ import 'reactflow/dist/style.css';
 import CustomEdge from "@/components/UI/OrganizationPages/StructurePage/Graph/Edge/Edge";
 import ModalNode from "@/components/UI/OrganizationPages/StructurePage/Graph/ModalNode/ModalNode";
 import useDevelopersStore from "@/components/UI/OrganizationPages/StructurePage/Graph/store";
+import {GraphContainer, Header} from "@/components/UI/OrganizationPages/StructurePage/Graph/styled/styled";
 
 export default function Graph(props: any) {
     const {nodes, edges, setEdges} = useDevelopersStore()
@@ -72,7 +73,11 @@ export default function Graph(props: any) {
     }, [edgesReactFlow])
 
     return (
-        <div style={{ width: '1000px', height: '1000px', /*border: '1px solid gray'*/ }}>
+        //<div style={{ width: '1000px', height: '1000px', /*border: '1px solid gray'*/ }}>
+        <GraphContainer>
+            <Header>
+                Структура организации
+            </Header>
             <ReactFlow
                 nodes={nodesReactFlow}
                 edges={edgesReactFlow}
@@ -105,6 +110,7 @@ export default function Graph(props: any) {
                     <button onClick={deleteEdge}>Удалить ребро</button>
                 </div>
             )}
-        </div>
+        </GraphContainer>
+        //</div>
     );
 }

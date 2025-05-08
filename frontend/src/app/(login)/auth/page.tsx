@@ -6,7 +6,7 @@ import theme from "../../../../theme/theme";
 import { ThemeProvider } from "@mui/system";
 import { Main } from "@/app/(login)/auth/styled/AuthStyled";
 import { motion, AnimatePresence } from "framer-motion";
-import useGlobalStore from "@/app/store";
+import useGlobalStore from "@/store/GlobalStore/store";
 
 export default function Auth() {
     const globalStore = useGlobalStore();

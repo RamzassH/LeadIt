@@ -27,7 +27,7 @@ func (s *EmployeeStorage) Save(ctx context.Context, payload models.CreateEmploye
 	const op = "EmployeeStorage.Save"
 
 	query := `
-	INSERT INTO employees (user_id, organization_id
+	INSERT INTO employees (user_id, organization_id)
 	VALUES ($1, $2)
 	RETURNING id`
 

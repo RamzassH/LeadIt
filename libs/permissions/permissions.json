@@ -1,0 +1,9 @@
+{
+  "canEditOrganization": true,
+  "canDeleteOrganization": true,
+  "canInviteEmployees": true,
+  "canDeleteEmployees": true,
+  "canEditProjects": true,
+  "canEditTasks": true,
+  "canEditSprints": true
+}

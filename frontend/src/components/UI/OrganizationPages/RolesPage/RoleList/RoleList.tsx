@@ -10,23 +10,16 @@ import {
     ColorIndicator, MemberCount
 } from "@/components/UI/OrganizationPages/RolesPage/RoleList/styled/styled";
 import {PersonOutlineTwoTone} from "@mui/icons-material";
-
-interface Role {
-    id: string;
-    name: string;
-    memberCount: number;
-    callback: (value: string) => void;
-    color?: string;
-    icon?: string;
-}
+import {Role} from "@/store/RolePageStore/store";
 
 interface RoleListProps {
     roles: Role[];
     totalRoles: number;
     totalMembers: number;
+    callback: (roleId: number | null) => void;
 }
 
-const RoleList: React.FC<RoleListProps> = ({ roles, totalRoles, totalMembers }) => {
+const RoleList: React.FC<RoleListProps> = ({ roles, totalRoles, totalMembers, callback }) => {
     return (
         <RolesContainer>
             <Header>
@@ -41,14 +34,14 @@ const RoleList: React.FC<RoleListProps> = ({ roles, totalRoles, totalMembers }) 
                 <React.Fragment key={role.id}>
                     <RoleItem>
                         <RoleInfo>
-                            {role.icon && <span>{role.icon}</span>}
                             <RoleName variant="body1">{role.name}</RoleName>
                         </RoleInfo>
                         <MemberCount variant="body2">
-                            {role.memberCount}
+                            {//role.memberCount
+                            }
                             <PersonOutlineTwoTone/>
                         </MemberCount>
-                        <IconButton onClick={() => {role.callback(role.id)}} size="small">
+                        <IconButton onClick={() => {callback(role.id)}} size="small">
                             <MoreHorizIcon fontSize="small" />
                         </IconButton>
                     </RoleItem>

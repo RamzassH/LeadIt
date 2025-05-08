@@ -3,15 +3,19 @@ import { immer } from 'zustand/middleware/immer';
 import {devtools} from "zustand/middleware";
 
 export interface Project {
-    id: string,
+    id: number,
     name: string,
     description: string
+    organization_id: number,
+    image: string,
 }
 
 interface State {
     projects: Project[]
 
-    addProject: (project: Project) => void
+    addProject: (project: Project) => void,
+    deleteProject: (projectId: number) => void,
+    setProjects: (projects: Project[]) => void,
 }
 
 const useProjectStore = create<State>()(
@@ -21,7 +25,13 @@ const useProjectStore = create<State>()(
 
             addProject: (project: Project) => set((state) => {
                 state.projects.push(project)
-            })
+            }),
+            deleteProject: (projectId: number) => set((state) => {
+                state.projects = state.projects.filter(project => project.id !== projectId);
+            }),
+            setProjects: (projects: Project[]) => set((state) => {
+                state.projects = projects;
+            }),
         }))
     )
 );

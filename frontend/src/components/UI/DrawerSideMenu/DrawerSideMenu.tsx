@@ -9,9 +9,18 @@ import Icon from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/StyleIc
 import VIPIcon from "@/images/icons-svg/VIPIcon";
 import Text from "@/components/UI/ProfilePage/SideMenu/MenuButton/styles/Text";
 import MenuDropList from "@/components/UI/ProfilePage/SideMenu/MenuDropList/MenuDropList";
-import BookIcon from "@/images/icons-svg/BookIcon";
 import React, { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import CreateOrganizationModalWindow
+    , {
+    CreateOrganizationForm
+} from "@/components/UI/ModalWindowTemplate/CreateOrganizationModalWindow/CreateOrganizationModalWindow";
+import {useFetching} from "@/hooks/useFetching";
+import {getOrganizationsAPI} from "@/api/organization/get";
+import {createOrganizationAPI} from "@/api/organization/create";
+import useOrganizationStore, {Organization} from "@/store/OrganizationStore/store";
+import useGlobalStore from "@/store/GlobalStore/store";
+import Image from "next/image";
 
 interface ButtonContent {
     icon: React.ReactNode;
@@ -27,14 +36,48 @@ interface DrawerSideMenuRef {
     triggerHandleClick: () => void;
 }
 
+interface OrganizationResponseForm {
+    id: number,
+    name: string,
+    organizer_id: number,
+    description: string,
+    image: string,
+}
+
 const DrawerSideMenu = forwardRef<DrawerSideMenuRef, DrawerSideMenuProps>((props, ref) => {
+    const {organizations, setOrganizations} = useOrganizationStore();
+    const currentOrganization = useGlobalStore(state => state.currentOrganization);
+    const setCurrentOrganization = useGlobalStore(state => state.setCurrentOrganization);
     const router = useRouter();
     const [open, setOpen] = useState(false);
+    const [openCreateWindow, setOpenCreateWindow] = useState(false);
+    const [createOrganizationRequest, isLoadingCreateRequest, errorCreateRequest] = useFetching(async (data: CreateOrganizationForm) => {
+        const response = await createOrganizationAPI(data, "")
+        setCurrentOrganization();
+        setOrganizationsList(
+            [{icon: <VIPIcon/>, text: data.name, callback: () => {setCurrentOrganization(data.name)}}, ...organizationsList]
+        )
+    })
+    const [getOrganizationsList, isLoadingOrganizationsList, errorOrganizationsList] = useFetching(async () => {
+        const response = await getOrganizationsAPI(1, "");
+        organizationStore.setOrganizations(response.data);
+        setOrganizationsList(response.data.map((item: OrganizationResponseForm) => ({icon: <VIPIcon/>, text: item.name, callback: () => {setCurrentOrganization(item.name)}})));
+    })
+    useEffect(() => {
+        getOrganizationsList();
+    }, []);
 
+    const create = async (data: CreateOrganizationForm) => {
+        await createOrganizationRequest(data)
+        setOpen(false);
+    }
+
+    const openModalWindowCreateOrganization = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setOpenCreateWindow(true);
+    }
     const toggleDrawer = (newOpen: boolean) => {
         setOpen(newOpen);
     };
-
     useImperativeHandle(ref, () => ({
         triggerHandleClick: () => { toggleDrawer(true); }
     }));
@@ -64,18 +107,28 @@ const DrawerSideMenu = forwardRef<DrawerSideMenuRef, DrawerSideMenuProps>((props
                     </Icon>
                     <Text>Профиль</Text>
                 </MenuButton>
-                <MenuDropList firstIcon={<VIPIcon/>} text="Организация">
-                    {list1.map((item, index) => (
-                        <MenuButton className="list-item" callback={item.callback} key={index}>
-                            <Icon className="first-icon">{item.icon}</Icon>
-                            <Text>{item.text}</Text>
+                {
+                    organizations.length < 1?
+                        null:
+                        <MenuDropList firstIcon={<VIPIcon/>} text={currentOrganization? currentOrganization.name: "Организация"}>
+                            {list1.map((item, index) => (
+                                <MenuButton className="list-item" callback={item.callback} key={index}>
+                                    <Icon className="first-icon">{item.icon}</Icon>
+                                    <Text>{item.text}</Text>
+                                </MenuButton>
+                            ))}
+                        </MenuDropList>
+                }
+                <MenuDropList firstIcon={<VIPIcon/>} text="Список организаций">
+                    {organizations.map((item, index) => (
+                        <MenuButton className="list-item" callback={() => {setCurrentOrganization(item)}} key={index}>
+                            <Icon className="first-icon"><Image src={item.image} alt="Ошибочка вышла"/></Icon>
+                            <Text>{item.name}</Text>
                         </MenuButton>
                     ))}
                 </MenuDropList>
-                <MenuDropList firstIcon={<BookIcon />} text="Гойда №3">
-                    {/* Добавьте детей, если необходимо */}
-                </MenuDropList>
             </DrawerBackground>
+            <CreateOrganizationModalWindow callback={create} open={openCreateWindow} handleClose={() => {setOpenCreateWindow(false);}}/>
         </DrawerContainer>
     );
 });

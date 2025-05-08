@@ -1,7 +1,7 @@
 'use client';
 import GlobalStyle from "@/app/styled";
 import {metadata} from "./metadata"
-import useGlobalStore from "@/app/store";
+import useGlobalStore from "@/store/GlobalStore/store";
 import {useEffect} from "react";
 import {getLocalStorage, setLocalStorage} from "@/utils/cookie";
 

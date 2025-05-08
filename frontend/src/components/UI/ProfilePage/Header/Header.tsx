@@ -5,7 +5,7 @@ import SideMenuButton from "@/components/UI/ProfilePage/Header/SideMenuButton/Si
 import {Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip} from "@mui/material";
 import {Logout, PersonAdd, Settings } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
-import useGlobalStore from "@/app/store";
+import useGlobalStore from "@/store/GlobalStore/store";
 
 interface HeaderProps {
     menuOpenFunction: () => void;

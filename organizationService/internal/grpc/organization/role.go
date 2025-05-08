@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ServerAPI) AddRole(ctx context.Context, req *rolev1.CreateRoleRequest) (*rolev1.CreateRoleResponse, error) {
+func (s *ServerAPI) CreateRole(ctx context.Context, req *rolev1.CreateRoleRequest) (*rolev1.CreateRoleResponse, error) {
 	payload := models.CreateRoleDTO{
 		Name:           req.GetName(),
 		OrganizationID: req.GetOrganizationId(),

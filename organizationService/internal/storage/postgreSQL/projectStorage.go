@@ -27,7 +27,7 @@ func (s *ProjectStorage) Save(ctx context.Context, payload models.CreateProjectD
 	const op = "ProjectStorage.Save"
 
 	query := `
-				INSERT INTO projects (name, description, organization_id, project_image)
+				INSERT INTO projects (name, description, organization_id, image)
 				VALUES ($1, $2, $3, $4)
 				RETURNING id`
 
@@ -90,9 +90,9 @@ func (s *ProjectStorage) Update(ctx context.Context, payload models.UpdateProjec
 			SET 
 			    name = COALESCE($1, name),
 			    description = COALESCE($2, description),
-			    project_image = COALESCE($3, project_image)
+			    image = COALESCE($3, image)
 			WHERE id = $4
-			RETURNING id, name, description, organization_id, project_image`
+			RETURNING id, name, description, organization_id, image`
 
 	row := s.db.QueryRowContext(ctx, query, payload.Name, payload.Description, payload.Image)
 
