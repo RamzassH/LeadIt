@@ -21,6 +21,7 @@ import {createOrganizationAPI} from "@/api/organization/create";
 import useOrganizationStore, {Organization} from "@/store/OrganizationStore/store";
 import useGlobalStore from "@/store/GlobalStore/store";
 import Image from "next/image";
+import useProjectStore from "@/store/ProjectsPageStore/store";
 
 interface ButtonContent {
     icon: React.ReactNode;
@@ -53,15 +54,15 @@ const DrawerSideMenu = forwardRef<DrawerSideMenuRef, DrawerSideMenuProps>((props
     const [openCreateWindow, setOpenCreateWindow] = useState(false);
     const [createOrganizationRequest, isLoadingCreateRequest, errorCreateRequest] = useFetching(async (data: CreateOrganizationForm) => {
         const response = await createOrganizationAPI(data, "")
-        setCurrentOrganization();
-        setOrganizationsList(
-            [{icon: <VIPIcon/>, text: data.name, callback: () => {setCurrentOrganization(data.name)}}, ...organizationsList]
+        const organization = {...data, organizer_id: 1, id: response.data};
+        setCurrentOrganization(organization);
+        setOrganizations(
+            [organization, ...organizations]
         )
     })
     const [getOrganizationsList, isLoadingOrganizationsList, errorOrganizationsList] = useFetching(async () => {
         const response = await getOrganizationsAPI(1, "");
-        organizationStore.setOrganizations(response.data);
-        setOrganizationsList(response.data.map((item: OrganizationResponseForm) => ({icon: <VIPIcon/>, text: item.name, callback: () => {setCurrentOrganization(item.name)}})));
+        setOrganizations(response.data);
     })
     useEffect(() => {
         getOrganizationsList();
@@ -126,6 +127,9 @@ const DrawerSideMenu = forwardRef<DrawerSideMenuRef, DrawerSideMenuProps>((props
                             <Text>{item.name}</Text>
                         </MenuButton>
                     ))}
+                    <MenuButton className="list-item" callback={openModalWindowCreateOrganization} key={organizations.length}>
+                        <Text>Создать организацию</Text>
+                    </MenuButton>
                 </MenuDropList>
             </DrawerBackground>
             <CreateOrganizationModalWindow callback={create} open={openCreateWindow} handleClose={() => {setOpenCreateWindow(false);}}/>

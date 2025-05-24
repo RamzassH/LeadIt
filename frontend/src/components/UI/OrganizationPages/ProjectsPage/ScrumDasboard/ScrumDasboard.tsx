@@ -55,14 +55,16 @@ const ScrumDashboard = () => {
                 onTaskUpdate={handleTaskUpdate}
                 onAddTask={handleAddTask}
             />
-
-            <BurndownChart
+            {/*
+                            <BurndownChart
                 sprintDays={14}
                 idealData={[50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]}
                 actualData={[50, 48, 42, 40, 38, 35, 32, 28, 25, 20, 15]}
             />
 
             <RetrospectiveBoard />
+            */}
+
         </Box>
     );
 };

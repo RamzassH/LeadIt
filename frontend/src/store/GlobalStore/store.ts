@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import {devtools} from "zustand/middleware";
 import React from "react";
-import {Organization} from "@/components/UI/OrganizationPages/OrganizationPage/store";
+import {Organization} from "@/store/OrganizationStore/store";
 
 interface State {
     isLogin: boolean;
